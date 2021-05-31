@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Header32.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Header16.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-h8Fdd0zR8H">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"compilationfail.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="FWT (快速沃尔什变换)详解 以及 K进制FWT约定：$F’&#x3D;FWT(F)$ 卷积的问题，事实上就是要构造$F’G’&#x3D;(FG)’$ 我们常见的卷积，是二进制位上的or ,and ,xor  但正式来说，是集合幂指数 上的 并 ， 交 ， 对称差 为了说人话，这里就不带入集合幂指数的概念了  一个常识：$\sum_{T\subseteq  S}(-1)^{|T|}&#x3D;[S&#x3D;\empty]$   or">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FWT (快速沃尔什变换)详解 以及 K进制FWT">
+<meta property="og:url" content="https://compilationfail.github.io/14503.html">
+<meta property="og:site_name" content="Orangejuice&#39;s Blog">
+<meta property="og:description" content="FWT (快速沃尔什变换)详解 以及 K进制FWT约定：$F’&#x3D;FWT(F)$ 卷积的问题，事实上就是要构造$F’G’&#x3D;(FG)’$ 我们常见的卷积，是二进制位上的or ,and ,xor  但正式来说，是集合幂指数 上的 并 ， 交 ， 对称差 为了说人话，这里就不带入集合幂指数的概念了  一个常识：$\sum_{T\subseteq  S}(-1)^{|T|}&#x3D;[S&#x3D;\empty]$   or">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-11-15T11:05:50.000Z">
+<meta property="article:modified_time" content="2021-05-31T12:07:23.481Z">
+<meta property="article:author" content="orangejuice">
+<meta property="article:tag" content="生成函数&#x2F;多项式">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://compilationfail.github.io/14503.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>FWT (快速沃尔什变换)详解 以及 K进制FWT | Orangejuice's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?40691610edf220c90edeacbd8e759711";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Orangejuice's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">测试中博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/14503.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FWT (快速沃尔什变换)详解 以及 K进制FWT
+        </h1>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-15 19:05:50" itemprop="dateCreated datePublished" datetime="2020-11-15T19:05:50+08:00">2020-11-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="FWT-快速沃尔什变换-详解-以及-K进制FWT"><a href="#FWT-快速沃尔什变换-详解-以及-K进制FWT" class="headerlink" title="FWT (快速沃尔什变换)详解 以及 K进制FWT"></a>FWT (快速沃尔什变换)详解 以及 K进制FWT</h1><p>约定：$F’=FWT(F)$</p>
+<p>卷积的问题，事实上就是要构造$F’G’=(FG)’$</p>
+<p>我们常见的卷积，是二进制位上的or ,and ,xor </p>
+<p>但正式来说，是<strong>集合幂指数</strong> 上的 <strong>并 ， 交 ， 对称差</strong></p>
+<p>为了说人话，这里就不带入集合幂指数的概念了</p>
+<blockquote>
+<p>一个常识：$\sum_{T\subseteq  S}(-1)^{|T|}=[S=\empty]$</p>
+</blockquote>
+<hr>
+<h2 id="or-和-and-卷积"><a href="#or-和-and-卷积" class="headerlink" title="or 和 and 卷积"></a>or 和 and 卷积</h2><p>ps: 虽然这两个并不是$\text{FWT}$，应该叫$\text{FMT}$(快速莫比乌斯变换)，但是由于常用的是这3个，所以放到一起</p>
+<p>这两种卷积的本质是相同的，所以只解释$or$卷积</p>
+<p><strong>or卷积的本质就是高位前缀和</strong></p>
+<p>即:$F’_S=\sum _{T\subseteq  S}F_T$</p>
+<h4 id="正确性："><a href="#正确性：" class="headerlink" title="正确性："></a>正确性：</h4><p>即$\forall S,F’_S \cdot G’_S=(F\cup G)’_S$</p>
+<p>左边=</p>
+<p>$F’_S \cdot G’_S=\sum _{T\subseteq  S}\sum _{R\subseteq  S}F_T\cdot G_R$</p>
+<p>右边=</p>
+<p>$(F\cup G)’_S=\sum_{T\subseteq  S}(F \cup G)_S$</p>
+<p>$=\sum_{T\subseteq  S}\sum_{A,B,A\cup B=S}F_A\cdot G_B$</p>
+<p>$=\sum_{T \subseteq  S}\sum_{R \subseteq  S}F_T \cdot G_R$</p>
+<script type="math/tex; mode=display">\</script><h3 id="卷积实现"><a href="#卷积实现" class="headerlink" title="卷积实现"></a>卷积实现</h3><p>其实第一次层循环的意思是<strong>枚举子集中和自己不同的位最高是</strong>$i$</p>
+<p>让$0$向$1$转移即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) </span><br><span class="line">        <span class="built_in">rep</span>(j,i,n<span class="number">-1</span>) <span class="keyword">if</span>(j&amp;i) s[j]+=s[j^i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>)</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;l+i;++j) </span><br><span class="line">                s[j+i]+=s[j];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Tips:如果要卡常，可以写成类似$\text{FFT}$的形式，因为优化了访问顺序会快一些</p>
+<script type="math/tex; mode=display">\</script><h3 id="实现逆卷积"><a href="#实现逆卷积" class="headerlink" title="实现逆卷积"></a>实现逆卷积</h3><p>把上面的加换成减，这是一个类似容斥的东西</p>
+<p>但是因为是反解，所以这个过程我么通常称为<strong>子集反演</strong></p>
+<p>那么每次$0$向$1$的转移意味着多了一个不同的位置</p>
+<p>设$F’_S=\sum_{T\subseteq  S}F_T$</p>
+<p>实际逆卷积就是$F_S=\sum_{T\subseteq  S}(-1)^{|T\oplus S|} F’_S$</p>
+<p>证明如下：</p>
+<p>$\Leftrightarrow F_S=\sum_{T\subseteq  S}(-1)^{|T\oplus S|} \sum _{R\in T}F_R$</p>
+<p>$\Leftrightarrow F_S=\sum_{T\subseteq  S}F_R\sum _{T\subseteq  R,R\subseteq  S}(-1)^{|S\oplus R|}$</p>
+<p>$\Leftrightarrow F_S=\sum_{T\subseteq  S}F_R\sum _{R\subseteq  (S\oplus T)}(-1)^{|R|}$</p>
+<p>带入上面所提到的$\sum_{T\subseteq  S}(-1)^{|T|}=[S=\empty]$，成立</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) </span><br><span class="line">        <span class="built_in">rep</span>(j,i,n<span class="number">-1</span>) <span class="keyword">if</span>(j&amp;i) s[j]+=f*s[j^i];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>)</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;l+i;++j) </span><br><span class="line">                s[j+i]+=f*s[j];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><h3 id="应用-子集卷积-可以看luogu"><a href="#应用-子集卷积-可以看luogu" class="headerlink" title="应用 : 子集卷积(可以看luogu)"></a>应用 : 子集卷积(可以看luogu)</h3><p>问题描述： 给定$F_S,G_T$，求出$H_{R}=\sum_{S\cup T=R,S\cap T=\emptyset }F_S\cdot G_T$，设有$2^n$个元素</p>
+<p>我们知道直接枚举的复杂度为$O(3^n)$</p>
+<p>直接应用or卷积无法保证$S\cap T=\emptyset $，但是可以再记录一个占位数量，即把$F,G$按照每一位包含1的数量分开成$n+1$部分，卷积完成之后</p>
+<p>应该满足1的个数恰好为两者之和，否则清空</p>
+<p>需要$n$次卷积，$n^2$次转移，因此复杂度为$O(n^22^n)$，在渐进意义上更优于$O(3^n)$</p>
+<hr>
+<h2 id="Xor-卷积"><a href="#Xor-卷积" class="headerlink" title="Xor 卷积"></a>Xor 卷积</h2><p>这里要用到一个小性质</p>
+<p>$|A\cap B|+|A\cap C|\equiv |A\cap (B\bigoplus C)| \pmod 2$</p>
+<p>思路介绍： </p>
+<p>我们是要构造一个$F_S\rightarrow G_T$的变换，使得该变换满足Xor的性质，且能在较优的时间复杂度内完成，并且能够在较优的时间内<strong>完成反演</strong></p>
+<p>由于上面的这条式子，考虑可以构造$F’_S=\sum_{T}(-1)^{|S\cap T|}F_T$，这样$(-1)^k$的系数在$\mod 2$意义下可以抵消</p>
+<h4 id="正确性"><a href="#正确性" class="headerlink" title="正确性"></a>正确性</h4><p>即$\forall S,F’_S \cdot G’_S=(F\bigoplus G)’_S$</p>
+<p>$F’_S\cdot G’_S=\sum_{T} \sum_{R}(-1)^{|S\cap T|+|S\cap R|}F_T\cdot G_R$</p>
+<p>$=\sum _T\sum _R(-1)^{|(T\bigoplus R)\cap S|}F_T\cdot G_R$</p>
+<p>显然这个式子与右边相同</p>
+<script type="math/tex; mode=display">\</script><h3 id="卷积实现-1"><a href="#卷积实现-1" class="headerlink" title="卷积实现"></a>卷积实现</h3><p>考虑和前面相同的方法，枚举二进制位上最高的$1$</p>
+<p>之前由于转移是单向的，所以只需要一次加法，这里由于有了系数同时还是双向的转移，所以要格外注意</p>
+<p>转移系数也是比较明显的</p>
+<p>$0\rightarrow 0 = 1$</p>
+<p>$0\rightarrow 1 = 1$</p>
+<p>$1\rightarrow 0 = 1$</p>
+<p>$1\rightarrow 1 = -1$</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(~j&amp;i) &#123;</span><br><span class="line">            ll t=a[j+i];</span><br><span class="line">            a[j+i]=a[j]-t;</span><br><span class="line">            a[j]=a[j]+t;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j)&#123;</span><br><span class="line">                ll t=a[j+i];</span><br><span class="line">                a[j+i]=a[j]-t;</span><br><span class="line">                a[j]+=t;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="实现逆卷积-1"><a href="#实现逆卷积-1" class="headerlink" title="实现逆卷积"></a>实现逆卷积</h3><p>考虑再卷一次</p>
+<p>$F’’_S=\sum_T\sum_R(-1)^{|S\cap R|+|T\cap R|}F_T$</p>
+<p>$=\sum_T \sum_R (-1)^{|(S\bigoplus T)\cap R|}F_T$</p>
+<p>$\because \sum_T (-1)^{|S\cap T|}=\sum_{T\subseteq  S}(-1)^{|T|}2^{|U|-|S|}=[S=\empty]2^{|U|-|S|}$(其中$U$是全集)</p>
+<p>$\therefore F’’_S=\sum_S2^{|U|}F_S$</p>
+<p>所以逆卷积就是再卷一遍，最后除去$n$即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(~j&amp;i) &#123;</span><br><span class="line">            ll t=a[j+i];</span><br><span class="line">            a[j+i]=a[j]-t;</span><br><span class="line">            a[j]=a[j]+t;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;   </span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]/=n;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FWT</span><span class="params">(<span class="keyword">int</span> n,ll *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j)&#123;</span><br><span class="line">                ll t=a[j+i];</span><br><span class="line">                a[j+i]=a[j]-t;</span><br><span class="line">                a[j]+=t;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;++i) a[i]/=n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和上面一样的，可以写成类似$\text{FFT}$的形式卡常</p>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><h2 id="拓展-K-FWT"><a href="#拓展-K-FWT" class="headerlink" title="拓展 K - FWT"></a>拓展 K - FWT</h2><p>实际上学习了这个拓展能让你更好地理解$\text{FWT}$</p>
+<p>不妨考虑$n$个维度的情况，每个维度是一个$0,1,\cdots k-1$中的数</p>
+<p>由于$k$进制下不好用集合描述，因此考虑用一个向量$\vec{V}=\lbrace V_0,V_1,\cdots,V_{n-1}\rbrace,V_i\in[0,k-1]$表示</p>
+<p>一个多项式可以具象地用$0,1,\cdots,k^n-1$这个$k^n$个位置上的系数表示</p>
+<p>$\text{and,or}$卷积在$k$进制下可以拓展为按位取$\min,\max$，这个直接累前缀和就可以了，不作赘述</p>
+<p>而$k$进制下的$\text{xor}$可以扩展为两个向量列的取模加法</p>
+<p>$\vec{A}+\vec{B}=\vec{C},C_i=(A_i+B_i)\bmod k$</p>
+<p>也可以描述为<strong>不进位的</strong>$k$进制数加法</p>
+<p>其实用$\text{K-FWT}$称呼这个似乎不是很形象，更好的可以称之为$\text{n-DFT}$</p>
+<p>也就是说$\text{K-FWT}$实际上就是在$n$个维度上<strong>分别做大小为$k$的循环卷积</strong>，使用一种结合$\text{FWT-DFT}$的方法(因此需要用到$k$次单位根$\omega_k$)</p>
+<h3 id="卷积构造"><a href="#卷积构造" class="headerlink" title="卷积构造"></a>卷积构造</h3><p>原多项式$F$向卷积多项式$F’$的转换系数为$[x^A]F\rightarrow [x^B]F’:\omega_k^{A\cdot B}$</p>
+<p>其中$A\cdot B$为向量内积，即$\sum A_i\cdot B_i$</p>
+<p>从中也可以很好地看到$\text{xor}$卷积的影子</p>
+<p>实现方法上，可以依次枚举$0,1,\cdots,n-1$每一位，将除了这一位上都相同的数取出来</p>
+<p>按照这一位上的值做一次$\text{DFT}$</p>
+<p>需要$n$位枚举，每次枚举需要做$k^{n-1}$次$k^2$的$\text{DFT}$，因而复杂度为$O(nk^{n+1})$</p>
+<p>对于$k$比较大的情况，如果$k=2^t$可以直接用$\text{FFT/NTT}$，否则还可以参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13498798.html">这个</a></p>
+<p>可以优化到$O(nk^n\log k)$ </p>
+<h3 id="逆卷积"><a href="#逆卷积" class="headerlink" title="逆卷积"></a>逆卷积</h3><p>当然是换成$\text{IDFT}$，最后全部除掉$k^n$</p>
+<p>正确性上，如果你对于$\text{IDFT}$的原理(单位根反演) 有所了解，就能发现</p>
+<p>只有所有位置上都相同的情况才会转移出$k^n$的系数</p>
+<p><br></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> w[<span class="number">20</span>]; <span class="comment">// 单位根的幂次</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">K_FWT</span><span class="params">(<span class="keyword">int</span> *F,<span class="keyword">int</span> n,<span class="keyword">int</span> f)</span></span>&#123; <span class="comment">// 这个n实际上是上面叙述中的n^k</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> t[<span class="number">20</span>];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i*=k)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*k)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j)&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> a=<span class="number">0</span>;a&lt;k;++a) </span><br><span class="line">                    <span class="keyword">for</span>(<span class="keyword">int</span> b=t[a]=<span class="number">0</span>;b&lt;k;++b) </span><br><span class="line">                        t[a]=(t[a]+<span class="number">1ll</span>*F[j+b*i]%P*w[b*(k+f*a)%k])%P;</span><br><span class="line">                <span class="keyword">for</span>(reg <span class="keyword">int</span> a=<span class="number">0</span>;a&lt;k;++a) F[j+a*i]=t[a];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        ll base=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) F[i]=F[i]*base%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0-%E5%A4%9A%E9%A1%B9%E5%BC%8F/" rel="tag"># 生成函数/多项式</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/14387.html" rel="prev" title="CodeChef November Challenge2019  Winning Ways (3-FWT)">
+      <i class="fa fa-chevron-left"></i> CodeChef November Challenge2019  Winning Ways (3-FWT)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/11756.html" rel="next" title="数论知识小结 [基础篇]">
+      数论知识小结 [基础篇] <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FWT-%E5%BF%AB%E9%80%9F%E6%B2%83%E5%B0%94%E4%BB%80%E5%8F%98%E6%8D%A2-%E8%AF%A6%E8%A7%A3-%E4%BB%A5%E5%8F%8A-K%E8%BF%9B%E5%88%B6FWT"><span class="nav-number">1.</span> <span class="nav-text">FWT (快速沃尔什变换)详解 以及 K进制FWT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#or-%E5%92%8C-and-%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.1.</span> <span class="nav-text">or 和 and 卷积</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E7%A1%AE%E6%80%A7%EF%BC%9A"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">正确性：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.1.</span> <span class="nav-text">卷积实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E9%80%86%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.1.2.</span> <span class="nav-text">实现逆卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-%E5%AD%90%E9%9B%86%E5%8D%B7%E7%A7%AF-%E5%8F%AF%E4%BB%A5%E7%9C%8Bluogu"><span class="nav-number">1.1.3.</span> <span class="nav-text">应用 : 子集卷积(可以看luogu)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xor-%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">Xor 卷积</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E7%A1%AE%E6%80%A7"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">正确性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">卷积实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E9%80%86%E5%8D%B7%E7%A7%AF-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">实现逆卷积</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95-K-FWT"><span class="nav-number">1.3.</span> <span class="nav-text">拓展 K - FWT</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E6%9E%84%E9%80%A0"><span class="nav-number">1.3.1.</span> <span class="nav-text">卷积构造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%86%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">逆卷积</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+	 
+
+	  <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/Header1000.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description">遇到问题可以看about</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">240</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">59</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https://github.com/CompilationFail" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:GetAWrongAnswer@gmail.com" title="E-Mail → mailto:GetAWrongAnswer@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https://www.last.fm/user/chasedeath" rel="noopener" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https://steamcommunity.com/profiles/76561198969516062/" rel="noopener" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+  </div>
+
+
+
+      </div>
+		
+		<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="330" 
+			src="//music.163.com/outchain/player?type=0&amp;id=5300764257&amp;auto=0&amp;height=330">
+		</iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021:5:26 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">orangejuice</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+  
+  <script>
+	(function(){
+   	 var bp = document.createElement('script');
+   	 var curProtocol = window.location.protocol.split(':')[0];
+    	if (curProtocol === 'https') {
+        	bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+   		}
+    	else {
+        	bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    	}
+    var s = document.getElementsByTagName("script")[0];
+    	s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
