@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Header32.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Header16.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="baidu-site-verification" content="code-h8Fdd0zR8H">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"compilationfail.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="「ROI 2016 Day2」二指禅考虑对于每个点，有前缀和后缀两种转移 对于两种转移分别建立$\text{trie}$树，并且维护最小权值，对于$dp_i$，可以匹配一段后缀从$j&lt;i$得到 也可以匹配一段前缀更新$j&gt;i$，分别$O(n)$枚举在两棵树上匹配即可完成转移 暴力转移复杂度为$O(n^2)$ 考虑优化转移效率，以$dp_i$匹配某一段前缀向$dp_j(j&gt;i)$转">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「ROI 2016 Day2」二指禅 ">
+<meta property="og:url" content="https://compilationfail.github.io/13762.html">
+<meta property="og:site_name" content="Orangejuice&#39;s Blog">
+<meta property="og:description" content="「ROI 2016 Day2」二指禅考虑对于每个点，有前缀和后缀两种转移 对于两种转移分别建立$\text{trie}$树，并且维护最小权值，对于$dp_i$，可以匹配一段后缀从$j&lt;i$得到 也可以匹配一段前缀更新$j&gt;i$，分别$O(n)$枚举在两棵树上匹配即可完成转移 暴力转移复杂度为$O(n^2)$ 考虑优化转移效率，以$dp_i$匹配某一段前缀向$dp_j(j&gt;i)$转">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-02-21T06:08:14.000Z">
+<meta property="article:modified_time" content="2021-05-31T05:00:42.247Z">
+<meta property="article:author" content="orangejuice">
+<meta property="article:tag" content="ROI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://compilationfail.github.io/13762.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>「ROI 2016 Day2」二指禅  | Orangejuice's Blog</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?40691610edf220c90edeacbd8e759711";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Orangejuice's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">测试中博客</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/13762.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          「ROI 2016 Day2」二指禅 
+        </h1>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-21 14:08:14" itemprop="dateCreated datePublished" datetime="2021-02-21T14:08:14+08:00">2021-02-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 13:00:42" itemprop="dateModified" datetime="2021-05-31T13:00:42+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="「ROI-2016-Day2」二指禅"><a href="#「ROI-2016-Day2」二指禅" class="headerlink" title="「ROI 2016 Day2」二指禅"></a>「ROI 2016 Day2」二指禅</h1><p>考虑对于每个点，有前缀和后缀两种转移</p>
+<p>对于两种转移分别建立$\text{trie}$树，并且维护最小权值，对于$dp_i$，可以匹配一段后缀从$j&lt;i$得到</p>
+<p>也可以匹配一段前缀更新$j&gt;i$，分别$O(n)$枚举在两棵树上匹配即可完成转移</p>
+<p>暴力转移复杂度为$O(n^2)$</p>
+<p>考虑优化转移效率，以$dp_i$匹配某一段前缀向$dp_j(j&gt;i)$转移为例</p>
+<h3 id="Part1-考虑求出最大的-j"><a href="#Part1-考虑求出最大的-j" class="headerlink" title="Part1 考虑求出最大的$j$"></a>Part1 考虑求出最大的$j$</h3><p>这个问题实际上就是求出每一个后缀的最大前缀匹配，也就是一个$\text{exkmp}$问题</p>
+<p>而且这题是一个多模板串版本，并不能用$\text{exkmp}$解决</p>
+<h4 id="Solution-1"><a href="#Solution-1" class="headerlink" title="Solution 1"></a>Solution 1</h4><p>是把所有前缀hash值取出来，放到$\text{hash_table}$里，然后二分长度+$\text{hash_table}$查询，复杂度为$O(\log L)$</p>
+<h4 id="Solution-2"><a href="#Solution-2" class="headerlink" title="Solution 2"></a>Solution 2</h4><p>树剖+hash</p>
+<p>对于$\text{trie}$树树剖并且预处理hash值，重链上二分hash匹配，轻儿子暴力走，复杂度为$O(\log ^2L)$</p>
+<p>如果使用全局平衡二叉树，可以做到单次查询复杂度为$O(\log L)$，常数应该远小于$\text{hash_table}$</p>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><h3 id="Part2-在-j-max-基础上转移"><a href="#Part2-在-j-max-基础上转移" class="headerlink" title="Part2 在$j_{max}$基础上转移"></a>Part2 在$j_{max}$基础上转移</h3><p>考虑先求出最大的$j$之后，得到其对应的$\text{trie}$树节点$u$，在的祖先$u$中，每一种不同的权值更新一次</p>
+<p>显然每一个祖先长度不同，因此最多只有$O(\sqrt L)$中不同的权值</p>
+<p>因此可以for过去更新每一种权值，每次更新是一段区间，可以用树状数组维护</p>
+<p>但是实际上极限情况下段极短，可以暴力枚举区间，所以并不是真的$O(\sqrt L\log L)$</p>
+<p>比较容易说明复杂度的优化方法是：</p>
+<p>采用分块$O(1)$更新，$O(\sqrt L)$查询</p>
+<p>这样可以做到稳定$O(\sqrt L)$完成转移</p>
+<script type="math/tex; mode=display">\</script><p>因此预处理复杂度为$O(m\log L-m\log ^2L)$，转移复杂度为$O(m\sqrt L-m\sqrt L\log L)$</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span> <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">cmin</span><span class="params">(T &amp;a,T b)</span></span>&#123; ((a&gt;b)&amp;&amp;(a=b)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">3e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>,D=<span class="number">6</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">char</span> T[N];</span><br><span class="line"><span class="keyword">int</span> Pow1[N],Pow2[N];</span><br><span class="line"><span class="keyword">int</span> S[N];</span><br><span class="line"><span class="keyword">const</span> ll K1=<span class="number">19260817</span>,P1=<span class="number">114514</span>;</span><br><span class="line"><span class="keyword">const</span> ll K2=<span class="number">1e9</span>+<span class="number">13</span>,P2=<span class="number">1919810</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Solver</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> S[N];</span><br><span class="line">    <span class="keyword">int</span> trie[N][<span class="number">2</span>],s[N],cnt,H1[N],H2[N];</span><br><span class="line">    <span class="keyword">int</span> fa[N],top[N],sz[N],h1[N],h2[N],son[N],lst[N],bot[N],L[N],id[N],dfn,dep[N];</span><br><span class="line">    <span class="comment">// lst[i] 记录祖先中第一个s[f]!=s[i]的节点</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">        sz[u]=<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>(s[u]==s[fa[u]]) lst[u]=lst[fa[u]];</span><br><span class="line">        <span class="keyword">else</span> lst[u]=fa[u];</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> v=trie[u][i];</span><br><span class="line">            <span class="keyword">if</span>(!v) <span class="keyword">continue</span>;</span><br><span class="line">            fa[v]=u,dep[v]=dep[u]+<span class="number">1</span>;</span><br><span class="line">            h1[v]=(h1[u]*K1+i+<span class="number">1</span>)%P1;</span><br><span class="line">            h2[v]=(h2[u]*K2+i+<span class="number">1</span>)%P2;</span><br><span class="line">            <span class="built_in">dfs</span>(v);</span><br><span class="line">            sz[u]+=sz[v];</span><br><span class="line">            <span class="keyword">if</span>(son[u]==<span class="number">0</span> || sz[v]&gt;sz[son[u]]) son[u]=v;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> t)</span></span>&#123;</span><br><span class="line">        id[L[u]=++dfn]=u;</span><br><span class="line">        bot[top[u]=t]=u; <span class="keyword">if</span>(son[u]) <span class="built_in">dfs</span>(son[u],t);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> v:trie[u]) <span class="keyword">if</span>(v&amp;&amp;v!=son[u]) <span class="built_in">dfs</span>(v,v);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Ins</span><span class="params">(<span class="keyword">char</span> *T,<span class="keyword">int</span> l,<span class="keyword">int</span> w)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> now=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,l) &#123;</span><br><span class="line">            <span class="keyword">int</span> c=T[i]-<span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span>(!trie[now][c]) s[trie[now][c]=++cnt]=<span class="number">2e9</span>;</span><br><span class="line">            <span class="built_in">cmin</span>(s[now=trie[now][c]],w);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">            H1[i]=(H1[i<span class="number">-1</span>]*K1+S[i]+<span class="number">1</span>)%P1;</span><br><span class="line">            H2[i]=(H2[i<span class="number">-1</span>]*K2+S[i]+<span class="number">1</span>)%P2;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">dfs</span>(<span class="number">0</span>),<span class="built_in">dfs</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 求i 的最长匹配位置</span></span><br><span class="line">        <span class="keyword">int</span> u=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(i&lt;=n) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!trie[u][S[i]]) <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span>(trie[u][S[i]]!=son[u])&#123; u=trie[u][S[i++]]; <span class="keyword">continue</span>; &#125;</span><br><span class="line">            <span class="keyword">int</span> l=<span class="number">1</span>,r=<span class="built_in">min</span>(n-i+<span class="number">1</span>,dep[bot[top[u]]]-dep[u]),res=<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">while</span>(l&lt;=r)&#123;</span><br><span class="line">                <span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">if</span>( (H1[i+mid<span class="number">-1</span>]<span class="number">-1ll</span>*H1[i<span class="number">-1</span>]*Pow1[mid]%P1+P1)%P1 ==  (h1[id[L[u]+mid]]<span class="number">-1ll</span>*h1[u]*Pow1[mid]%P1+P1)%P1 &amp;&amp;</span><br><span class="line">                        (H2[i+mid<span class="number">-1</span>]<span class="number">-1ll</span>*H2[i<span class="number">-1</span>]*Pow2[mid]%P2+P2)%P2 == (h2[id[L[u]+mid]]<span class="number">-1ll</span>*h2[u]*Pow2[mid]%P2+P2)%P2)</span><br><span class="line">                    l=mid+<span class="number">1</span>,res=mid;</span><br><span class="line">                <span class="keyword">else</span> r=mid<span class="number">-1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            i+=res,u=id[L[u]+res];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> u;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; X,Y;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">BIT</span>&#123;</span></span><br><span class="line">    ll s[N];</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="built_in">memset</span>(s,<span class="number">127</span>,<span class="keyword">sizeof</span> s);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,ll x)</span></span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(p) <span class="built_in">cmin</span>(s[p],x),p-=p&amp;-p;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">ll <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p)</span></span>&#123;</span><br><span class="line">        ll res=<span class="number">1e18</span>;</span><br><span class="line">        <span class="keyword">while</span>(p&lt;=n) <span class="built_in">cmin</span>(res,s[p]),p+=p&amp;-p;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; TX,TY;</span><br><span class="line">ll dp[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,Pow1[<span class="number">0</span>]=Pow2[<span class="number">0</span>]=<span class="number">1</span>,N<span class="number">-1</span>) &#123;</span><br><span class="line">        Pow1[i]=Pow1[i<span class="number">-1</span>]*K1%P1;</span><br><span class="line">        Pow2[i]=Pow2[i<span class="number">-1</span>]*K2%P2;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d%d%*d&quot;</span>,&amp;n,&amp;m);</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">scanf</span>(<span class="string">&quot;%1d&quot;</span>,S+i),X.S[i]=Y.S[n-i+<span class="number">1</span>]=S[i];</span><br><span class="line">    <span class="built_in">rep</span>(t,<span class="number">1</span>,m) &#123;</span><br><span class="line">        <span class="keyword">int</span> w,l; <span class="built_in">scanf</span>(<span class="string">&quot;%d%s&quot;</span>,&amp;w,T+<span class="number">1</span>),l=<span class="built_in">strlen</span>(T+<span class="number">1</span>);</span><br><span class="line">        X.<span class="built_in">Ins</span>(T,l,w),<span class="built_in">reverse</span>(T+<span class="number">1</span>,T+l+<span class="number">1</span>),Y.<span class="built_in">Ins</span>(T,l,w);</span><br><span class="line">    &#125;</span><br><span class="line">    X.<span class="built_in">Init</span>(),Y.<span class="built_in">Init</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n) dp[i]=<span class="number">1e18</span>;</span><br><span class="line">    TX.<span class="built_in">Init</span>(),TY.<span class="built_in">Init</span>();</span><br><span class="line">    TY.<span class="built_in">Add</span>(<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">0</span>,n) &#123;</span><br><span class="line">        <span class="comment">// 暴力维护转移</span></span><br><span class="line">        <span class="keyword">if</span>(i) &#123;</span><br><span class="line">            <span class="built_in">cmin</span>(dp[i],TX.<span class="built_in">Que</span>(i));</span><br><span class="line">            <span class="keyword">int</span> u=Y.<span class="built_in">Que</span>(n-i+<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">while</span>(u) &#123;</span><br><span class="line">                <span class="keyword">int</span> l=Y.dep[Y.lst[u]]+<span class="number">1</span>,r=Y.dep[u];</span><br><span class="line">                <span class="keyword">if</span>(r-l+<span class="number">1</span>&lt;=D) <span class="built_in">rep</span>(j,l,r) <span class="built_in">cmin</span>(dp[i],dp[i-j]+Y.s[u]);</span><br><span class="line">                <span class="keyword">else</span> <span class="built_in">cmin</span>(dp[i],TY.<span class="built_in">Que</span>(i-r+<span class="number">1</span>)+Y.s[u]);</span><br><span class="line">                u=Y.lst[u];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        TY.<span class="built_in">Add</span>(i+<span class="number">1</span>,dp[i]);</span><br><span class="line">        <span class="keyword">if</span>(i==n||dp[i]==<span class="number">1e18</span>) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">int</span> u=X.<span class="built_in">Que</span>(i+<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">while</span>(u) &#123;</span><br><span class="line">            <span class="keyword">int</span> l=X.dep[X.lst[u]]+<span class="number">1</span>,r=X.dep[u];</span><br><span class="line">            <span class="keyword">if</span>(r-l+<span class="number">1</span>&lt;=D) <span class="built_in">rep</span>(j,l,r) <span class="built_in">cmin</span>(dp[i+j],dp[i]+X.s[u]);</span><br><span class="line">            <span class="keyword">else</span> TX.<span class="built_in">Add</span>(i+r,dp[i]+X.s[u]);</span><br><span class="line">            u=X.lst[u];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,dp[n]&lt;<span class="number">1e18</span>?dp[n]:<span class="number">-1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ROI/" rel="tag"># ROI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/34311.html" rel="prev" title="「ROI 2016 Day1」人烟之山 ">
+      <i class="fa fa-chevron-left"></i> 「ROI 2016 Day1」人烟之山 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/27408.html" rel="next" title="「USACO 2020.12 Platinum」Sleeping Cows">
+      「USACO 2020.12 Platinum」Sleeping Cows <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E3%80%8CROI-2016-Day2%E3%80%8D%E4%BA%8C%E6%8C%87%E7%A6%85"><span class="nav-number">1.</span> <span class="nav-text">「ROI 2016 Day2」二指禅</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Part1-%E8%80%83%E8%99%91%E6%B1%82%E5%87%BA%E6%9C%80%E5%A4%A7%E7%9A%84-j"><span class="nav-number">1.0.1.</span> <span class="nav-text">Part1 考虑求出最大的$j$</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Solution-1"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">Solution 1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Solution-2"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">Solution 2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Part2-%E5%9C%A8-j-max-%E5%9F%BA%E7%A1%80%E4%B8%8A%E8%BD%AC%E7%A7%BB"><span class="nav-number">1.0.2.</span> <span class="nav-text">Part2 在$j_{max}$基础上转移</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+	 
+
+	  <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/Header1000.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description">遇到问题可以看about</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">255</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https://github.com/CompilationFail" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:GetAWrongAnswer@gmail.com" title="E-Mail → mailto:GetAWrongAnswer@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https://www.last.fm/user/chasedeath" rel="noopener" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https://steamcommunity.com/profiles/76561198969516062/" rel="noopener" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+  </div>
+
+
+
+      </div>
+		
+		<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="330" 
+			src="//music.163.com/outchain/player?type=0&amp;id=5300764257&amp;auto=0&amp;height=330">
+		</iframe>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2021:5:26 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">orangejuice</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+  
+  <script>
+	(function(){
+   	 var bp = document.createElement('script');
+   	 var curProtocol = window.location.protocol.split(':')[0];
+    	if (curProtocol === 'https') {
+        	bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+   		}
+    	else {
+        	bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    	}
+    var s = document.getElementsByTagName("script")[0];
+    	s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
