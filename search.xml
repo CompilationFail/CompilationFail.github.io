@@ -1,6 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CF1063F - String Journey</title>
+    <url>/19923.html</url>
+    <content><![CDATA[<h1 id="CF1063F-String-Journey"><a href="#CF1063F-String-Journey" class="headerlink" title="CF1063F - String Journey"></a>CF1063F - String Journey</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>一个String Journey:</p>
+<p>$\{t_i\}$，满足$t_{i}$是$t_{i-1}$的严格子串</p>
+<p>给定$s$，一个合法分组可以表示为这样的形式：</p>
+<p>$s=u_1+t_1+u_2+t_2+\cdots+t_k+u_{k+1}$，其中$u$为多余串，可以为空</p>
+<p>最大化$k$</p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>肯定要按照串长从小到大接入，翻转串后，记$dp_i$表示</p>
+<p>以$i$为右端点，能匹配的最长$t_i$长度</p>
+<p>仔细分析会发现，$dp_{i}$并不是越大越优，只更新最大的$dp_i$会影响后面的转移</p>
+<p>但是可以对于$dp_i=l$的情况，判断其是否合法：</p>
+<p>1.$s[i-l+1:i-1]$在$i-l$之前的$dp_j$中出现过</p>
+<p>2.或者 $s[i-l+2:i]$在$i-l$之前的$dp_j$中出现过</p>
+<h4 id="维护判定"><a href="#维护判定" class="headerlink" title="维护判定"></a>维护判定</h4><p>可以考虑用后缀自动机维护这个关系，每次判定即：</p>
+<p>判定$s[x:y]$是否在$z$时间前出现过</p>
+<p>倍增找到$s[x:y]$对应的后缀自动机节点</p>
+<p>$s[y:x]$对应的后缀自动机节点的子树内，是否存在一个在$z$之前加入的$\ge x-y+1$的权值</p>
+<p>这看起来是一个二维问题，但是实际上会发现，每个点被修改的次数是$O(n)$的</p>
+<p>具体的，每次得到一个$dp_{i}$之后，需要判定在后缀自动机的$s[i-dp_i+1,i]$上插入</p>
+<p>$l=dp_i,time=i$的标记</p>
+<p>插入是顺次进行的，因此$time$递增</p>
+<p>每次插入对于被插入节点的祖先，它一定被 <strong>完全覆盖</strong></p>
+<p>这样的覆盖实际上就已经能够确定对于这个节点的最优权值</p>
+<p>此后对于它的插入均无效</p>
+<p>因此可以均摊$O(n)$维护插入操作，用$\text{vector}$存下每个$time$对应的$l_{max}$</p>
+<p>查询时二分当前点的情况即可</p>
+<p><br></p>
+<h4 id="确定最优的-dp-i-l"><a href="#确定最优的-dp-i-l" class="headerlink" title="确定最优的$dp_{i}=l$"></a>确定最优的$dp_{i}=l$</h4><p>$\text{Naive}$的想法自然是直接二分，这样复杂度就飚到$O(n\log ^2n)$，应该也能过</p>
+<p>实际上分析会发现</p>
+<blockquote>
+<p>$dp_{i} \ge dp_{i-1}-1$</p>
+</blockquote>
+<p>（最坏情况下，需要额外删除一个字符）</p>
+<p>因此可以用类似求后缀数组$\text{height}$的方式维护</p>
+<p>查询次数为$O(n)$，总复杂度为$O(n\log n)$</p>
+<p>Time: 467ms</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1e6</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">char</span> s[N];</span><br><span class="line"><span class="keyword">int</span> link[N],trans[N][<span class="number">26</span>],lst,cnt,len[N];</span><br><span class="line"><span class="keyword">int</span> End[N],fa[<span class="number">20</span>][N];</span><br><span class="line"></span><br><span class="line">vector &lt;Pii&gt; G[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Push</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y,<span class="keyword">int</span> z)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">cmin</span>(z,len[x]);</span><br><span class="line">	<span class="keyword">if</span>(G[x].<span class="built_in">size</span>() &amp;&amp; G[x].<span class="built_in">rbegin</span>()-&gt;second==len[x]) <span class="keyword">return</span>;</span><br><span class="line">	G[x].<span class="built_in">pb</span>(<span class="built_in">mp</span>(y,<span class="built_in">max</span>(z,G[x].<span class="built_in">size</span>()?G[x].<span class="built_in">rbegin</span>()-&gt;second:<span class="number">0</span>)));</span><br><span class="line">	<span class="keyword">if</span>(x) <span class="built_in">Push</span>(link[x],y,z);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Extend</span><span class="params">(<span class="keyword">int</span> c)</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> p=lst,cur=++cnt; len[cur]=len[lst]+<span class="number">1</span>,lst=cur;</span><br><span class="line">	<span class="keyword">while</span>(~p &amp;&amp; !trans[p][c]) trans[p][c]=cur,p=link[p];</span><br><span class="line">	End[len[cur]]=cur;</span><br><span class="line">	<span class="keyword">if</span>(p==<span class="number">-1</span>) link[cur]=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">int</span> q=trans[p][c];</span><br><span class="line">		<span class="keyword">if</span>(len[q]==len[p]+<span class="number">1</span>) link[cur]=q;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">int</span> v=++cnt;</span><br><span class="line">			len[v]=len[p]+<span class="number">1</span>,<span class="built_in">memcpy</span>(trans[v],trans[q],<span class="number">104</span>);</span><br><span class="line">			<span class="keyword">while</span>(~p &amp;&amp; trans[p][c]==q) trans[p][c]=v,p=link[p];</span><br><span class="line">			link[v]=link[q],link[cur]=link[q]=v;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> dp[N];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> l)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">drep</span>(i,<span class="number">19</span>,<span class="number">0</span>) <span class="keyword">if</span>(len[fa[i][x]]&gt;=l) x=fa[i][x];</span><br><span class="line">	<span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span> </span>&#123; <span class="comment">// query maxlen x when i&lt;=y</span></span><br><span class="line">	<span class="keyword">auto</span> it=<span class="built_in">upper_bound</span>(G[x].<span class="built_in">begin</span>(),G[x].<span class="built_in">end</span>(),<span class="built_in">mp</span>(y,INF));</span><br><span class="line">	<span class="keyword">if</span>(it==G[x].<span class="built_in">begin</span>()) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">return</span> --it,it-&gt;second;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),link[<span class="number">0</span>]=<span class="number">-1</span>;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,s+<span class="number">1</span>),<span class="built_in">reverse</span>(s+<span class="number">1</span>,s+n+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">Extend</span>(s[i]-<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,cnt) fa[<span class="number">0</span>][i]=link[i];</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,<span class="number">19</span>) <span class="built_in">rep</span>(j,<span class="number">1</span>,cnt) fa[i][j]=fa[i<span class="number">-1</span>][fa[i<span class="number">-1</span>][j]];</span><br><span class="line">	<span class="keyword">int</span> ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		dp[i]=<span class="built_in">max</span>(<span class="number">1</span>,dp[i<span class="number">-1</span>]<span class="number">-1</span>);</span><br><span class="line">		<span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> t=dp[i]+<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">int</span> f=<span class="number">0</span>;</span><br><span class="line">			f|=<span class="built_in">Que</span>(<span class="built_in">Find</span>(End[i],t<span class="number">-1</span>),i-t)&gt;=t<span class="number">-1</span>;</span><br><span class="line">			f|=<span class="built_in">Que</span>(<span class="built_in">Find</span>(End[i<span class="number">-1</span>],t<span class="number">-1</span>),i-t)&gt;=t<span class="number">-1</span>;</span><br><span class="line">			<span class="keyword">if</span>(f) dp[i]=t;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cmax</span>(ans,dp[i]),<span class="built_in">Push</span>(<span class="built_in">Find</span>(End[i],dp[i]),i,dp[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>字符串</tag>
+        <tag>Codeforces</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CF1085G - Beautiful Matrix</title>
+    <url>/18141.html</url>
+    <content><![CDATA[<h1 id="CF1085G-Beautiful-Matrix"><a href="#CF1085G-Beautiful-Matrix" class="headerlink" title="CF1085G - Beautiful Matrix"></a>CF1085G - Beautiful Matrix</h1><h2 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h2><p>给定一个$n\times n$的矩阵</p>
+<p>称一个矩阵是Beautiful：每行是一个排列，相邻两行之间错排</p>
+<p>求所有Beautiful的矩阵中给定矩阵的字典序排名</p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>设$n$阶错排方案数为$f_n=(n-1)(f_{n-1}+f_{n-2})$</p>
+<p>这是一个较为复杂的错排问题，要求字典序小于给定矩阵的字典序的个数</p>
+<p>可以考虑枚举相同部分以及下一位不同的值</p>
+<p>此时，对于后面的行，只需要考虑错排方案$f_n$</p>
+<p>对于当前行，后面有部分数已经出现，不再需要考虑错排方案数，设为$a$</p>
+<p>有部分数还未出现，需要考虑错排数，设为$b$</p>
+<p>容易发现枚举一个位置之后，后面的$a,b$最多两种情况</p>
+<p>可以通过树状数组维护</p>
+<p>那么就需要计算$(a,b)$对于答案的贡献，不妨把权值累和为$G_{a,b}$</p>
+<p>考虑每一个无限制的位置$i$</p>
+<p>1.要么它放自己$a,b\rightarrow a-1,b$</p>
+<p>2.要么它不放自己$a,b\rightarrow a-1,b+1$</p>
+<p>那么$O(n^2)$递推$G_{a,b}$的贡献即可</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2010</span>,P=<span class="number">998244353</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> A[N],B[N];</span><br><span class="line"><span class="keyword">int</span> F[N],G[N][N];</span><br><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span> </span>&#123;</span><br><span class="line">	ll res=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">BIT</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> s[N];</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span></span>&#123; <span class="built_in">memset</span>(s,<span class="number">0</span>,<span class="keyword">sizeof</span> s); &#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> x)</span> </span>&#123; <span class="keyword">while</span>(p&lt;=n) s[p]+=x,p+=p&amp;-p; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span>(p) res+=s[p],p-=p&amp;-p;</span><br><span class="line">		<span class="keyword">return</span> res;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> l,<span class="keyword">int</span> r)</span></span>&#123; <span class="keyword">return</span> <span class="built_in">Que</span>(r)-<span class="built_in">Que</span>(l<span class="number">-1</span>); &#125;</span><br><span class="line">&#125; T,T2;</span><br><span class="line"><span class="keyword">int</span> X[N],Y[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> &amp;x,ll y)</span></span>&#123; x=(x+y)%P; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),F[<span class="number">0</span>]=F[<span class="number">2</span>]=<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">3</span>,n) F[i]=<span class="number">1ll</span>*(i<span class="number">-1</span>)*(F[i<span class="number">-1</span>]+F[i<span class="number">-2</span>])%P;</span><br><span class="line">	<span class="built_in">drep</span>(t,n<span class="number">-1</span>,<span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span>(t&lt;n<span class="number">-1</span>) <span class="built_in">rep</span>(i,<span class="number">1</span>,n) X[i]=<span class="number">1</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) Y[i]=<span class="number">1</span>;</span><br><span class="line">		T.<span class="built_in">clear</span>(),T2.<span class="built_in">clear</span>();</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) T2.<span class="built_in">Add</span>(i,<span class="number">1</span>);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(X[i] &amp;&amp; Y[i]) T.<span class="built_in">Add</span>(i,<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">int</span> w=<span class="built_in">qpow</span>(F[n],t);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">			<span class="keyword">if</span>(X[A[i]] &amp;&amp; Y[A[i]]) T.<span class="built_in">Add</span>(A[i],<span class="number">-1</span>);</span><br><span class="line">			X[A[i]]=<span class="number">0</span>;</span><br><span class="line">			</span><br><span class="line">			B[i]=<span class="built_in">rd</span>();</span><br><span class="line">			<span class="keyword">int</span> c=T2.<span class="built_in">Que</span>(B[i]<span class="number">-1</span>)-(A[i]&lt;B[i] &amp;&amp; Y[A[i]]);</span><br><span class="line">			<span class="keyword">int</span> all=T.<span class="built_in">Que</span>(n),d=T.<span class="built_in">Que</span>(B[i]<span class="number">-1</span>);</span><br><span class="line">			<span class="keyword">if</span>(c-d) <span class="built_in">Add</span>(G[n-i-all][all],<span class="number">1ll</span>*w*(c-d));</span><br><span class="line">			<span class="keyword">if</span>(d) <span class="built_in">Add</span>(G[n-i-all+<span class="number">1</span>][all<span class="number">-1</span>],<span class="number">1ll</span>*w*d);</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">if</span>(X[B[i]] &amp;&amp; Y[B[i]]) T.<span class="built_in">Add</span>(B[i],<span class="number">-1</span>);</span><br><span class="line">			T2.<span class="built_in">Add</span>(B[i],<span class="number">-1</span>),Y[B[i]]=<span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">swap</span>(A,B);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">drep</span>(i,n,<span class="number">1</span>) <span class="built_in">rep</span>(j,<span class="number">0</span>,n-i) &#123;</span><br><span class="line">		G[i<span class="number">-1</span>][j]+=G[i][j],<span class="built_in">Mod1</span>(G[i<span class="number">-1</span>][j]); <span class="comment">// let A[i]=i</span></span><br><span class="line">		G[i<span class="number">-1</span>][j+<span class="number">1</span>]+=G[i][j],<span class="built_in">Mod1</span>(G[i<span class="number">-1</span>][j+<span class="number">1</span>]); <span class="comment">// let A[i]!=i</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n) ans=(ans+<span class="number">1ll</span>*F[i]*G[<span class="number">0</span>][i])%P;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>数据结构</tag>
+        <tag>Codeforces</tag>
+        <tag>dp计数</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CF1348F - Olha and Igor</title>
+    <url>/14204.html</url>
+    <content><![CDATA[<h1 id="CF1348F-Olha-and-Igor"><a href="#CF1348F-Olha-and-Igor" class="headerlink" title="CF1348F - Olha and Igor"></a>CF1348F - Olha and Igor</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>有一棵$2^{h}-1$个点的完全二叉树，不知道每个点的编号</p>
+<p>每次询问交互器$u,v,w$：$w$为根时$(u,v)$的$\text{LCA}$</p>
+<p>求在$n+420$次询问内确定二叉树的根</p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>这个$n+420$看起来就像一个乱搞</p>
+<p>我的乱搞思路是：</p>
+<p>如果能找到任何一个在根两边的点对$(u,v)$</p>
+<p>查询所有$(u,v,w)$就能知道$(u,v)$路径上每个点的子树$\text{size}$，从而确定根</p>
+<p><br></p>
+<p>随机一个点对就有$\frac{1} {2}$的概率满足要求，但是条件并不允许</p>
+<p>所以需要判定是否满足要求</p>
+<p>考虑$(u,v)$在根的同一边时</p>
+<p>随机一个点$w$查询$(u,v,w)$有$&gt;\frac{1} {2}$的概率得到同一个点</p>
+<p>（这个子树$\text{size}&gt;\frac{n} {2}$）</p>
+<p>否则，去掉得到$u,v$的情况，其他的点最多只有$\frac{1} {4}$的概率得到</p>
+<p>（最大的就是根两边的子树所在的部分）</p>
+<p>那么可以通过随机采样来判断</p>
+<p>也可以不每次都随机，如果找到了那个$&gt;\frac{1} {2}$的点，就能确定到达根更近的一个点</p>
+<p>然后去查询到这个点的点集$\{w\}$里随机选择一个点，此时有更大概率选对</p>
+<p>调参之后可以n+160次过掉</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1</span>&lt;&lt;<span class="number">19</span>,P=<span class="number">998244353</span>;</span><br><span class="line"></span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; A[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;? %d %d %d\n&quot;</span>,u,v,w),<span class="built_in">fflush</span>(stdout);</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">rd</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> D=<span class="number">80</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> h=<span class="built_in">rd</span>(),n=(<span class="number">1</span>&lt;&lt;h)<span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">int</span> u,v;</span><br><span class="line">	<span class="keyword">do</span> u=<span class="built_in">rand</span>()%n+<span class="number">1</span>,v=<span class="built_in">rand</span>()%n+<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span>(u==v);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>(<span class="number">1ll</span>*n*n&lt;=<span class="number">420</span>) &#123;</span><br><span class="line">		<span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> u,v;</span><br><span class="line">			<span class="keyword">do</span> u=<span class="built_in">rand</span>()%n+<span class="number">1</span>,v=<span class="built_in">rand</span>()%n+<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(u==v);</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,n) A[i].<span class="built_in">clear</span>();</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(i!=u &amp;&amp; i!=v) &#123;</span><br><span class="line">				<span class="keyword">int</span> x=<span class="built_in">Que</span>(u,v,i);</span><br><span class="line">				A[x].<span class="built_in">pb</span>(i);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>((<span class="keyword">int</span>)A[i].<span class="built_in">size</span>()==n/<span class="number">2</span>+<span class="number">1</span>) <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;! %d\n&quot;</span>,i),<span class="number">0</span>;</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>((<span class="keyword">int</span>)A[i].<span class="built_in">size</span>()==<span class="number">1</span> &amp;&amp; i!=u &amp;&amp; i!=v) <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;! %d\n&quot;</span>,i),<span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">rep</span>(t,<span class="number">1</span>,<span class="number">160</span>/D) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) A[i].<span class="built_in">clear</span>();</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,D) &#123;</span><br><span class="line">			<span class="keyword">int</span> w;</span><br><span class="line">			<span class="keyword">do</span> w=<span class="built_in">rand</span>()%n+<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(u==w || v==w);</span><br><span class="line">			<span class="keyword">int</span> x=<span class="built_in">Que</span>(u,v,w);</span><br><span class="line">			A[x].<span class="built_in">pb</span>(w);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">int</span> ma=<span class="number">0</span>,ma2=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(i!=u &amp;&amp; i!=v) &#123;</span><br><span class="line">			<span class="keyword">int</span> t=A[i].<span class="built_in">size</span>();</span><br><span class="line">			<span class="keyword">if</span>(t&gt;ma) <span class="built_in">swap</span>(ma,t);</span><br><span class="line">			<span class="keyword">if</span>(t&gt;ma2) ma2=t;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(<span class="number">1.0</span>*ma2/ma&gt;=<span class="number">0.7</span> || ma&lt;=(D<span class="number">-2</span>)*<span class="number">0.34</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>((<span class="keyword">int</span>)A[i].<span class="built_in">size</span>()==ma &amp;&amp; i!=v &amp;&amp; i!=u) &#123;</span><br><span class="line">			u=i;</span><br><span class="line">			<span class="keyword">do</span> v=A[i][<span class="built_in">rand</span>()%A[i].<span class="built_in">size</span>()];</span><br><span class="line">			<span class="keyword">while</span>(v==u);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) A[i].<span class="built_in">clear</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(i!=u &amp;&amp; i!=v) &#123;</span><br><span class="line">		<span class="keyword">int</span> x=<span class="built_in">Que</span>(u,v,i);</span><br><span class="line">		A[x].<span class="built_in">pb</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>((<span class="keyword">int</span>)A[i].<span class="built_in">size</span>()==n/<span class="number">2</span>+<span class="number">1</span>) <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;! %d\n&quot;</span>,i),<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>((<span class="keyword">int</span>)A[i].<span class="built_in">size</span>()==<span class="number">1</span> &amp;&amp; i!=u &amp;&amp; i!=v) <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;! %d\n&quot;</span>,i),<span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>乱搞</tag>
+        <tag>Codeforces</tag>
+        <tag>交互</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CF1419F - Rain of Fire</title>
+    <url>/62021.html</url>
+    <content><![CDATA[<h1 id="CF1419F-Rain-of-Fire"><a href="#CF1419F-Rain-of-Fire" class="headerlink" title="CF1419F - Rain of Fire"></a>CF1419F - Rain of Fire</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>给定$n$个点$(x_i,y_i)$，现在还需要你额外加入恰好一个点，点之间不重复</p>
+<p>两点之间能够连边，必须满足$x$相同或者$y$相同，边权即曼哈顿距离</p>
+<p>求决策加入点之后，最小化 生成树上的最大边权 </p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>可以先考虑二分答案，然后判断能否构成联通块</p>
+<p>可以先对于原图$O(n)$构建，然后枚举加入的点和旁边的点连边</p>
+<p>加入的点只有两种情况</p>
+<p>1.在某一条x,y横线竖线交点上，能够合并两点</p>
+<p>2.在某两点连线中点，能够缩短两点距离</p>
+<p>额外增加的边数$O(1)$，因此可以$O(n^2)$判断</p>
+<p>复杂度为$O(n^2\log n)$</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1010</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> F[N];</span><br><span class="line"><span class="keyword">int</span> stk[N],top;</span><br><span class="line"><span class="keyword">int</span> X[N],Y[N],HX[N],HY[N],CX,CY;</span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; VX[N],VY[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> cnt;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find2</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123; <span class="keyword">while</span>(F[x]!=x) x=F[x]; <span class="keyword">return</span> x; &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Uni2</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">	x=<span class="built_in">Find2</span>(x),y=<span class="built_in">Find2</span>(y);</span><br><span class="line">	<span class="keyword">if</span>(x!=y) F[x]=y,cnt--,stk[++top]=x;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123; <span class="keyword">return</span> F[x]==x?x:F[x]=<span class="built_in">Find</span>(F[x]); &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Uni</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">	x=<span class="built_in">Find</span>(x),y=<span class="built_in">Find</span>(y);</span><br><span class="line">	<span class="keyword">if</span>(x!=y) F[x]=y,cnt--;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Back</span><span class="params">()</span></span>&#123; <span class="keyword">while</span>(top) F[stk[top]]=stk[top],top--,cnt++; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> prex[N][N],nxtx[N][N];</span><br><span class="line"><span class="keyword">int</span> prey[N][N],nxty[N][N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Check</span><span class="params">(<span class="keyword">int</span> mid)</span></span>&#123;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,cnt=n+<span class="number">1</span>) F[i]=i;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CX) <span class="built_in">rep</span>(j,<span class="number">1</span>,VX[i].<span class="built_in">size</span>()<span class="number">-1</span>) <span class="keyword">if</span>(HY[Y[VX[i][j]]]-HY[Y[VX[i][j<span class="number">-1</span>]]]&lt;=mid) <span class="built_in">Uni</span>(VX[i][j],VX[i][j<span class="number">-1</span>]);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CY) <span class="built_in">rep</span>(j,<span class="number">1</span>,VY[i].<span class="built_in">size</span>()<span class="number">-1</span>) <span class="keyword">if</span>(HX[X[VY[i][j]]]-HX[X[VY[i][j<span class="number">-1</span>]]]&lt;=mid) <span class="built_in">Uni</span>(VY[i][j],VY[i][j<span class="number">-1</span>]);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n+<span class="number">1</span>) <span class="built_in">Find</span>(i);</span><br><span class="line">	</span><br><span class="line">	top=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CX) <span class="built_in">rep</span>(j,<span class="number">1</span>,VX[i].<span class="built_in">size</span>()<span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> x=VX[i][j<span class="number">-1</span>],y=VX[i][j];</span><br><span class="line">		<span class="keyword">if</span>(HY[Y[y]]-HY[Y[x]]&lt;=mid*<span class="number">2ll</span>) &#123;</span><br><span class="line">			<span class="built_in">Uni2</span>(n+<span class="number">1</span>,x),<span class="built_in">Uni2</span>(n+<span class="number">1</span>,y);</span><br><span class="line">			<span class="keyword">if</span>(cnt==<span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">			<span class="built_in">Back</span>();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CY) <span class="built_in">rep</span>(j,<span class="number">1</span>,VY[i].<span class="built_in">size</span>()<span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> x=VY[i][j<span class="number">-1</span>],y=VY[i][j];</span><br><span class="line">		<span class="keyword">if</span>(HX[X[y]]-HX[X[x]]&lt;=mid*<span class="number">2ll</span>) &#123;</span><br><span class="line">			<span class="built_in">Uni2</span>(n+<span class="number">1</span>,x),<span class="built_in">Uni2</span>(n+<span class="number">1</span>,y);</span><br><span class="line">			<span class="keyword">if</span>(cnt==<span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">			<span class="built_in">Back</span>();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CX) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">1</span>,CY) &#123;</span><br><span class="line">			<span class="keyword">if</span>(prex[i][j]==prey[i][j]) <span class="keyword">continue</span>;</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> v:&#123;prex[i][j],nxtx[i][j],prey[i][j],nxty[i][j]&#125;) &#123;</span><br><span class="line">				<span class="keyword">if</span>(v &amp;&amp; <span class="built_in">abs</span>(HX[i]-HX[X[v]])&lt;=mid &amp;&amp; <span class="built_in">abs</span>(HY[j]-HY[Y[v]])&lt;=mid) &#123;</span><br><span class="line">					<span class="built_in">Uni2</span>(v,n+<span class="number">1</span>);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(cnt==<span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">			<span class="built_in">Back</span>();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) HX[i]=X[i]=<span class="built_in">rd</span>(),HY[i]=Y[i]=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">sort</span>(HX+<span class="number">1</span>,HX+n+<span class="number">1</span>),CX=<span class="built_in">unique</span>(HX+<span class="number">1</span>,HX+n+<span class="number">1</span>)-HX<span class="number">-1</span>;</span><br><span class="line">	<span class="built_in">sort</span>(HY+<span class="number">1</span>,HY+n+<span class="number">1</span>),CY=<span class="built_in">unique</span>(HY+<span class="number">1</span>,HY+n+<span class="number">1</span>)-HY<span class="number">-1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		X[i]=<span class="built_in">lower_bound</span>(HX+<span class="number">1</span>,HX+CX+<span class="number">1</span>,X[i])-HX;</span><br><span class="line">		Y[i]=<span class="built_in">lower_bound</span>(HY+<span class="number">1</span>,HY+CY+<span class="number">1</span>,Y[i])-HY;</span><br><span class="line">		VX[X[i]].<span class="built_in">pb</span>(i),VY[Y[i]].<span class="built_in">pb</span>(i);</span><br><span class="line">		prex[X[i]][Y[i]]=i,nxtx[X[i]<span class="number">-1</span>][Y[i]]=i;</span><br><span class="line">		prey[X[i]][Y[i]]=i,nxty[X[i]][Y[i]<span class="number">-1</span>]=i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CX) <span class="built_in">rep</span>(j,<span class="number">1</span>,CY) &#123;</span><br><span class="line">		prex[i][j]=prex[i][j]?prex[i][j]:prex[i<span class="number">-1</span>][j];</span><br><span class="line">		prey[i][j]=prey[i][j]?prey[i][j]:prey[i][j<span class="number">-1</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">drep</span>(i,CX,<span class="number">1</span>) <span class="built_in">drep</span>(j,CY,<span class="number">1</span>) &#123;</span><br><span class="line">		nxtx[i][j]=nxtx[i][j]?nxtx[i][j]:nxtx[i+<span class="number">1</span>][j];</span><br><span class="line">		nxty[i][j]=nxty[i][j]?nxty[i][j]:nxty[i][j+<span class="number">1</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CX) <span class="built_in">sort</span>(VX[i].<span class="built_in">begin</span>(),VX[i].<span class="built_in">end</span>(),[&amp;](<span class="keyword">int</span> x,<span class="keyword">int</span> y)&#123; <span class="keyword">return</span> Y[x]&lt;Y[y]; &#125;);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,CY) <span class="built_in">sort</span>(VY[i].<span class="built_in">begin</span>(),VY[i].<span class="built_in">end</span>(),[&amp;](<span class="keyword">int</span> x,<span class="keyword">int</span> y)&#123; <span class="keyword">return</span> X[x]&lt;X[y]; &#125;);</span><br><span class="line">	<span class="keyword">int</span> l=<span class="number">0</span>,r=<span class="number">2e9</span>,res=<span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">while</span>(l&lt;=r) &#123;</span><br><span class="line">		<span class="keyword">int</span> mid=(<span class="number">0ll</span>+l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">		<span class="keyword">if</span>(<span class="built_in">Check</span>(mid)) r=mid<span class="number">-1</span>,res=mid;</span><br><span class="line">		<span class="keyword">else</span> l=mid+<span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,res);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>图论</tag>
+        <tag>Codeforces</tag>
+        <tag>暴力</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>零化多项式/特征多项式/最小多项式/常系数线性齐次递推</title>
     <url>/10505.html</url>
     <content><![CDATA[<h1 id="零化多项式-特征多项式-最小多项式-常系数线性齐次递推"><a href="#零化多项式-特征多项式-最小多项式-常系数线性齐次递推" class="headerlink" title="零化多项式/特征多项式/最小多项式/常系数线性齐次递推"></a>零化多项式/特征多项式/最小多项式/常系数线性齐次递推</h1><h3 id="约定"><a href="#约定" class="headerlink" title="约定:"></a>约定:</h3><p>$I_n$是$n$阶单位矩阵，即主对角线是$1$的$n$阶矩阵</p>
@@ -254,8 +392,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>概率|期望</tag>
         <tag>Codeforces</tag>
+        <tag>概率|期望</tag>
       </tags>
   </entry>
   <entry>
@@ -308,8 +446,8 @@
         <tag>Number Theory</tag>
         <tag>数据结构</tag>
         <tag>技巧</tag>
-        <tag>暴力</tag>
         <tag>Codeforces</tag>
+        <tag>暴力</tag>
       </tags>
   </entry>
   <entry>
@@ -370,9 +508,9 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>构造</tag>
         <tag>Codeforces</tag>
         <tag>交互</tag>
+        <tag>构造</tag>
       </tags>
   </entry>
   <entry>
@@ -399,9 +537,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>暴力</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -460,9 +598,9 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -523,10 +661,10 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>构造</tag>
-        <tag>性质</tag>
         <tag>Codeforces</tag>
         <tag>交互</tag>
+        <tag>构造</tag>
+        <tag>性质</tag>
       </tags>
   </entry>
   <entry>
@@ -560,8 +698,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>dp</tag>
         <tag>Codeforces</tag>
+        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -591,9 +729,9 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>Codeforces</tag>
         <tag>树</tag>
         <tag>dp</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -616,9 +754,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>概率|期望</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -692,8 +830,8 @@
       <tags>
         <tag>生成函数/多项式</tag>
         <tag>技巧</tag>
-        <tag>暴力</tag>
         <tag>Codeforces</tag>
+        <tag>暴力</tag>
         <tag>meet in the middle</tag>
       </tags>
   </entry>
@@ -721,9 +859,9 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>Codeforces</tag>
         <tag>计算几何</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -777,8 +915,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>凸包|斜率优化|李超树</tag>
         <tag>Codeforces</tag>
+        <tag>凸包|斜率优化|李超树</tag>
       </tags>
   </entry>
   <entry>
@@ -807,10 +945,10 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>暴力</tag>
         <tag>计算几何</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -837,10 +975,10 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>Codeforces</tag>
         <tag>树</tag>
         <tag>点分治</tag>
         <tag>凸包|斜率优化|李超树</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -877,10 +1015,10 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>性质</tag>
         <tag>概率|期望</tag>
         <tag>凸包|斜率优化|李超树</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -924,9 +1062,9 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>Codeforces</tag>
         <tag>贪心</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -1017,8 +1155,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>贪心</tag>
         <tag>Codeforces</tag>
+        <tag>贪心</tag>
       </tags>
   </entry>
   <entry>
@@ -1086,9 +1224,9 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>Codeforces</tag>
         <tag>性质</tag>
         <tag>dp</tag>
-        <tag>Codeforces</tag>
         <tag>数位dp</tag>
         <tag>笛卡尔树</tag>
       </tags>
@@ -1124,11 +1262,11 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>博弈</tag>
         <tag>树</tag>
         <tag>点分治</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -1155,8 +1293,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>贪心</tag>
         <tag>Codeforces</tag>
+        <tag>贪心</tag>
       </tags>
   </entry>
   <entry>
@@ -1642,8 +1780,8 @@
       </categories>
       <tags>
         <tag>生成函数/多项式</tag>
-        <tag>dp计数</tag>
         <tag>Codeforces</tag>
+        <tag>dp计数</tag>
       </tags>
   </entry>
   <entry>
@@ -1668,8 +1806,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp计数</tag>
         <tag>Codeforces</tag>
+        <tag>dp计数</tag>
       </tags>
   </entry>
   <entry>
@@ -1698,9 +1836,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>概率|期望</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -1886,8 +2024,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>贪心</tag>
         <tag>Codeforces</tag>
+        <tag>贪心</tag>
       </tags>
   </entry>
   <entry>
@@ -1968,9 +2106,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>构造</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2174,9 +2312,9 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>Codeforces</tag>
         <tag>树</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2201,9 +2339,9 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>Codeforces</tag>
         <tag>树</tag>
         <tag>dp</tag>
-        <tag>Codeforces</tag>
         <tag>虚树</tag>
       </tags>
   </entry>
@@ -2249,8 +2387,8 @@
       </categories>
       <tags>
         <tag>Number Theory</tag>
-        <tag>贪心</tag>
         <tag>Codeforces</tag>
+        <tag>贪心</tag>
       </tags>
   </entry>
   <entry>
@@ -2347,9 +2485,9 @@
       </categories>
       <tags>
         <tag>线性代数</tag>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>暴力</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2386,8 +2524,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>构造</tag>
         <tag>Codeforces</tag>
+        <tag>构造</tag>
       </tags>
   </entry>
   <entry>
@@ -2417,8 +2555,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>性质</tag>
         <tag>Codeforces</tag>
+        <tag>性质</tag>
       </tags>
   </entry>
   <entry>
@@ -2482,8 +2620,8 @@
       </categories>
       <tags>
         <tag>字符串</tag>
-        <tag>dp</tag>
         <tag>Codeforces</tag>
+        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -2530,9 +2668,9 @@
       </categories>
       <tags>
         <tag>字符串</tag>
+        <tag>Codeforces</tag>
         <tag>暴力</tag>
         <tag>dp</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2587,10 +2725,10 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>博弈</tag>
-        <tag>性质</tag>
         <tag>Codeforces</tag>
         <tag>交互</tag>
+        <tag>博弈</tag>
+        <tag>性质</tag>
       </tags>
   </entry>
   <entry>
@@ -2658,8 +2796,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>dp计数</tag>
         <tag>Codeforces</tag>
+        <tag>dp计数</tag>
       </tags>
   </entry>
   <entry>
@@ -2804,9 +2942,9 @@
       <tags>
         <tag>生成函数/多项式</tag>
         <tag>线性代数</tag>
-        <tag>神题</tag>
-        <tag>暴力</tag>
         <tag>Codeforces</tag>
+        <tag>暴力</tag>
+        <tag>神题</tag>
       </tags>
   </entry>
   <entry>
@@ -2848,9 +2986,9 @@
       </categories>
       <tags>
         <tag>字符串</tag>
+        <tag>Codeforces</tag>
         <tag>dp计数</tag>
         <tag>性质</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2916,8 +3054,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp</tag>
         <tag>Codeforces</tag>
+        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -2985,8 +3123,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp计数</tag>
         <tag>Codeforces</tag>
+        <tag>dp计数</tag>
       </tags>
   </entry>
   <entry>
@@ -3040,8 +3178,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>贪心</tag>
         <tag>Codeforces</tag>
+        <tag>贪心</tag>
       </tags>
   </entry>
   <entry>
@@ -3069,8 +3207,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp</tag>
         <tag>Codeforces</tag>
+        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -3143,8 +3281,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>性质</tag>
         <tag>Codeforces</tag>
+        <tag>性质</tag>
       </tags>
   </entry>
   <entry>
@@ -3388,9 +3526,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>Codeforces</tag>
         <tag>构造</tag>
         <tag>计算几何</tag>
-        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3448,8 +3586,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>各省OI</tag>
         <tag>暴力</tag>
+        <tag>各省OI</tag>
       </tags>
   </entry>
   <entry>
@@ -4670,8 +4808,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>各省OI</tag>
         <tag>暴力</tag>
+        <tag>各省OI</tag>
         <tag>dp</tag>
         <tag>打牌题</tag>
       </tags>
@@ -5349,8 +5487,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>各大OJ</tag>
         <tag>暴力</tag>
+        <tag>各大OJ</tag>
       </tags>
   </entry>
   <entry>
@@ -5881,8 +6019,8 @@
       </categories>
       <tags>
         <tag>乱搞</tag>
-        <tag>贪心</tag>
         <tag>暴力</tag>
+        <tag>贪心</tag>
         <tag>性质</tag>
         <tag>ROI</tag>
       </tags>
@@ -8546,8 +8684,8 @@ $\begin{aligned} 1-\frac{C(sz[u],k)} {C(m,k)}-\frac{C(m-sz[u],k)} {C(m,k)}\end{a
         <category>题解</category>
       </categories>
       <tags>
-        <tag>各大OJ</tag>
         <tag>dp计数</tag>
+        <tag>各大OJ</tag>
         <tag>树</tag>
         <tag>点分治</tag>
       </tags>
@@ -8843,8 +8981,8 @@ $\begin{aligned} 1-\frac{C(sz[u],k)} {C(m,k)}-\frac{C(m-sz[u],k)} {C(m,k)}\end{a
         <category>题解</category>
       </categories>
       <tags>
-        <tag>各大OJ</tag>
         <tag>dp计数</tag>
+        <tag>各大OJ</tag>
       </tags>
   </entry>
   <entry>
