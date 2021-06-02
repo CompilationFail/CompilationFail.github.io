@@ -201,6 +201,88 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/28590.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/28590.html" class="post-title-link" itemprop="url">CF1515G - Phoenix and Odometers</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-06 11:58:26" itemprop="dateCreated datePublished" datetime="2021-05-06T11:58:26+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:44:06" itemprop="dateModified" datetime="2021-05-31T21:44:06+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1515G-Phoenix-and-Odometers"><a href="#CF1515G-Phoenix-and-Odometers" class="headerlink" title="CF1515G - Phoenix and Odometers"></a>CF1515G - Phoenix and Odometers</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>给定一张带权有向图，每次查询$v,s,t$表示从$v$出发并且回到$v$，可以经过重边</p>
+<p>判断是否存在经过路径总长$l$满足$l+s\equiv 0 \pmod t$</p>
+<script type="math/tex; mode=display">\</script><h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>显然$v$只能在其自己的强连通分量里走，并且分量内部的任意一个环都是可达的</p>
+<p>由于是模意义下，所以环的贡献可以抵消，环之间可以无限叠加</p>
+<p>根据裴蜀定理，能够生成的数就是是$\gcd(len_i)$的倍数</p>
+<p>只需预处理强连通分量内部的环，判断$\gcd(len_i,t)|\gcd(s,t)$即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> to,nxt,w;</span><br><span class="line">&#125;e[N];</span><br><span class="line"><span class="keyword">int</span> head[N],ecnt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w)</span></span>&#123;</span><br><span class="line">	e[++ecnt]=(Edge)&#123;v,head[u],w&#125;;</span><br><span class="line">	head[u]=ecnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll G[N],S[N];</span><br><span class="line"><span class="function">ll <span class="title">gcd</span><span class="params">(ll a,ll b)</span></span>&#123; <span class="keyword">return</span> b==<span class="number">0</span>?a:<span class="built_in">gcd</span>(b,a%b); &#125;</span><br><span class="line"><span class="keyword">int</span> t[N],low[N],dfn,stk[N],ins[N],top,id[N],scc;</span><br><span class="line">ll dis[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	ins[stk[++top]=u]=<span class="number">1</span>,low[u]=t[u]=++dfn;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) &#123;</span><br><span class="line">		<span class="keyword">int</span> v=e[i].to;</span><br><span class="line">		<span class="keyword">if</span>(!t[v]) &#123;</span><br><span class="line">			dis[v]=dis[u]+e[i].w;</span><br><span class="line">			<span class="built_in">dfs</span>(v),<span class="built_in">cmin</span>(low[u],low[v]);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(ins[v]) &#123;	</span><br><span class="line">            <span class="comment">// 不管是横边还是返祖边，长度都是dis[u]-dis[v]!!!</span></span><br><span class="line">			<span class="built_in">cmin</span>(low[u],t[v]);</span><br><span class="line">			G[u]=<span class="built_in">gcd</span>(G[u],dis[u]-dis[v]+e[i].w);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(low[u]==t[u]) &#123;</span><br><span class="line">		++scc;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> v=<span class="number">-1</span>;v!=u;) &#123;</span><br><span class="line">			ins[v=stk[top--]]=<span class="number">0</span>;</span><br><span class="line">			id[v]=scc,S[scc]=<span class="built_in">gcd</span>(S[scc],G[v]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>(),w=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="built_in">AddEdge</span>(u,v,w);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(!t[i]) <span class="built_in">dfs</span>(i);</span><br><span class="line">	<span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),s=<span class="built_in">rd</span>(),t=<span class="built_in">rd</span>();</span><br><span class="line">		s=<span class="built_in">gcd</span>(s,t),t=<span class="built_in">gcd</span>(t,S[id[u]]);</span><br><span class="line">		<span class="built_in">puts</span>(s%t==<span class="number">0</span>?<span class="string">&quot;YES&quot;</span>:<span class="string">&quot;NO&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/8321.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1123,99 +1205,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/34801.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/34801.html" class="post-title-link" itemprop="url">Codeforces1508D -  Tree Calendar</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-04 20:47:16" itemprop="dateCreated datePublished" datetime="2021-05-04T20:47:16+08:00">2021-05-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 21:48:33" itemprop="dateModified" datetime="2021-05-31T21:48:33+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CF1508E-Tree-Calendar"><a href="#CF1508E-Tree-Calendar" class="headerlink" title="CF1508E -  Tree Calendar"></a>CF1508E -  Tree Calendar</h1><p>题目大意：</p>
-<p>有一棵已知的有根树和一个未知的$\text{dfs}$序，且做了若干次操作，每次操作是</p>
-<p>对于所有的$(u,fa_u)\vee  label_{fa_u}&lt;label_{u}$，找到最小的二元组$(label_{fa_u},lable_u)$，交换二元组的$label$</p>
-<p>给定最终的序列，求复原一个$\text{dfs}$序并且给出操作次数，或者确定不存在这样的$\text{dfs}$序</p>
-<script type="math/tex; mode=display">\</script><p>模拟这样的过程，容易发现：</p>
-<p>1号节点沿着最小$\text{dfs}$序路径走下去，直到叶子，同时将路径上的点推上来，一共推了$dep_{leaf}$次</p>
-<p>2号节点沿着最小$\text{dfs}$序路径走下去，直到叶子，同时将路径上的点推上来，一共推了$dep_{leaf’}$次</p>
-<p>….</p>
-<p>考虑每个节点都已经推到最底下的情况，则最终所有的节点有两种情况</p>
-<p>1.是推下来的节点，则其$label$恰好为原树上出栈序列的标号</p>
-<p>2.剩下的点构成一个新的连通块，按照新的$\text{dfs}$序的顺序标号</p>
-<p>那么考虑找到当前最小的二元组$(label_{fa_u},label_u)$，就知道当前正在推的是哪个元素</p>
-<p>考虑先复原这个元素被推下来的过程，<strong>复原的过程中注意判定是否当前的元组合法</strong></p>
-<p>然后容易通过当前的$label$确定一开始的$\text{dfs}$序</p>
-<p>具体的，设$s_u$为$u$子树中最小的$label$，按照$s_u$递增的顺序遍历每个儿子得到的$\text{dfs}$才可能是合法的$\text{dfs}$序</p>
-<p>原理比较显然，已经被推的叶子按照$\text{stack}$序遍历，剩下的按照原先的$\text{dfs}$序遍历，最终取$\text{min}$然后遍历即合法</p>
-<p>然后按照上面的过程，对于得到的$\text{dfs}$序判定是否合法即可</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">3e5</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> A[N],F[N];</span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; G[N];</span><br><span class="line">ll ans;</span><br><span class="line"><span class="keyword">int</span> X[N],Y[N],Z[N],C1,C2,C3,D[N];</span><br><span class="line"><span class="comment">// X 原树 dfs 序</span></span><br><span class="line"><span class="comment">// y 原树 stack 序</span></span><br><span class="line"><span class="comment">// z 删去已经推完的点之后，剩下的点的 dfs 序</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> I[N],J[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs1</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	I[u]=A[u];</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> v:G[u]) D[v]=D[u]+<span class="number">1</span>,<span class="built_in">dfs1</span>(v),<span class="built_in">cmin</span>(I[u],I[v]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs2</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	J[X[u]=++C1]=u;</span><br><span class="line">	<span class="built_in">sort</span>(G[u].<span class="built_in">begin</span>(),G[u].<span class="built_in">end</span>(),[&amp;](<span class="keyword">int</span> x,<span class="keyword">int</span> y)&#123; <span class="keyword">return</span> I[x]&lt;I[y]; &#125;);</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> v:G[u]) <span class="built_in">dfs2</span>(v);</span><br><span class="line">	Y[u]=++C2;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> vis[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs3</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(vis[u]) <span class="keyword">return</span>;</span><br><span class="line">	Z[u]=++C3;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> v:G[u]) <span class="built_in">dfs3</span>(v);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) A[i]=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="keyword">int</span> p=n+<span class="number">1</span>; A[n+<span class="number">1</span>]=n+<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">2</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>();</span><br><span class="line">		G[u].<span class="built_in">pb</span>(v),F[v]=u;</span><br><span class="line">		<span class="keyword">if</span>(A[u]&lt;A[v] &amp;&amp; A[p]&gt;A[u]) p=u;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> f=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(p&lt;=n) <span class="keyword">while</span>(F[p]) &#123;</span><br><span class="line">		<span class="keyword">int</span> f=F[p];</span><br><span class="line">		<span class="comment">// illgal swap</span></span><br><span class="line">		<span class="keyword">if</span>(A[f]&lt;A[p]) <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;NO&quot;</span>),<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">swap</span>(A[p],A[F[p]]);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// not optimal swap</span></span><br><span class="line">		<span class="keyword">if</span>(F[f] &amp;&amp; A[F[f]]&lt;A[f]) <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;NO&quot;</span>),<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> v:G[f]) <span class="keyword">if</span>(A[v]&gt;A[f] &amp;&amp; A[v]&lt;A[p]) <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;NO&quot;</span>),<span class="number">0</span>;</span><br><span class="line">		p=F[p],ans++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">dfs1</span>(<span class="number">1</span>),<span class="built_in">dfs2</span>(<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(A[i]&lt;A[p]) f&amp;=A[i]==Y[i],vis[i]=<span class="number">1</span>,ans+=D[i];</span><br><span class="line">	<span class="built_in">dfs3</span>(<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(A[i]&gt;=A[p]) f&amp;=Z[i]+A[p]<span class="number">-1</span>==A[i];</span><br><span class="line">	<span class="keyword">if</span>(!f) <span class="built_in">puts</span>(<span class="string">&quot;NO&quot;</span>);</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;YES&quot;</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>,X[i]);</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1289,7 +1278,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">251</span>
+          <span class="site-state-item-count">252</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
