@@ -201,6 +201,99 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/4664.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/4664.html" class="post-title-link" itemprop="url">CF1514E - Baby Ehab's Hyper Apartment</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-06 12:07:57" itemprop="dateCreated datePublished" datetime="2021-05-06T12:07:57+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:43:48" itemprop="dateModified" datetime="2021-05-31T21:43:48+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1514E-Baby-Ehab’s-Hyper-Apartment"><a href="#CF1514E-Baby-Ehab’s-Hyper-Apartment" class="headerlink" title="CF1514E - Baby Ehab’s Hyper Apartment"></a>CF1514E - Baby Ehab’s Hyper Apartment</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>交互题，给定$n$元竞赛图，方向未知，通过两种操作</p>
+<p>1.查询$(a,b)$方向 ，上限$9n$次</p>
+<p>2.查询$a$到达一个集合$S$是否存在正向边，上限$2n$次</p>
+<p>判定所有点之间能否互相到达</p>
+<p><br></p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>能否互相到达是一个强连通问题，因此需要求出分量以及分量之间的拓扑关系</p>
+<p>由于是竞赛图，最终的每个分量一定可以排成一排，只能由前面向后面连边</p>
+<p>由于$9\approx \log n$，我们需要一个带$\log $的算法</p>
+<p>考虑将分量内部相对顺序随意，其他关系按照拓扑序确定</p>
+<p>通过一个 <strong>伪排序</strong> 得到一个初始序列</p>
+<p>然后只需要合并得到强连通分量的区间</p>
+<p>具体的，按照序列顺序，顺次向图上加入每个点$i$</p>
+<p>对于每个点$i$和当前的其所在分量$A$，左边的分量$B$，以及左边所有点的集合$S$</p>
+<p>判断$A,B$是否合并，即判断$i$是否有到达$S$的边</p>
+<p>最多有$n-1$次合并，以及$n-1$次合并失败</p>
+<p>tips: 由于标准库实现的原因，伪排序不能用std::sort，但是可以用std::stable_sort</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;1 %d %d\n&quot;</span>,a,b),<span class="built_in">fflush</span>(stdout);</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">rd</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> P[N];</span><br><span class="line"><span class="keyword">int</span> L[N],F[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		n=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) F[i]=P[i]=i;</span><br><span class="line">		<span class="built_in">stable_sort</span>(P,P+n,Que);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">			L[i]=i;</span><br><span class="line">			<span class="keyword">while</span>(L[i]) &#123;</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;2 %d %d &quot;</span>,P[i],L[i]);</span><br><span class="line">				<span class="built_in">rep</span>(j,<span class="number">0</span>,L[i]<span class="number">-1</span>) <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>,P[j]);</span><br><span class="line">				<span class="built_in">puts</span>(<span class="string">&quot;&quot;</span>),<span class="built_in">fflush</span>(stdout);</span><br><span class="line">				<span class="keyword">if</span>(<span class="built_in">rd</span>()) L[i]=L[L[i]<span class="number">-1</span>];</span><br><span class="line">				<span class="keyword">else</span> <span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="built_in">rep</span>(j,L[i],i) F[P[j]]=i;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;3&quot;</span>);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) <span class="built_in">putchar</span>((F[i]&lt;=F[j])+<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">			<span class="built_in">puts</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">fflush</span>(stdout);</span><br><span class="line">		<span class="keyword">if</span>(<span class="built_in">rd</span>()==<span class="number">-1</span>) <span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/28590.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1035,176 +1128,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/7692.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/7692.html" class="post-title-link" itemprop="url">联合省选2021爆零记</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-04 22:24:33" itemprop="dateCreated datePublished" datetime="2021-05-04T22:24:33+08:00">2021-05-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%B8%B8%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">游记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="联合省选2021爆零记"><a href="#联合省选2021爆零记" class="headerlink" title="联合省选2021爆零记"></a>联合省选2021爆零记</h1><h3 id="Day0"><a href="#Day0" class="headerlink" title="Day0"></a>Day0</h3><p><del>车程一如既往6h不眠不休</del></p>
-<p>听说订了神仙酒店！</p>
-<p><del>诶门在哪里</del></p>
-<p>刷脸进门！</p>
-<p>双层单间！</p>
-<p>一人一间大床房！</p>
-<p>100Mbs宽带！</p>
-<p>/se/se/se/se/se/se</p>
-<p>购买干粮*2</p>
-<p>22:00上床</p>
-<script type="math/tex; mode=display">\</script><h2 id="Day1"><a href="#Day1" class="headerlink" title="Day1"></a>Day1</h2><p>牛肉面送到寝室，进食….</p>
-<p><del>这个雨下得和去年莫名相似</del> 携带干粮*1，抵达学军紫荆港</p>
-<p>抵达Linux机房</p>
-<h3 id="Minute-10"><a href="#Minute-10" class="headerlink" title="Minute -10"></a>Minute -10</h3><p><del>哇居然提前10分钟开敲板子</del></p>
-<h3 id="Minute-0"><a href="#Minute-0" class="headerlink" title="Minute 0"></a>Minute 0</h3><p>今天密码公布相当顺利</p>
-<h3 id="Minute-10-20"><a href="#Minute-10-20" class="headerlink" title="Minute 10 - 20"></a>Minute 10 - 20</h3><p>嗯，是签到小贪心吗？好像是的</p>
-<p>数据范围。。。不能二分</p>
-<p>ok尺取</p>
-<p>…对拍对拍对拍对拍对拍…</p>
-<h3 id="Minute-20"><a href="#Minute-20" class="headerlink" title="Minute 20 - ?"></a>Minute 20 - ?</h3><p>T2 WTF???</p>
-<p>谨慎分析，嗯，是一个$2n$元$n^2$方程的线性规划求可行解</p>
-<p><del>啊啊啊啊啊啊</del></p>
-<p>消元？击毙-&gt;</p>
-<p>换元？击毙-&gt;</p>
-<p>网络流？击毙-&gt;</p>
-<p>单纯形？击毙-&gt;</p>
-<p>诶听说这年头对偶很流行？击毙-&gt;</p>
-<p>差分约束？方程这么长，不会。击毙-&gt;</p>
-<p>击毙-&gt;我</p>
-<p>$m=2$，这不硬来吗。。</p>
-<p>贪心乱搞一手….枚举每个点然后把四周$b_{i,j}$取$\min$放进去</p>
-<p>对拍…. WAWAWAWA</p>
-<p>改顺序… WAWAWAWA</p>
-<p>换堆… WAWAWAWA</p>
-<p>回撤! </p>
-<p>…WAWAWAWAWAWAWAWAWAWAWAWA…</p>
-<p>全排列$nm\leq 9$香啊</p>
-<p><del>我死了</del></p>
-<h3 id="Minute-120-150"><a href="#Minute-120-150" class="headerlink" title="Minute 120-150"></a>Minute 120-150</h3><p>完了完了T2都不会写，是不是所有人都会T2啊啊啊啊啊啊</p>
-<p>先T3暴力开一下，<del>说好了就暴力啊</del></p>
-<p>记忆化一下模拟是不是就44pts了</p>
-<script type="math/tex; mode=display">\</script><h3 id="Minute"><a href="#Minute" class="headerlink" title="Minute ???"></a>Minute ???</h3><p>…自闭中…</p>
-<script type="math/tex; mode=display">\</script><h3 id="Minute-infty"><a href="#Minute-infty" class="headerlink" title="Minute $\infty$"></a>Minute $\infty$</h3><p>出考场。。。</p>
-<p><del>完了所有人都A了T3</del></p>
-<p>带着愉<del>m</del>快<del>d</del>的心情回到酒店，感觉这波爆零势在必得</p>
-<p><del>那就先愉悦一下自己</del></p>
-<p>沙县小吃=晚饭</p>
-<p>21:30上床(ok早一点)</p>
-<p><br></p>
-<p><br></p>
-<p><br></p>
-<h2 id="Day2"><a href="#Day2" class="headerlink" title="Day2"></a>Day2</h2><p><del>说实话早上不知道醒了几次</del></p>
-<p>内心平静地又一次来到考场</p>
-<h3 id="Minute-10-1"><a href="#Minute-10-1" class="headerlink" title="Minute -10"></a>Minute -10</h3><p>今天没有提前10min敲板子</p>
-<p><del>但是Linux机房日常不还原</del></p>
-<h3 id="Minute-0-1"><a href="#Minute-0-1" class="headerlink" title="Minute 0"></a>Minute 0</h3><p>今天也是顺利公布密码的一天</p>
-<h3 id="Minute-10-20-1"><a href="#Minute-10-20-1" class="headerlink" title="Minute 10-20"></a>Minute 10-20</h3><p>…脑抽中…</p>
-<p>诶是不是要每个颜色开一个倍增<del>（写锤子</del></p>
-<h3 id="Minute-20-1"><a href="#Minute-20-1" class="headerlink" title="Minute 20++"></a>Minute 20++</h3><p><del>很显然每个点只用开自己颜色下一个颜色的匹配倍增</del></p>
-<p>终于开始敲….</p>
-<p><del>很快啊</del></p>
-<p>看起来大样例挺不chuo的</p>
-<script type="math/tex; mode=display">\</script><h3 id="Minute-40"><a href="#Minute-40" class="headerlink" title="Minute 40"></a>Minute 40</h3><p><del>辛酸血泪之题目看错</del></p>
-<p>啊，要求每次排名都是第一，那不是显然要记编号和分数</p>
-<p>看起来状态也不是很多嘛，calculating</p>
-<p><del>很好，完全存不下</del></p>
-<p>$\text{Hash_Table} $ GoGoGo！！</p>
-<p>诶怎么过不了样例，哦原来少了一个条件，<del>没关系一样存状态</del></p>
-<p>…TLE MLE TLE MLE TLE…</p>
-<p>调参..</p>
-<p><del>求您给我多点分。。。</del></p>
-<script type="math/tex; mode=display">\</script><h3 id="Minute-1"><a href="#Minute-1" class="headerlink" title="Minute ??++"></a>Minute ??++</h3><p>《关于联合省选把数据结构写进题目名字里》</p>
-<p>真棒<del>（淦）</del>，又出板板题</p>
-<p>根据题意模拟中….</p>
-<p>bitset 看起来很不错，暴力存储连通到达情况，qn^2/64，总能拿pts75吧</p>
-<p><br></p>
-<p><br></p>
-<h3 id="Minute-infty-1"><a href="#Minute-infty-1" class="headerlink" title="Minute $\infty$"></a>Minute $\infty$</h3><p><del>今天又是打暴力的一天呢</del></p>
-<p><del>6h 返程</del></p>
-<script type="math/tex; mode=display">\</script><h2 id="Day"><a href="#Day" class="headerlink" title="Day?"></a>Day?</h2><p>怎么才有民间数据…</p>
-<p>D1 T1 ok</p>
-<p>D1 T2 ok</p>
-<p>D1 T3 啊啊啊啊啊啊WA了</p>
-<p>D2 T1 ok</p>
-<p>D2 T2 <del>这个数据不行</del></p>
-<p>D2 T3 啊啊啊啊啊怎么又WA了</p>
-<p><del>哭爹还是喊娘</del></p>
-<h2 id="Day-1"><a href="#Day-1" class="headerlink" title="Day??++"></a>Day??++</h2><p>出成绩….</p>
-<p>D1 T1 ok</p>
-<p>D1 T2 ok</p>
-<p>D1 T3 44-&gt;16pts …</p>
-<p>D2 T1 ok</p>
-<p>D2 T2 怎么就真的60pts呗</p>
-<p>D2 T3 难道bitset它T掉了？</p>
-<p><del>371完成爆零</del></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1278,7 +1201,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">252</span>
+          <span class="site-state-item-count">253</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

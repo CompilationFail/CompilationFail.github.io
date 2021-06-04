@@ -201,6 +201,99 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/29370.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/29370.html" class="post-title-link" itemprop="url">[HDU-6834] Yukikaze and Smooth numbers</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-08 21:22:49" itemprop="dateCreated datePublished" datetime="2020-08-08T21:22:49+08:00">2020-08-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:51:30" itemprop="dateModified" datetime="2021-05-31T21:51:30+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="HDU-6834-Yukikaze-and-Smooth-numbers"><a href="#HDU-6834-Yukikaze-and-Smooth-numbers" class="headerlink" title="[HDU-6834] Yukikaze and Smooth numbers"></a>[HDU-6834] Yukikaze and Smooth numbers</h1><p>题意：计算$[1,n]$中只包含$[1,k]$的质因数的数个数</p>
+<p>让人联想到Min25筛的$dp$模型</p>
+<p>设$m=\sqrt n$，可以对于$k &gt; m$和$k\leq m$讨论</p>
+<h2 id="Case1-k-leq-m"><a href="#Case1-k-leq-m" class="headerlink" title="Case1:$k\leq m$"></a>Case1:$k\leq m$</h2><p>此时可以直接套用类似Min25筛的$dp$模型求解</p>
+<p>令$dp_{i,j}$为$[1,j]$只包含$[1,i]$的质因数的数个数</p>
+<p>则$dp_{i,j}=\sum_k dp_{i-1,\lfloor \frac{j} {prime_i^k}\rfloor }$</p>
+<p>要求的是$dp_{k,n}$，第二维状态是$O(m)$级别的</p>
+<p>直接写当然是近似于$O(m\cdot \pi(n))=O(\frac{n} {\log n})$级别的</p>
+<p>加上Min25筛的优化，令$dp_i,j$不包含单质数和1的情况，以减少转移情况</p>
+<p>如果从大到小考虑每个质数，那么只需要考虑$j\ge prime_i^2$的第二维状态，以减少很多的$dp$时间</p>
+<p>沿用Min25筛复杂度证明，是$O(\frac{n^{\frac{3} {4} }} {\log n})$的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> id(x) (x&lt;=m?x:cnt-n/x+1)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> dp[N],g[N],st[N],cnt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(k==<span class="number">1</span>)&#123; <span class="built_in">puts</span>(<span class="string">&quot;1&quot;</span>); <span class="keyword">continue</span>; &#125;</span><br><span class="line">m=<span class="built_in">sqrt</span>(n),cnt=<span class="number">0</span>;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,n) st[++cnt]=i=n/(n/i),dp[cnt]=<span class="number">0</span>; <span class="comment">// 不包括质数本身和1</span></span><br><span class="line"><span class="keyword">int</span> sz=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(pri[sz+<span class="number">1</span>]&lt;=k) sz++;</span><br><span class="line"><span class="keyword">int</span> p=<span class="number">0</span>;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,cnt)&#123;</span><br><span class="line">    <span class="keyword">while</span>(p&lt;sz &amp;&amp; pri[p+<span class="number">1</span>]&lt;=st[i]) p++;</span><br><span class="line">    g[i]=p;</span><br><span class="line">&#125;    </span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,cnt) <span class="keyword">for</span>(ll x=pri[sz]*pri[sz];x&lt;=st[i];x*=pri[sz]) dp[i]++;</span><br><span class="line"><span class="keyword">for</span>(reg <span class="keyword">int</span> i=sz<span class="number">-1</span>;i;--i) &#123;</span><br><span class="line">    <span class="keyword">for</span>(reg <span class="keyword">int</span> j=cnt,tmp=pri[i]*pri[i];st[j]&gt;=tmp;--j) &#123;</span><br><span class="line">        reg <span class="keyword">int</span> x=st[j];</span><br><span class="line">        <span class="keyword">while</span>(x&gt;=tmp) &#123;</span><br><span class="line">            x/=pri[i];</span><br><span class="line">            dp[j]+=dp[<span class="built_in">id</span>(x)]+g[<span class="built_in">id</span>(x)]-i+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,dp[cnt]+sz+<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">\</script><h2 id="Case2-k-gt-m"><a href="#Case2-k-gt-m" class="headerlink" title="Case2 : $k&gt; m$"></a>Case2 : $k&gt; m$</h2><p>可以把问题转化为求不合法部分，即$\sum_{prime_i&gt;k}\lfloor \frac{n} {prime_i}\rfloor $</p>
+<p>采用数论分段计算$\lfloor \frac{n} {i}\rfloor $，那么剩下的问题就是要求一段区间内的质数个数</p>
+<p>同样采用类似上面的模型，</p>
+<p>令$dp_{i,j}$为$[1,j]$内与前$[1,i]$内质数互质的个数以及这些质数本身，不包括1 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">int</span> dp[N],g[N],st[N],cnt;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> id(x) (x&lt;=m?x:cnt-n/x+1)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Count</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(n&lt;N) <span class="keyword">return</span> pcount[n];</span><br><span class="line">    ::n=n,m=<span class="built_in">sqrt</span>(n),cnt=<span class="number">0</span>;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n) st[++cnt]=i=n/(n/i),dp[cnt]=i<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">for</span>(reg <span class="keyword">int</span> i=<span class="number">1</span>;pri[i]&lt;=m;++i) &#123;</span><br><span class="line">        <span class="keyword">for</span>(reg <span class="keyword">int</span> j=cnt,tmp=pri[i]*pri[i];st[j]&gt;=tmp;--j) &#123;</span><br><span class="line">            reg <span class="keyword">int</span> k=st[j]/pri[i];</span><br><span class="line">            dp[j]-=dp[<span class="built_in">id</span>(k)]-(i<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> dp[cnt];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体复杂度没有算过，应该不会太高</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/1020.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1035,137 +1128,6 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/21992.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/21992.html" class="post-title-link" itemprop="url">堆</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-07-26 08:20:47" itemprop="dateCreated datePublished" datetime="2020-07-26T08:20:47+08:00">2020-07-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:18:04" itemprop="dateModified" datetime="2021-05-31T20:18:04+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h1><p>每个节点权值大于(小根堆)父亲的树形数据结构</p>
-<p>以下均讨论小根堆的问题</p>
-<h2 id="普通二叉堆"><a href="#普通二叉堆" class="headerlink" title="普通二叉堆"></a>普通二叉堆</h2><p>用数组$a[1:n]$构成一棵二叉树来维护堆操作，可以做到</p>
-<p>1.插入元素</p>
-<p>2.查询堆顶</p>
-<p>3.删除堆顶或者删除特定元素(需要记录权值位置)</p>
-<p>1.插入元素</p>
-<p>先放到$a[n+1]$的位置，然后每次与父亲比较是否交换</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">push</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    a[++n]=x;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> p=n;p&gt;<span class="number">1</span> &amp;&amp; a[p]&lt;a[p&gt;&gt;<span class="number">1</span>];) <span class="built_in">swap</span>(a[p],a[p&gt;&gt;<span class="number">1</span>]),p&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2.删除特定元素</p>
-<p>删除后，把$a[n]$元素放到空的位置，然后向下走，注意每次一定是把左右儿子中比较小的换上来</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delete</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    <span class="built_in">swap</span>(a[x],a[n--]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> p=x;(p&lt;&lt;<span class="number">1</span>)&lt;=n;)&#123;</span><br><span class="line">		<span class="keyword">int</span> nxt=p&lt;&lt;<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>((p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>)&lt;=n &amp;&amp; a[p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>]&lt;a[p&lt;&lt;<span class="number">1</span>]) nxt=p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>(a[nxt]&lt;a[p]) <span class="built_in">swap</span>(a[p],a[nxt]);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<script type="math/tex; mode=display">\</script><h2 id="配对堆"><a href="#配对堆" class="headerlink" title="配对堆"></a>配对堆</h2><p>配对堆不是一个二叉树结构，所以在存储上，使用左儿子右兄弟来存储树形结构</p>
-<p>可以实现的操作有</p>
-<p>1.插入/删除元素，查询堆顶</p>
-<p>2.查询堆顶</p>
-<p>3.<strong>合并两个堆</strong></p>
-<p>首先要维护最基本的两个操作</p>
-<p>1.合并两个堆</p>
-<p>直接按照堆顶权值大小合并，接上去即可</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a[N],ch[N],br[N]; <span class="comment">//权值，儿子，兄弟</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Union</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!x||!y) <span class="keyword">return</span> x|y;</span><br><span class="line">    <span class="keyword">if</span>(a[x]&gt;a[y]) <span class="built_in">swap</span>(x,y);</span><br><span class="line">    br[y]=ch[x],ch[x]=y;</span><br><span class="line">    <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2.配对操作</p>
-<p>把一个点的所有儿子两两合并之后再依次合并到一起</p>
-<p>配对堆的所有操作都基于合并和配对实现</p>
-<p>合并操作是$O(1)$的</p>
-<p>配对操作单次最坏是$O(n)$，但是和$\text{Splay}$类似的，配对可以让儿子中兄弟最多的个数减半，是一个均摊$O(\log n)$的操作，因此不可持久化，但是实际运行常数比较小</p>
-<p>操作实现：用一个函数给$x$和$x$的右边的所有兄弟配对，递归实现</p>
-<p>每次让$x$和右边第一个兄弟配对(即先合并)，再和右边剩下的节点合并</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Pair</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!x || !br[x]) <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">int</span> y=br[x],z=br[y];</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Union</span>(<span class="built_in">Union</span>(x,y),<span class="built_in">Pair</span>(z));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>3.删除元素</p>
-<p>如果删除的不是堆顶元素，还需要额外存储每个点的父亲</p>
-<p>把被删除元素的儿子合并之后接到父亲上面</p>
-<p>4.查询堆顶</p>
-<p>如果是查询某个特定元素所在堆的堆顶，需要用并查集来维护</p>
-<script type="math/tex; mode=display">\</script><h2 id="左偏树"><a href="#左偏树" class="headerlink" title="左偏树"></a>左偏树</h2><p>左偏树是一个二叉堆结构，顾名思义，向左边偏的树</p>
-<p>左偏树判断左偏的方法是定义了一个$dis$数组，满足$\forall dis_{lson}\ge dis_{rson},dis_x=dis_{rson}+1$</p>
-<p>因此一直走右儿子的链长度就是$O(\log n)$的</p>
-<p>利用这个性质完成操作，每次合并之后检查$dis_{lson},dis_{rson}$是否满足条件</p>
-<p>可以完成的操作有</p>
-<p>1.插入节点/合并堆</p>
-<p>2.删除节点</p>
-<p>3.访问堆顶</p>
-<p>4.<strong>可持久化</strong></p>
-<p>1.检查操作</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Check</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(dis[ls[x]]&lt;dis[rs[x]]) <span class="built_in">swap</span>(ls[x],rs[x]);</span><br><span class="line">    dis[x]=dis[rs[x]]+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>左偏树的合并操作就是</p>
-<p>让较大的堆顶 和 小的堆顶的右儿子合并成为 新的右儿子</p>
-<p>很显然合并次数$\leq $两个堆的右儿子长度之和，这个操作是单次$O(\log n)$</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Union</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!x||!y) <span class="keyword">return</span> x|y;</span><br><span class="line">    <span class="keyword">if</span>(a[x]&gt;a[y]) <span class="built_in">swap</span>(x,y);</span><br><span class="line">    <span class="keyword">return</span> rs[x]=<span class="built_in">Union</span>(rs[x],y),;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>2.删除节点</p>
-<p>合并左右儿子后接到父亲上</p>
-<p>3.访问堆顶</p>
-<p>左偏树的深度没有保证，访问特定节点所在堆的堆顶需要用并查集维护</p>
-<p>4.可持久化</p>
-<p>由于单次访问复杂度保证了是$O(\log n)$，因此可以对于每次合并得到的开一个新的节点存下来</p>
-<p>即完成了可持久化操作</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1239,7 +1201,7 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">252</span>
+          <span class="site-state-item-count">253</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

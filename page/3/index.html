@@ -201,6 +201,99 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/21555.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/21555.html" class="post-title-link" itemprop="url">CF1119F - Niyaz and Small Degrees</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-26 20:53:45" itemprop="dateCreated datePublished" datetime="2021-05-26T20:53:45+08:00">2021-05-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:25:28" itemprop="dateModified" datetime="2021-05-31T21:25:28+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1119F-Niyaz-and-Small-Degrees"><a href="#CF1119F-Niyaz-and-Small-Degrees" class="headerlink" title="CF1119F - Niyaz and Small Degrees"></a>CF1119F - Niyaz and Small Degrees</h1><h2 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h2><p>给定一棵带权树，对于每个$k\in[0,n-1]$</p>
+<p>求出删除一个权值最小的边集使得没有一个点度数$&gt;k$</p>
+<p><br></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><h3 id="单个-k"><a href="#单个-k" class="headerlink" title="单个$k$"></a>单个$k$</h3><p>考虑对于单个$k$的计算，可以有如下$O(n)$的$dp$做法</p>
+<p>令$dp_{u,0/1}$表示对于$u$子树内的点已经确定合法，$0/1$表示连向父亲的边是否断掉</p>
+<p>实际上我们需要在连向儿子的边中选择若干条断掉</p>
+<p>也就是取若干$v\in son_u,dp_{v,1}$和若干$dp_{v,0}$</p>
+<p>实际上只需要考虑$dp_{v,1}-dp_{v,0}$差值的前$d$小，其中$d=deg_u-k(-1)$</p>
+<p>用<code>std::nth_element</code>即可实现$O(n)$计算</p>
+<p><br></p>
+<h3 id="所有-k"><a href="#所有-k" class="headerlink" title="所有$k$"></a>所有$k$</h3><p>考虑对于$k$，只有$deg_u&gt;k$的$u$才会考虑对于它周围的边删除</p>
+<p>我们称对于$k$这样的节点$u$为关键点，其集合为$S_k$</p>
+<p>换句话说，$u$只有在$k\in[0,deg_u-1]$的$deg_u$的$k$中被计算答案</p>
+<p>而又知道$\sum deg_u=2n-2$，故对于所有$k$考虑关键点的数量之和为$O(n)$</p>
+<p>但是实际实现上，因为这样的$u$构成若干联通子图，且那些与关键点所连的非关键点需要处理边的贡献</p>
+<p>显然一个非关键点$dp_{v,0}=0,dp_{v,1}=w_v$，$w_v$为父边权值</p>
+<p>我们需要在$\{w_v|v\in son_u-S_k\}$和$\{dp_{v,1}-dp_{v,0}|v\in son_u\cap S_k\}$中取前$d$小，可以用线段树$O(n\log n)$维护</p>
+<p>如果使用基数排序+链表+懒标记做删除和$k$大操作，查询$k$大部分复杂度为$O(n)$，但是还是要sort$dp_{v,1}-dp_{v,0}$</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2.5e5</span>+<span class="number">10</span>,U=<span class="number">1e6</span>,M=N*<span class="number">40</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">int</span> A[N],C,D[N];</span><br><span class="line">vector &lt;Pii&gt; E[N],G[N];</span><br><span class="line"><span class="keyword">int</span> I[N],V[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> rt[N],ls[M],rs[M],c[M],cnt; ll s[M];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Upd</span><span class="params">(<span class="keyword">int</span> &amp;p,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!p) p=++cnt;</span><br><span class="line">	s[p]+=x*y,c[p]+=y;</span><br><span class="line">	<span class="keyword">if</span>(l==r) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	x&lt;=mid?<span class="built_in">Upd</span>(ls[p],l,mid,x,y):<span class="built_in">Upd</span>(rs[p],mid+<span class="number">1</span>,r,x,y);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">ll <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(c[p]&lt;k) <span class="keyword">return</span> <span class="number">1e18</span>;</span><br><span class="line">	<span class="keyword">if</span>(!k || l==r) <span class="keyword">return</span> l*k;</span><br><span class="line">	<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(c[ls[p]]&gt;=k) <span class="keyword">return</span> <span class="built_in">Que</span>(ls[p],l,mid,k);</span><br><span class="line">	<span class="keyword">return</span> s[ls[p]]+<span class="built_in">Que</span>(rs[p],mid+<span class="number">1</span>,r,k-c[ls[p]]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll dp[N][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> vis[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u)</span> </span>&#123;</span><br><span class="line">	vis[u]=<span class="number">1</span>;</span><br><span class="line">	dp[u][<span class="number">0</span>]=dp[u][<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">	vector &lt;ll&gt; val;</span><br><span class="line">	<span class="keyword">int</span> c=<span class="number">0</span>; ll s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(Pii t:G[u]) &#123;</span><br><span class="line">		<span class="keyword">int</span> v=t.first,w=t.second;</span><br><span class="line">		<span class="keyword">if</span>(vis[v]) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="built_in">dfs</span>(v);</span><br><span class="line">		dp[v][<span class="number">1</span>]+=w,s+=dp[v][<span class="number">0</span>];</span><br><span class="line">		<span class="keyword">if</span>(dp[v][<span class="number">1</span>]&lt;=dp[v][<span class="number">0</span>]) c++,s+=dp[v][<span class="number">1</span>]-dp[v][<span class="number">0</span>];</span><br><span class="line">		<span class="keyword">else</span> val.<span class="built_in">pb</span>(dp[v][<span class="number">1</span>]-dp[v][<span class="number">0</span>]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">sort</span>(val.<span class="built_in">begin</span>(),val.<span class="built_in">end</span>());</span><br><span class="line">	<span class="comment">// Get the sum of first k elements</span></span><br><span class="line">	<span class="keyword">auto</span> F=[&amp;](<span class="keyword">int</span> k) &#123;</span><br><span class="line">		ll ans=<span class="built_in">Que</span>(rt[u],<span class="number">1</span>,U,k),s=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span>(ll i:val) &#123;</span><br><span class="line">			<span class="keyword">if</span>(--k&lt;<span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">			<span class="built_in">cmin</span>(ans,(s+=i)+<span class="built_in">Que</span>(rt[u],<span class="number">1</span>,U,k));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ans;</span><br><span class="line">	&#125;;</span><br><span class="line">	dp[u][<span class="number">0</span>]=s+<span class="built_in">F</span>(<span class="built_in">max</span>(<span class="number">0</span>,D[u]-c-m));</span><br><span class="line">	dp[u][<span class="number">1</span>]=s+<span class="built_in">F</span>(<span class="built_in">max</span>(<span class="number">0</span>,D[u]-c<span class="number">-1</span>-m));</span><br><span class="line">	<span class="comment">//cout&lt;&lt;&quot;Dfs &quot;&lt;&lt;u&lt;&lt;&#x27; &#x27;&lt;&lt;dp[u][0]&lt;&lt;&#x27; &#x27;&lt;&lt;dp[u][1]&lt;&lt;endl;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll ans[N];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">2</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>(),w=<span class="built_in">rd</span>();</span><br><span class="line">		ans[<span class="number">0</span>]+=w;</span><br><span class="line">		E[u].<span class="built_in">pb</span>(<span class="built_in">mp</span>(v,w)),E[v].<span class="built_in">pb</span>(<span class="built_in">mp</span>(u,w));</span><br><span class="line">		<span class="built_in">Upd</span>(rt[u],<span class="number">1</span>,U,w,<span class="number">1</span>),<span class="built_in">Upd</span>(rt[v],<span class="number">1</span>,U,w,<span class="number">1</span>);</span><br><span class="line">		D[u]++,D[v]++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) I[i]=i;</span><br><span class="line">	<span class="built_in">sort</span>(I+<span class="number">1</span>,I+n+<span class="number">1</span>,[&amp;](<span class="keyword">int</span> x,<span class="keyword">int</span> y)&#123; <span class="keyword">return</span> D[x]&gt;D[y]; &#125;);</span><br><span class="line">	<span class="keyword">int</span> p=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(m=n<span class="number">-1</span>;m;m--) &#123;</span><br><span class="line">		<span class="comment">//printf(&quot;Solving %d \n&quot;,m);</span></span><br><span class="line">		<span class="keyword">while</span>(p &amp;&amp; D[I[p]]&gt;m) &#123;</span><br><span class="line">			<span class="keyword">int</span> u=I[p++];</span><br><span class="line">			V[A[++C]=u]=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">for</span>(Pii v:E[u]) <span class="keyword">if</span>(V[v.first]) &#123;</span><br><span class="line">				<span class="built_in">Upd</span>(rt[u],<span class="number">1</span>,U,v.second,<span class="number">-1</span>),<span class="built_in">Upd</span>(rt[v.first],<span class="number">1</span>,U,v.second,<span class="number">-1</span>);</span><br><span class="line">				G[u].<span class="built_in">pb</span>(v),G[v.first].<span class="built_in">pb</span>(<span class="built_in">mp</span>(u,v.second));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,C) vis[A[i]]=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,C) <span class="keyword">if</span>(!vis[A[i]]) <span class="built_in">dfs</span>(A[i]),ans[m]+=dp[A[i]][<span class="number">0</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="built_in">printf</span>(<span class="string">&quot;%lld &quot;</span>,ans[i]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/31260.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1082,131 +1175,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/22983.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/22983.html" class="post-title-link" itemprop="url">下降幂多项式</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-20 09:52:48" itemprop="dateCreated datePublished" datetime="2021-05-20T09:52:48+08:00">2021-05-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:14:47" itemprop="dateModified" datetime="2021-05-31T20:14:47+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="下降幂多项式"><a href="#下降幂多项式" class="headerlink" title="下降幂多项式"></a>下降幂多项式</h1><hr>
-<h2 id="下降幂的定义"><a href="#下降幂的定义" class="headerlink" title="下降幂的定义"></a>下降幂的定义</h2><p>下降幂$\text{Falling Factorial}$</p>
-<p>下降幂多项式$\text{Falling Factorial Polynomial}$下面简称$\text{FFP}$</p>
-<p>$x$的$n$阶下降幂$x^{\underline n}=\prod_0^{n-1}(x-i) = \frac{x!} {(x-n)!}$</p>
-<p>一个下降幂多项式$F(x)=\sum a_ix^{\underline i}$</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/14049870.html">学习了斯特林数或许对于下降幂的性质能够有所了解</a></p>
-<p><br></p>
-<p><br></p>
-<hr>
-<h3 id="快速求解-x-underline-n-的展开形式"><a href="#快速求解-x-underline-n-的展开形式" class="headerlink" title="快速求解$x^{\underline n}$的展开形式"></a>快速求解$x^{\underline n}$的展开形式</h3><p>$x^{\underline{n} }=x(x-1)\cdots (x-n+1)$</p>
-<p>考虑倍增求解，假设已知$F(x)=x^{\underline{n} }$</p>
-<p>要求$G(x)=x^{\underline{2n} }$</p>
-<p>显然$G(x)=F(x)F(x-n)$</p>
-<p>而$\displaystyle F(x-n)=\sum_{i=0}^{n} [x^i]F(x) \cdot (x-n)^i$</p>
-<p>用一次卷积处理这个二项展开即可</p>
-<p>复杂度为$O(n\log n)$</p>
-<p><br></p>
-<hr>
-<h2 id="FFP与其点值的-text-EGF"><a href="#FFP与其点值的-text-EGF" class="headerlink" title="FFP与其点值的$\text{EGF}$"></a>FFP与其点值的$\text{EGF}$</h2><p>点值的$\text{EGF}$为$\displaystyle EGF(F(x))=\sum_0^{\infty}\frac{F(i)x^i } {i!}$</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{\infty}\frac{x^i} {i!}\sum_{j=0}^{n} \frac{i!} {(i-j)!}\cdot F_j$</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{\infty}x^i \sum_{j=0}^{n} \frac{1} {(i-j)!}\cdot F_j$</p>
-<p>换一下顺序</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{n} F_i \sum_{j=i}^{\infty}\frac{1} {(j-i)!} x^j$</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{n} F_i \cdot x^i \sum_{j=0}^{\infty}\frac{1} {j!} x^j$</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{n} F_i \cdot x^i e^x$</p>
-<p>那么直接和$e^x$卷积就可以得到$F(x)$的$\text{EGF}$</p>
-<p>Tips: $e^x$直接带入展开式 $\displaystyle e^{ax}=\sum_0^{\infty}\frac{(ax)^i} {i!} $</p>
-<p>如果要从$\text{EGF}$得到$F(x)$</p>
-<p>$\displaystyle EGF(F(x))=\sum_{i=0}^{n} F_i \cdot x^ie^x$</p>
-<p>$\displaystyle F_i=\frac{EGF(F(x))} {x^ie^x}$</p>
-<p>那么就直接卷上$e^{-x}$就可以了</p>
-<p>即可以通过简单卷积完成$\text{FFP} \Longleftrightarrow \text{EGF}$的转化</p>
-<p><br></p>
-<hr>
-<h2 id="FFP卷积"><a href="#FFP卷积" class="headerlink" title="FFP卷积"></a>FFP卷积</h2><p>求出$\text{EGF}$，然后点值对应相乘(注意乘完之后要补上一个$i!$)，最后再反求$F(x)$</p>
-<p><br></p>
-<p><br></p>
-<hr>
-<p>Tips: 下面的知识恐怕需要先学<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13073178.html">多点求值/快速插值</a></p>
-<h2 id="多项式转FFP"><a href="#多项式转FFP" class="headerlink" title="多项式转FFP"></a>多项式转FFP</h2><p>带入$0,\cdots n-1$，多点求值得到$\text{FFP}$点值的$EGF$，然后求得到$\text{FFP}$</p>
-<p><br></p>
-<p><br></p>
-<hr>
-<h2 id="FFP转多项式"><a href="#FFP转多项式" class="headerlink" title="FFP转多项式"></a>FFP转多项式</h2><p>求出$F(x)$的$EGF$，然后带入前$n$项的值，快速插值回来即可</p>
-<p>由于$x_i$是连续的，所以不需要再多点求值求解$\prod\frac{1} {x_i-x_j}$，可以直接阶乘得到</p>
-<p><br></p>
-<p><br></p>
-<h2 id="关于上升幂"><a href="#关于上升幂" class="headerlink" title="关于上升幂"></a>关于上升幂</h2><p>$x^{\overline n}=\frac{(x+n-1)!} {(x-1)!}=x(x+1)(x+2)\cdots(x+n-1)$</p>
-<p>容易发现的是$x^{\overline n}=(-x)(-((-x)-1))(-((-x)-2))\cdots (-(-x-(n-1)))=(-1)^n (-x)^{\underline{n} }$</p>
-<p>所以上升幂多项式与普通多项式的转化 可以认为是上面的点值变成了$0,-1,\cdots ,-(n-1)$，奇数项系数取反</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1280,7 +1248,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">252</span>
+          <span class="site-state-item-count">253</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

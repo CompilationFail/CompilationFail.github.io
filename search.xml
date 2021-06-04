@@ -1,6 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>带花树笔记</title>
+    <url>/46999.html</url>
+    <content><![CDATA[<h1 id="带花树笔记"><a href="#带花树笔记" class="headerlink" title="带花树笔记"></a>带花树笔记</h1><p>实际上只是存一下算法流程以便复习</p>
+<h3 id="前言：名字的由来"><a href="#前言：名字的由来" class="headerlink" title="前言：名字的由来"></a>前言：名字的由来</h3><p>树：增广交替树，即从$u$开始，由匹配边和增广边交替构成的树</p>
+<p>对于二分图，增广过程中忽略偶环，因此就是一棵树</p>
+<p>花：一般图存在奇环，在扩展增广树的过程中遇到奇环，就将奇环叫做花</p>
+<h3 id="算法略解"><a href="#算法略解" class="headerlink" title="算法略解"></a>算法略解</h3><p><del>二分图匹配的匈牙利算法采用$\text{dfs}$这一点可能对于我的二分图造成了很大困扰</del></p>
+<p>依然是对于每个点$rt$出发，试图找一条增广路</p>
+<p>按照每个点被遍历的情况进行染色，设$col_{rt}=1$，交替的$col_{i}=2$</p>
+<p>广搜式地增广，队列中的节点$u$一定满足$col_{u}=1$</p>
+<p>每次试图增广一条边$(u,v)$</p>
+<p>1.$v$还未被访问过</p>
+<p>1-1.$v$是空点，就匹配</p>
+<p>1-2.$v$已经被匹配，此时满足交替，扩展树形，从其匹配点继续</p>
+<p>2.遇到偶环：依然忽略，因为对于增广无益</p>
+<p>3.遇到奇环，即$col_u=col_v=1$</p>
+<p>考虑此时，奇环的两端对应树上一段交替的匹配路径</p>
+<p>由于路径长度是奇数，这意味着环总有一个点无法被匹配</p>
+<p>如果最终我们希望找到的一条增广路径，其恰好穿过这个环</p>
+<p><img src="https://i.loli.net/2021/06/04/QkKXlv8Loxqn26Z.png" alt="Screenshot from 2021-06-04 22-01-53.png"></p>
+<p>那么其在环上覆盖了一段点，此时，可以直接将这段边修改为所需要的交替情况</p>
+<p>同时可以调整另一边的交替情况，最终使得匹配合法，且更改后不影响环上的匹配数</p>
+<p>也就是说，一条交替路径可以从环的根节点进入，从任何一个节点出去</p>
+<p>那么我们可以直接将环上的点缩成一个点</p>
+<p>同时将每个未被增广的点（即原先$col=2$）$col$改为$1$，加入队列</p>
+<p>由于在处理过程中修改了图的结构，需要用并查集维护</p>
+<p><br></p>
+<p>实际实现细节较多，突出表现在：</p>
+<p>1.在进行合并时，要在在一定程度上保留原路径的形态，以便最终找到增广路径后复原</p>
+<p>由于一段路径穿过环有两种可能的覆盖情况，真的每次找到环然后调整两边会让实现极其复杂</p>
+<p>在合并过程中，我们修改不会跨过多出的环边的那一段 ，总是合法的</p>
+<p>所以保留路径的过程，只需要将原先两段路径上的点相邻之间双向连边</p>
+<p>2.实际实现时并不能像合并树链一样每次找深的点跳上去</p>
+<p>解决方法：先找到两个点的$\text{LCA}$，然后分别合并两段路径</p>
+<p>找到$\text{LCA}$的过程为保证复杂度：</p>
+<p>交替地跳两个节点，直到一个点被遍历了两次，那个点就是$\text{LCA}$</p>
+<p>这样复杂度就是：较深节点到$\text{LCA}$距离$\times 2$</p>
+<p>遍历标记不能清空，所以采取时间戳</p>
+<p>这样就能做到合并节点复杂度为均摊$O(n)$（忽略了并查集哈）</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">510</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>,P=<span class="number">1e9</span>+<span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; G[N];</span><br><span class="line"><span class="keyword">int</span> col[N]; <span class="comment">// vertex type</span></span><br><span class="line"><span class="keyword">int</span> F[N]; <span class="comment">// for union find set </span></span><br><span class="line"><span class="keyword">int</span> match[N]; <span class="comment">// match[u]=v ,match[v]=u holds if match[u]!=0</span></span><br><span class="line"><span class="keyword">int</span> pre[N]; <span class="comment">// previous vertex on alternating tree</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123; <span class="keyword">return</span> F[x]==x?x:F[x]=<span class="built_in">Find</span>(F[x]); &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Switch</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	<span class="comment">// match one by one...</span></span><br><span class="line">	<span class="keyword">while</span>(u) &#123;</span><br><span class="line">		<span class="keyword">int</span> t=match[pre[u]];</span><br><span class="line">		match[match[pre[u]]=u]=pre[u];</span><br><span class="line">		u=t;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">LCA</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">int</span> clo,vis[N];</span><br><span class="line">	clo++;</span><br><span class="line">	<span class="comment">// lca method: step by step !!!</span></span><br><span class="line">	<span class="comment">// the problem is : we don&#x27;t know the depths of both vertices</span></span><br><span class="line">	<span class="comment">// but we can keep jumping alternatively , until the deeper vertex reaches lca</span></span><br><span class="line">	<span class="comment">// so the complexity is the distance between deeper vertex and lca</span></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span>(u) &#123;</span><br><span class="line">			u=<span class="built_in">Find</span>(u);</span><br><span class="line">			<span class="keyword">if</span>(vis[u]==clo) <span class="keyword">return</span> u;</span><br><span class="line">			vis[u]=clo;</span><br><span class="line">			u=pre[match[u]];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">swap</span>(u,v);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">queue &lt;<span class="keyword">int</span>&gt; que;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Shrink</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> f)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// shrink the path v-&gt;u-&gt;f</span></span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">Find</span>(u)!=f) &#123;</span><br><span class="line">		pre[u]=v,v=match[u];</span><br><span class="line">		<span class="keyword">if</span>(col[v]==<span class="number">2</span>) col[v]=<span class="number">1</span>,que.<span class="built_in">push</span>(v);</span><br><span class="line">		<span class="keyword">if</span>(<span class="built_in">Find</span>(u)==u) F[u]=f;</span><br><span class="line">		<span class="keyword">if</span>(<span class="built_in">Find</span>(v)==v) F[v]=f;</span><br><span class="line">		u=pre[v];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Bfs</span><span class="params">(<span class="keyword">int</span> u)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) col[i]=pre[i]=<span class="number">0</span>,F[i]=i;</span><br><span class="line">	<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) que.<span class="built_in">pop</span>();</span><br><span class="line">	que.<span class="built_in">push</span>(u),col[u]=<span class="number">1</span>;</span><br><span class="line">	<span class="comment">//cout&lt;&lt;&quot;tryna match &quot;&lt;&lt;u&lt;&lt;endl;</span></span><br><span class="line">	<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=que.<span class="built_in">front</span>(); que.<span class="built_in">pop</span>();</span><br><span class="line">		<span class="built_in">assert</span>(col[u]==<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> v:G[u]) &#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="built_in">Find</span>(u)==<span class="built_in">Find</span>(v)) <span class="keyword">continue</span>;</span><br><span class="line">			<span class="keyword">if</span>(!col[v]) &#123;</span><br><span class="line">				col[v]=<span class="number">2</span>,pre[v]=u;</span><br><span class="line">				<span class="keyword">if</span>(!match[v]) <span class="keyword">return</span> <span class="built_in">Switch</span>(v),<span class="number">1</span>;</span><br><span class="line">				col[match[v]]=<span class="number">1</span>,que.<span class="built_in">push</span>(match[v]);</span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span>(col[u]==col[v]) &#123;</span><br><span class="line">				<span class="comment">//cout&lt;&lt;&quot;lcaing &quot;&lt;&lt;u&lt;&lt;&#x27; &#x27;&lt;&lt;v&lt;&lt;endl;</span></span><br><span class="line">				<span class="keyword">int</span> lca=<span class="built_in">LCA</span>(u,v);</span><br><span class="line">				<span class="comment">//cout&lt;&lt;&quot;shrink!!!&quot;&lt;&lt;u&lt;&lt;&#x27; &#x27;&lt;&lt;v&lt;&lt;&#x27; &#x27;&lt;&lt;lca&lt;&lt;endl;</span></span><br><span class="line">				<span class="comment">// the path has two parts</span></span><br><span class="line">				<span class="built_in">Shrink</span>(u,v,lca);</span><br><span class="line">				<span class="built_in">Shrink</span>(v,u,lca);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>();</span><br><span class="line">		G[u].<span class="built_in">pb</span>(v),G[v].<span class="built_in">pb</span>(u);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) ans+=!match[i] &amp;&amp; <span class="built_in">Bfs</span>(i);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>,match[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>图论</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>2021TCO Round 2B IncorrectCancellation</title>
     <url>/34396.html</url>
     <content><![CDATA[<h1 id="2021TCO-Round-2B-IncorrectCancellation"><a href="#2021TCO-Round-2B-IncorrectCancellation" class="headerlink" title="2021TCO Round 2B IncorrectCancellation"></a>2021TCO Round 2B IncorrectCancellation</h1><p>口胡一下</p>
@@ -9942,9 +9991,9 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
         <category>题解</category>
       </categories>
       <tags>
-        <tag>meet in the middle</tag>
         <tag>TopCoder</tag>
         <tag>矩阵树</tag>
+        <tag>meet in the middle</tag>
       </tags>
   </entry>
   <entry>
