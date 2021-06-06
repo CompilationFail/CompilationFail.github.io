@@ -201,6 +201,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/57109.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/57109.html" class="post-title-link" itemprop="url">CF1477E - Nezzar and Tournaments</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-21 13:38:22" itemprop="dateCreated datePublished" datetime="2021-05-21T13:38:22+08:00">2021-05-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:40:56" itemprop="dateModified" datetime="2021-05-31T21:40:56+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1477E-Nezzar-and-Tournaments"><a href="#CF1477E-Nezzar-and-Tournaments" class="headerlink" title="CF1477E - Nezzar and Tournaments"></a>CF1477E - Nezzar and Tournaments</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>有两队人$a_i,i\in[1,n],b_j,j\in[1,m]$，现在把他们放在一起排成一行$c_i$</p>
+<p>顺次给每个人计分，初始$s_0=k$</p>
+<p>$s_i=\max\{0,s_{i-1}+c_i-c_{\max\{i-1,1\} } \}$</p>
+<p>现在要最大化每个$a_i$所在位置的$s_i$之和 与 $b_i$所在$s_i$之和 的差</p>
+<p>支持修改和对于不同$k$查询</p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>考虑$k=0$简单情况</p>
+<p>1.若$s_i$不清零，则$s_i=c_i-lst$，其中$lst$表示上一个被清零位置的$c_j$</p>
+<p>2.$s_i$清零，则$c_i&lt;lst$</p>
+<p>容易发现，$\displaystyle s_i=c_i-\min_{j\leq i} \{ c_j\}$</p>
+<p><br></p>
+<p>那么对于含$k$的情况，类似可以得到</p>
+<p>$\displaystyle s_i=k-c_1+c_i+\max\{0,c_1-k-\min_{j\leq i} \{c_j\} \}$</p>
+<p>假设我们固定了一个$c_1$，现在考虑对于剩下的$a_i,b_j$排出一个最优的排列</p>
+<p>容易发现，$k-c_1+c_i$的贡献时固定的，只有前缀最小值会影响答案</p>
+<p>我们希望对于$b_i$，前缀最小值较大，$a_i$反之</p>
+<p>那么容易发现可以先降序排列$b_j$，再正序排列$a_i$</p>
+<p>此时$b_{\min}$可以贡献给$a_i$的前缀最小值，同时$b_j$的前缀最小值能够取到最大</p>
+<p><br></p>
+<p>此时，不妨设$c_1=t$，$\min\{a_i,b_i\}=Min$</p>
+<p>在$\min\{c_j\}=c_1$时，$\max$里的东西没有贡献，故可以得到</p>
+<p>1.对于每个$a_i$，若它没有被放在$c_1$，则贡献$k-t+a_i+\max\{0,t-k-Min\}$</p>
+<p>2.对于每个$b_i$（不特殊考虑第一个），则贡献$-(k-t+b_i+\max\{0,t-k-b_i\})$（忽略最小值为$t$的情况）</p>
+<p>则最终式子为</p>
+<p>$\displaystyle f(t)=(n-[t\in a_i])\cdot  \max\{0,t-k-Min\}-\sum \max\{0,t-k-b_i\}+(m-n)t+C$</p>
+<p>其中$C=(n-m)k+\sum a_i-\sum b_i$</p>
+<p>容易发现$f(t)$是关于$t$的分段一次函数，根据斜率变化情况分析，极值位置仅$O(1)$个</p>
+<p>那么对于$a_i$作为$t$和$b_j$作为$t$的情况，分别计算$f(t)$的极值位置</p>
+<p>极值位置需要一个$k$大查询和$\text{lower_bound}$</p>
+<p>计算$f(t)$需要一个前缀查询</p>
+<p>我用$\text{BIT}$充当平衡树来维护，复杂度为$O((n+m+q)\log 10^6)$</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1e6</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m,q;</span><br><span class="line"><span class="keyword">int</span> a[N],b[N];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">BIT</span>&#123;</span></span><br><span class="line">	ll s[N];</span><br><span class="line">	<span class="keyword">int</span> c[N],n;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">(<span class="keyword">int</span> m)</span></span>&#123; n=m; &#125;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">		p++;</span><br><span class="line">		<span class="keyword">while</span>(p&lt;N) s[p]+=x,c[p]+=y,p+=p&amp;-p;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function">ll <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p)</span></span>&#123;</span><br><span class="line">		p++;</span><br><span class="line">		<span class="keyword">if</span>(p&lt;=<span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		ll sum=<span class="number">0</span>,cnt=<span class="number">0</span>,t=p<span class="number">-1</span>;</span><br><span class="line">		<span class="keyword">while</span>(p) sum+=s[p],cnt+=c[p],p-=p&amp;-p;</span><br><span class="line">		<span class="keyword">return</span> t*cnt-sum;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Rank</span><span class="params">(<span class="keyword">int</span> p)</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span>(p&lt;<span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 一些奇怪的边界特判 ，防止查询越界</span></span><br><span class="line">		p++,<span class="built_in">cmin</span>(p,N<span class="number">-1</span>);</span><br><span class="line">		<span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span>(p) res+=c[p],p-=p&amp;-p;</span><br><span class="line">		<span class="keyword">return</span> res;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Kth</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123; <span class="comment">// 注意一定要避免找到并不存在的数值</span></span><br><span class="line">		<span class="built_in">cmin</span>(k,n),<span class="built_in">cmax</span>(k,<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">int</span> p=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">drep</span>(i,<span class="number">19</span>,<span class="number">0</span>) <span class="keyword">if</span>(p+(<span class="number">1</span>&lt;&lt;i)&lt;N &amp;&amp; c[p+(<span class="number">1</span>&lt;&lt;i)]&lt;k) k-=c[p+=<span class="number">1</span>&lt;&lt;i];</span><br><span class="line">		<span class="keyword">return</span> p;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Prev</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">Kth</span>(<span class="built_in">Rank</span>(x)); &#125;</span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">Next</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">Kth</span>(<span class="built_in">min</span>(n,<span class="built_in">Rank</span>(x)+<span class="number">1</span>)); &#125;</span><br><span class="line">&#125; A,B;</span><br><span class="line"></span><br><span class="line">ll delta;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddA</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">	delta+=x*k;</span><br><span class="line">	A.<span class="built_in">Add</span>(x,x*k,k);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddB</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">	delta-=x*k;</span><br><span class="line">	B.<span class="built_in">Add</span>(x,x*k,k);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">QueA</span><span class="params">(ll k)</span></span>&#123;</span><br><span class="line">	ll Min=<span class="built_in">min</span>(A.<span class="built_in">Kth</span>(<span class="number">1</span>),B.<span class="built_in">Kth</span>(<span class="number">1</span>));</span><br><span class="line">	<span class="keyword">auto</span> F=[&amp;](ll t)&#123; <span class="built_in"><span class="keyword">return</span></span> (n<span class="number">-1</span>)*<span class="built_in">max</span>(<span class="number">0ll</span>,t-k-Min)-B.<span class="built_in">Que</span>(t-k)+(m-n)*t; &#125;;</span><br><span class="line">	ll ans=<span class="built_in">max</span>(<span class="built_in">F</span>(A.<span class="built_in">Kth</span>(<span class="number">1</span>)),<span class="built_in">F</span>(A.<span class="built_in">Kth</span>(n)));</span><br><span class="line">	<span class="keyword">int</span> p=B.<span class="built_in">Kth</span>(m<span class="number">-1</span>)+k;</span><br><span class="line">	<span class="built_in">cmax</span>(ans,<span class="built_in">F</span>(A.<span class="built_in">Prev</span>(p))),<span class="built_in">cmax</span>(ans,<span class="built_in">F</span>(A.<span class="built_in">Next</span>(p)));</span><br><span class="line">	<span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">QueB</span><span class="params">(ll k)</span></span>&#123;</span><br><span class="line">	ll Min=<span class="built_in">min</span>(A.<span class="built_in">Kth</span>(<span class="number">1</span>),B.<span class="built_in">Kth</span>(<span class="number">1</span>));</span><br><span class="line">	<span class="keyword">auto</span> F=[&amp;](ll t)&#123; <span class="keyword">return</span> n*<span class="built_in">max</span>(<span class="number">0ll</span>,t-k-Min)-B.<span class="built_in">Que</span>(t-k)+(m-n)*t; &#125;;</span><br><span class="line">	ll ans=<span class="built_in">max</span>(<span class="built_in">F</span>(B.<span class="built_in">Kth</span>(<span class="number">1</span>)),<span class="built_in">F</span>(B.<span class="built_in">Kth</span>(m)));</span><br><span class="line">	<span class="keyword">int</span> p=B.<span class="built_in">Kth</span>(m)+k;</span><br><span class="line">	<span class="built_in">cmax</span>(ans,<span class="built_in">F</span>(B.<span class="built_in">Prev</span>(p))),<span class="built_in">cmax</span>(ans,<span class="built_in">F</span>(B.<span class="built_in">Next</span>(p)));</span><br><span class="line">	<span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">Que</span><span class="params">(ll k)</span></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">max</span>(<span class="built_in">QueA</span>(k),<span class="built_in">QueB</span>(k))+delta+(n-m)*k;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>(),q=<span class="built_in">rd</span>(),A.<span class="built_in">Init</span>(n),B.<span class="built_in">Init</span>(m);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">AddA</span>(a[i]=<span class="built_in">rd</span>(),<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="built_in">AddB</span>(b[i]=<span class="built_in">rd</span>(),<span class="number">1</span>);</span><br><span class="line">	<span class="keyword">while</span>(q--) &#123;</span><br><span class="line">		<span class="keyword">int</span> opt=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="keyword">if</span>(opt==<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=<span class="built_in">rd</span>(),y=<span class="built_in">rd</span>();</span><br><span class="line">			<span class="built_in">AddA</span>(a[x],<span class="number">-1</span>),<span class="built_in">AddA</span>(a[x]=y,<span class="number">1</span>);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(opt==<span class="number">2</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=<span class="built_in">rd</span>(),y=<span class="built_in">rd</span>();</span><br><span class="line">			<span class="built_in">AddB</span>(b[x],<span class="number">-1</span>),<span class="built_in">AddB</span>(b[x]=y,<span class="number">1</span>);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,<span class="built_in">Que</span>(<span class="built_in">rd</span>()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/22983.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1377,96 +1484,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/61997.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/61997.html" class="post-title-link" itemprop="url">「USACO 2021 US Open Platinum」United Cows of Farmer John</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-13 11:47:16" itemprop="dateCreated datePublished" datetime="2021-05-13T11:47:16+08:00">2021-05-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 22:29:29" itemprop="dateModified" datetime="2021-05-31T22:29:29+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「USACO-2021-US-Open-Platinum」United-Cows-of-Farmer-John"><a href="#「USACO-2021-US-Open-Platinum」United-Cows-of-Farmer-John" class="headerlink" title="「USACO 2021 US Open Platinum」United Cows of Farmer John"></a>「USACO 2021 US Open Platinum」United Cows of Farmer John</h1><p>考虑依次枚举右端点$i$，计算左边合法的方案数，设一个数$x$上次出现的位置为$lst_x$</p>
-<p>则$i$能够作为右端点的区间就是$[lst_{a_i}+1,i-2]$</p>
-<p>考虑什么样的位置可以作为左端点，显然这个点在$[1,i]$中是最后一次出现</p>
-<p>我们将不妨这样的点权值设为$w_i=1$</p>
-<p>考虑一个点作为中间点贡献怎样的区间，同样的，这个点在$[1,i]$中是最后一次出现</p>
-<p>并且，能够贡献的区间$&gt;$上一次出现的位置$lst_x$</p>
-<p>这个中间点能够匹配的左端点个数就是$\displaystyle \sum_{k=lst_{a_j}+1}^{j-1} w_k$</p>
-<p>现在我们要用数据结构动态修改某一个位置的$w_i$，增减$[lst_{a_j}+1,j-1]$的区间，查询$[lst_{a_i}+1,i-2]$</p>
-<p>不妨再为一个点增加点权$t_i$，此时我们要维护的操作</p>
-<p>1.单点修改$w_i$</p>
-<p>2.区间修改$t_i$</p>
-<p>3.求$w_it_i$区间和</p>
-<p>在线段树上每个节点维护$w_i$之和，$w_it_i$之和，可以标记永久化$t_i$</p>
-<p>具体实现参考代码<del>（实际写得很丑）</del></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> lst[N],lst2[N],cnt;</span><br><span class="line">ll s1[N&lt;&lt;<span class="number">2</span>],s2[N&lt;&lt;<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> t[N&lt;&lt;<span class="number">2</span>];</span><br><span class="line"><span class="comment">// s1表示w之和，s2表示区间内部t[i]*w[i]之和，t[i]现在是永久化的标记</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Up</span><span class="params">(<span class="keyword">int</span> p)</span></span>&#123;</span><br><span class="line">	s2[p]=s2[p&lt;&lt;<span class="number">1</span>]+s2[p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>];</span><br><span class="line">	s1[p]=s1[p&lt;&lt;<span class="number">1</span>]+s1[p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>]+s2[p]*t[p];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Upd</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(l==r) &#123;</span><br><span class="line">		s2[p]^=<span class="number">1</span>,s1[p]=t[p]*s2[p];</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	x&lt;=mid?<span class="built_in">Upd</span>(p&lt;&lt;<span class="number">1</span>,l,mid,x):<span class="built_in">Upd</span>(p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>,mid+<span class="number">1</span>,r,x);</span><br><span class="line">	<span class="built_in">Up</span>(p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Upd</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> ql,<span class="keyword">int</span> qr,<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(ql&gt;qr) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span>(ql&lt;=l &amp;&amp; r&lt;=qr) &#123;</span><br><span class="line">		t[p]+=x,s1[p]+=x*s2[p];</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(ql&lt;=mid) <span class="built_in">Upd</span>(p&lt;&lt;<span class="number">1</span>,l,mid,ql,qr,x);</span><br><span class="line">	<span class="keyword">if</span>(qr&gt;mid) <span class="built_in">Upd</span>(p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>,mid+<span class="number">1</span>,r,ql,qr,x);</span><br><span class="line">	<span class="built_in">Up</span>(p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">	ll x,y;</span><br><span class="line">	<span class="built_in">Node</span>(ll x=<span class="number">0</span>,ll y=<span class="number">0</span>):<span class="built_in">x</span>(x),<span class="built_in">y</span>(y)&#123;  &#125;</span><br><span class="line">	Node <span class="keyword">operator</span> + (<span class="keyword">const</span> Node __) &#123; <span class="keyword">return</span> <span class="built_in">Node</span>(x+__.x,y+__.y); &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function">Node <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> ql,<span class="keyword">int</span> qr)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(ql&gt;qr) <span class="keyword">return</span> <span class="built_in">Node</span>();</span><br><span class="line">	<span class="keyword">if</span>(ql&lt;=l &amp;&amp; r&lt;=qr) <span class="keyword">return</span> <span class="built_in">Node</span>(s1[p],s2[p]);</span><br><span class="line">	<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>; Node res;</span><br><span class="line">	<span class="keyword">if</span>(ql&lt;=mid) res=res+<span class="built_in">Que</span>(p&lt;&lt;<span class="number">1</span>,l,mid,ql,qr);</span><br><span class="line">	<span class="keyword">if</span>(qr&gt;mid) res=res+<span class="built_in">Que</span>(p&lt;&lt;<span class="number">1</span>|<span class="number">1</span>,mid+<span class="number">1</span>,r,ql,qr);</span><br><span class="line">	res.x+=res.y*t[p];</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	ll ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> x=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="keyword">if</span>(lst[x]) &#123;</span><br><span class="line">			<span class="built_in">Upd</span>(<span class="number">1</span>,<span class="number">1</span>,n,lst[x]),cnt--;</span><br><span class="line">			<span class="built_in">Upd</span>(<span class="number">1</span>,<span class="number">1</span>,n,lst2[x]+<span class="number">1</span>,lst[x],<span class="number">-1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		Node t=<span class="built_in">Que</span>(<span class="number">1</span>,<span class="number">1</span>,n,lst[x]+<span class="number">1</span>,i<span class="number">-2</span>);</span><br><span class="line">		ans+=t.x;</span><br><span class="line">		<span class="built_in">Upd</span>(<span class="number">1</span>,<span class="number">1</span>,n,i),cnt++,<span class="built_in">Upd</span>(<span class="number">1</span>,<span class="number">1</span>,n,lst[x]+<span class="number">1</span>,i<span class="number">-1</span>,<span class="number">1</span>);</span><br><span class="line">		lst2[x]=lst[x],lst[x]=i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1540,20 +1557,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">253</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-count">62</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1651,7 +1668,6 @@
   </div>
 
   
-  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
@@ -1667,6 +1683,7 @@
 <script src="/js/next-boot.js"></script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
 
 
   

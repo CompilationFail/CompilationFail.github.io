@@ -201,6 +201,228 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/40967.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/40967.html" class="post-title-link" itemprop="url">FFT&NTT(以及扩展)</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-05 18:38:38" itemprop="dateCreated datePublished" datetime="2021-02-05T18:38:38+08:00">2021-02-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="FFT-amp-NTT-以及扩展"><a href="#FFT-amp-NTT-以及扩展" class="headerlink" title="FFT&amp;NTT(以及扩展)"></a>FFT&amp;NTT(以及扩展)</h1><p>预备知识：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13092822.html">用于NTT</a></p>
+<p>NTT/FFT其实本质相同，用途是快速求解  <strong>多项式乘积</strong> </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>FT: 傅里叶变换:</p>
+<p>这是一个工程上的概念，可以简述为：一个周期性的信号波段可以用 若干个<strong>正弦曲线</strong> 的带权和表示</p>
+<p>DFT: 离散傅里叶变换，这是傅里叶变换在离散情况下的变种</p>
+<p>FFT: 快速傅里叶变换</p>
+<p>NTT: 快速数论变换</p>
+<script type="math/tex; mode=display">\</script><h2 id="谈及核心思想"><a href="#谈及核心思想" class="headerlink" title="谈及核心思想"></a>谈及核心思想</h2><p>1.<strong>单位根</strong>:</p>
+<p>构造$\omega_n$为$n$阶单位根(不知道$\omega_n$的值域)，满足性质$\omega_n^n=\omega_n^0=1$</p>
+<p>对于$2|n$,$\omega _n^{\frac{n} {2} }=-1$</p>
+<p>显然$\omega_n$满足一个非常简单的性质：<strong>折半引理</strong> $\displaystyle \forall 2|i\vee  2|n , \omega_n^i=\omega_{\frac{n} {2} }^{\frac{i} {2} }$</p>
+<p>$\omega_n$实际上是一个在幂次上呈现$n$元循环的数值</p>
+<p>2.<strong>多项式</strong>与<strong>点值式</strong>的转化</p>
+<p>一个$n$阶多项式最普通的表示就是$F(x)=\sum_{i=0}^{n-1} a_ix^i$</p>
+<p>然而，多项式也可以用$n$个<strong>互不相关的</strong>点表示，即$(x_0,y_0),(x_1,y_1),\cdots,(x_{n-1},y_{n-1})$</p>
+<p>两者可以互相转化</p>
+<p>对于同$x_i$的点值，两个多项式卷积时，其$y_i$可以直接对应相乘</p>
+<p>FFT/NTT的核心过程是</p>
+<p>多项式$\longrightarrow$ 点值式$\longrightarrow$点值式对应相乘$\longrightarrow$多项式</p>
+<p>而用单位根来构造快速的多项式与点值式的转化</p>
+<p>3.<strong>分治思想</strong></p>
+<p>用于降低多项式与点值式转换的复杂度</p>
+<script type="math/tex; mode=display">\</script><h2 id="FFT的单位根"><a href="#FFT的单位根" class="headerlink" title="FFT的单位根"></a>FFT的单位根</h2><p>$(x,y)$指复数$i=\sqrt{-1},(x,y)=x+yi$</p>
+<p>基本运算$(x,y)+(a,b)=(x+a,y+b),(x,y)\cdot (a,b)=(ax-by,ay+bx)$</p>
+<p>FFT的单位根是:$\omega_n$=$(cos(\frac{2\pi} {n}),sin(\frac{2\pi} {n}))$</p>
+<p>而$\omega _n^i=(cos(\frac{2\pi} {n}\cdot i),sin(\frac{2\pi} {n}\cdot i))$ (展开发现就是三角函数求和公式)</p>
+<p>显然满足单位根的性质​</p>
+<p>(实际上可以发现，这个说是点值其实就是信号序列的三角函数表示)</p>
+<script type="math/tex; mode=display">\</script><h2 id="NTT"><a href="#NTT" class="headerlink" title="NTT"></a>NTT</h2><p>相信您已经了解了原根的一些性质，$\text{NTT}$的单位根常用原根构造</p>
+<p>$\text{NTT}$的单位根实际有较大的局限性，对于质数$P$只能构造出$n|P-1,\omega_n=g^{\frac{P-1} {n} }$</p>
+<p>计算在模意义下就能满足单位根的性质</p>
+<p>通常我们$P$取$998244353$，$2^{23}|(P-1)$，它的一个原根是3</p>
+<p>实际上，为了满足下面分治需要，构造的模数通常满足$P-1=s\cdot 2^t$的$t$较大，这类模数我们常称作$\text{NTT}$模数</p>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><p>以上部分均为基础知识，相对来说应该不会太难，下面是主要难点</p>
+<script type="math/tex; mode=display">\</script><h2 id="多项式转点值式"><a href="#多项式转点值式" class="headerlink" title="多项式转点值式"></a>多项式转点值式</h2><p>接下来我们考虑如何将多项式转化为点值式</p>
+<p>对于点值式，我们构造的点横坐标为$x_i=\omega_n^i$</p>
+<p>具体目标是对于函数$F(x)$，求出在$x_0,x_1,\cdots ,x_{n-1}$上的函数值</p>
+<p>即求出$F(x_i)=a_0\omega_n^0+a_1\omega_n^{i}+a_2\omega_n^{2i}+\cdots$</p>
+<p>接下来就是核心的<strong>分治思想</strong>，注意，这里的分治是子问题<strong>严格等大</strong>的</p>
+<p>对于当前问题，分成两部分子问题求解(实际是可以分成多部分的，但是这个是特殊情况暂时不予讨论)，即求解</p>
+<p>令$m=\frac{n} {2}$</p>
+<p>$\displaystyle 2|i,G(x_i)=a_0\omega_{m}^0+a_2\omega_{m}^{\frac{i} {2} }+a_4\omega_{m}^{\frac{i} {2}\cdot 2}+\cdots$</p>
+<p>$\displaystyle 2|i,H(x_i)=a_1\omega_{m}^0+a_3\omega_{m}^{\frac{i} {2} }+a_5\omega_{m}^{\frac{i} {2}\cdot 2}+\cdots$</p>
+<p>更简洁的描述为</p>
+<p>$i&lt;m,G(x_i’)=a_0\omega_{m}^0+a_2\omega_{m}^{i}+a_4\omega_{m}^{2i}+\cdots$</p>
+<p>$i&lt;m,H(x_i’)=a_1\omega_{m}^0+a_3\omega_{m}^{i}+a_5\omega_{m}^{2i}+\cdots$</p>
+<p>由于$G(x’_i),H(x’_i)$计算的是$[0,m-1]$项，而求$F(x_i)$时用到的是$0,2,4,\cdots$项，实际需要访问$G(x^2_i),H(x^2_i)$</p>
+<p>和$F(x_i)$的式子比较，我们得到合并的式子为</p>
+<p>$F(x_i)=G(x^2_i)+x_i H(x^2_i)$</p>
+<p>带入折半引理，实际等价于</p>
+<p>$F(x_i)=G(x’_i)+x_i H(x’_i)$</p>
+<p>注意$x_i=x’_{i\mod m}$</p>
+<p>为了保证复杂度，尽量使得每次分治的子问题都分为两部分，这样的复杂度为$O(n\log n)$</p>
+<p>附:实际上，分为$d$个子问题时，每次合并的复杂度为$O(n\cdot d)$，因此复杂度为</p>
+<p>保证每次分治为两个严格等大的子问题，可以从一开始就把$n$扩充为$2$的幂次</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(N&lt;=n+m) N&lt;&lt;=<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>附:$d$个子问题时，设子问题答案为$G_j(x_i)$，则合并的式子为</p>
+<p>$\displaystyle F(x_i)=\sum_{j=0}^{d-1}x_i^jG_j(x_i^d)=\sum_{i=0}^{d-1}x_i^jG_j(x’_{i\mod \frac{n} {d} })$</p>
+<h2 id="点值式转多项式"><a href="#点值式转多项式" class="headerlink" title="点值式转多项式"></a>点值式转多项式</h2><p>一个简单的性质：单位根反演 $\displaystyle \sum_{j=0}^{n-1}\omega_n^{ij}= \left\{\begin{aligned} \frac{\omega_n^{in}-1} {\omega_n^i-1}=0  &amp;&amp; i\ne 0\\ n  &amp;&amp; i=0\end{aligned} \right.$</p>
+<p>设点值式对应$y_i$的序列为$b_i$</p>
+<p>则$n\cdot a_i=\sum_{j=0}^{n-1}\omega_n^{-ij} b_j$</p>
+<p>证明</p>
+<p>$\displaystyle \sum_{j=0}^{n-1}\omega_n^{-ij}b_j=\sum_{j=0}^{n-1} \omega_n^{-ij}(\sum_{k=0}^{n-1}a_k\omega_n^{jk})$</p>
+<p>$\displaystyle \sum_{j=0}^{n-1}\omega_n^{-ij}b_j= \sum_{k=0}^{n-1}a_k\sum_{j=0}^{n-1}\omega_n^{j(k-i)}$</p>
+<p>由上面的式子，发现只有$k-i=0$时右边的求和式有值，所以上式成立</p>
+<p>因此点值式转多项式直接把系数改为$\omega_n^{-i}$即可</p>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><h2 id="Tips"><a href="#Tips" class="headerlink" title="Tips:"></a>Tips:</h2><p>1.由于单位根的循环特性，溢出会直接溢出到本来的式子里</p>
+<p>因此，如果乘法过后的多项式产生了超过$&gt;n$的项$x^i$，会溢出到$x^{i\mod n}$</p>
+<p>2.点值式并不是不满足除法，只是除法得到的多项式并不一定是一个$n$元以内的多项式，除了恰好整除的情况，得到的通常是一个无穷级数的式子，如$\displaystyle \frac{1} {1-x}=\frac{1-x^{\infty} } {1-x}=\sum_{i=0}^{\infty}x^i$</p>
+<p>真正要求除法，通常是求前$n$项的结果，即需要用到<strong>多项式乘法逆</strong></p>
+<script type="math/tex; mode=display">\</script><h2 id="代码实现与优化"><a href="#代码实现与优化" class="headerlink" title="代码实现与优化"></a>代码实现与优化</h2><p><a target="_blank" rel="noopener" href="http://uoj.ac/problem/34">模板题传送门</a></p>
+<p>然后我们得到一份优美的代码(FFT)</p>
+<p>(Complex是C++库自带的复数,M_PI是C++自带$\pi$常量)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FFT</span><span class="params">(<span class="keyword">int</span> n,Complex *a,<span class="keyword">int</span> f)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(n==<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">	Complex tmp[N];</span><br><span class="line">	<span class="keyword">int</span> m=n/<span class="number">2</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) tmp[i]=a[i&lt;&lt;<span class="number">1</span>],tmp[i+m]=a[i&lt;&lt;<span class="number">1</span>|<span class="number">1</span>]; <span class="comment">// 按照奇偶分类</span></span><br><span class="line">	<span class="built_in">memcpy</span>(a,tmp,<span class="built_in"><span class="keyword">sizeof</span></span>(Complex) * n);</span><br><span class="line">	<span class="built_in">FFT</span>(m,a,f),<span class="built_in">FFT</span>(m,a+m,f); <span class="comment">// 分两半，算g(x),h(x)</span></span><br><span class="line">	<span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span>,<span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>; <span class="comment">// w=x^1,e=x^i</span></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) &#123;</span><br><span class="line">		tmp[i]=a[i]+e*a[i+m]; <span class="comment">// f(x_i)=g(x_i)+e*h(x_i)</span></span><br><span class="line">		e=e*w; </span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,m,n<span class="number">-1</span>) &#123;</span><br><span class="line">		tmp[i]=a[i-m]+e*a[i];</span><br><span class="line">		e=e*w;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">memcpy</span>(a,tmp,<span class="built_in"><span class="keyword">sizeof</span></span>(T)*n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于$(\omega_n)^{\frac{n} {2} }=-1$，所以还可以简化为</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span>,<span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) &#123;</span><br><span class="line">	tmp[i]=a[i]+e*a[i+m];</span><br><span class="line">	tmp[i+m]=a[i]-e*a[i+m];</span><br><span class="line">	e=e*w;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于用了double，最后输出要取整</p>
+<h3 id="蝴蝶优化"><a href="#蝴蝶优化" class="headerlink" title="蝴蝶优化"></a>蝴蝶优化</h3><p>我们加一点优化，取代递归的分治过程</p>
+<p>可以看到，分治时我们按照$i \mod 2$分成两组，然后继续分</p>
+<p>这个过程中，实际上我们就是将$i$的二进制位前后翻转</p>
+<p>所以我们可以暴力处理出$i$分治底层的位置</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">	<span class="keyword">int</span> x=i,s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;(j&lt;&lt;c)&lt;=n;++j) &#123;</span><br><span class="line">		s=(s&lt;&lt;<span class="number">1</span>)|(x&amp;<span class="number">1</span>);</span><br><span class="line">		x&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">	&#125; <span class="comment">// s就是最终位置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然也是有$O(n)$处理方法的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N=<span class="number">1</span>,c=<span class="number">-1</span>;</span><br><span class="line"><span class="keyword">while</span>(N&lt;=n+m) N&lt;&lt;=<span class="number">1</span>,c++;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,N<span class="number">-1</span>) rev[i]=(rev[i&gt;&gt;<span class="number">1</span>]&gt;&gt;<span class="number">1</span>)|((i&amp;<span class="number">1</span>)&lt;&lt;c);</span><br></pre></td></tr></table></figure>
+<p>(建议自己模拟一下)</p>
+<p>有了这个翻转数组，我们可以直接从分治底层开始解决整个问题，每次合并操作完全相同</p>
+<p>每次分治问题的大小，依次合并每一个子问题区间即可</p>
+<p>为了在一个数组上完成操作，还需要注意合并顺序</p>
+<p>代码解释$i$:分治子问题大小为$2i$，$l$:合并区间的左端点为$l$，右端点为$l+2i$，$j$枚举合并位置</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">FFT</span><span class="params">(<span class="keyword">int</span> n,Complex *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="function">Complex <span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j,e=e*w) &#123;</span><br><span class="line">                Complex t=a[j+m]*e;   <span class="comment">// a&#x27;[j]=a[j]+e*a[j+m]</span></span><br><span class="line">                                      <span class="comment">// a&#x27;[j+i]=a[j]-e*a[j+m]</span></span><br><span class="line">                a[j+m]=a[j]-t;</span><br><span class="line">                a[j]=a[j]+t;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>事实上我们还有更快的写法，就是将$\omega_n^i$预处理出来</p>
+<p>(注意这个$\text{FFT}$的预处理很考验double精度，不能每次都直接累乘上去，隔几个就要重新调用依次三角函数)</p>
+<p>当然如果自己写复数会更快</p>
+<p><br></p>
+<h3 id="关于点值式转多项式的优化"><a href="#关于点值式转多项式的优化" class="headerlink" title="关于点值式转多项式的优化"></a>关于点值式转多项式的优化</h3><p>由于每次求得点值是$\omega_n^{-i}=\omega_n^{n-i}$</p>
+<p>所以可以直接用 多项式转点值式的函数， 最后把$[1,n-1]$这一段翻转，每个数除掉$n$即可</p>
+<p><br></p>
+<h3 id="对于加减运算取模的优化"><a href="#对于加减运算取模的优化" class="headerlink" title="对于加减运算取模的优化"></a>对于加减运算取模的优化</h3><p>三目运算</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a+=b,a=a&gt;=P?a-P:a;</span><br><span class="line">a-=b,a=a&lt;<span class="number">0</span>?a+P:a;</span><br></pre></td></tr></table></figure>
+<p>逻辑运算优化(原理是逻辑预算会在第一个确定表达式值的位置停下)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a+=b,((a&gt;=P)&amp;&amp;(a-=P));</span><br><span class="line">a-=b,((a&lt;<span class="number">0</span>)&amp;&amp;(a+=P));</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="关于系数预处理优化-以NTT为例"><a href="#关于系数预处理优化-以NTT为例" class="headerlink" title="关于系数预处理优化(以NTT为例)"></a>关于系数预处理优化(以NTT为例)</h3><p>带入上面已经提到的优化，无预处理系数的$\text{NTT}$大概是这样的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> a[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">NTT</span><span class="params">(<span class="keyword">int</span> n,<span class="keyword">int</span> *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> e=<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j,e=<span class="number">1ll</span>*e*w%P) &#123;</span><br><span class="line">                <span class="keyword">int</span> t=<span class="number">1ll</span>*a[j+i]*e%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="keyword">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p>一种简单的预处理是，每次对于每个分治大小，预处理依次系数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> a[N],e[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">NTT</span><span class="params">(<span class="keyword">int</span> n,<span class="keyword">int</span> *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    e[<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;i;++j) e[j]=<span class="number">1ll</span>*e[j<span class="number">-1</span>]*w%P;</span><br><span class="line">        <span class="comment">//for(int j=i-2;j&gt;=0;j-=2) e[j+1]=1ll*w*(e[j]=e[j&gt;&gt;1])%P;</span></span><br><span class="line">        <span class="comment">//这个版本是沿用上一次预处理的结果，实际(只有)用这种预处理方法可以极大程度上加强FFT的精度</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="keyword">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="keyword">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另一种是在一开始就把所有的系数用一个数组存下来，具体过程可以描述为</p>
+<p>对于每个分治长度$n$，我们只需要访问$\omega_n^{0},\omega_n^{1},\cdots,\omega_n^{\frac{n} {2}-1}$</p>
+<p>那么对于分治长度$n$，我们在$w$数组的第$\frac{n} {2}$ ~ $n-1$项依次存储这些值</p>
+<p>优化:我们只需要对于最大的分治长度处理，剩下的部分发现可以直接用折半引理访问得到</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1</span>&lt;&lt;<span class="number">21</span>;</span><br><span class="line"><span class="keyword">int</span> a[N],w[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">    w[N&gt;&gt;<span class="number">1</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> t=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/N);</span><br><span class="line">    <span class="built_in">rep</span>(i,(N&gt;&gt;<span class="number">1</span>)+<span class="number">1</span>,N<span class="number">-1</span>) w[i]=<span class="number">1ll</span>*w[i<span class="number">-1</span>]*t%P;</span><br><span class="line">    <span class="built_in">drep</span>(i,(N&gt;&gt;<span class="number">1</span>)<span class="number">-1</span>,<span class="number">1</span>) w[i]=w[i&lt;&lt;<span class="number">1</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">NTT</span><span class="params">(<span class="keyword">int</span> n,<span class="keyword">int</span> *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> *e=w+i;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="keyword">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="keyword">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>三份代码在duck.ac上的评测结果表明，不预处理系数将近慢一倍</p>
+<p>单组数据来看，预处理系数会慢一点</p>
+<p>多组来看，预处理系数会快</p>
+<p>实际差距不大，都可以使用</p>
+<p>但是在某些层面来说，下面这份板子才是最好的(适用NTT,FFT且精度较高)，不需要预处理</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> a[N],e[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">NTT</span><span class="params">(<span class="keyword">int</span> n,<span class="keyword">int</span> *a,<span class="keyword">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    e[<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=i<span class="number">-2</span>;j&gt;=<span class="number">0</span>;j-=<span class="number">2</span>) e[j+<span class="number">1</span>]=<span class="number">1ll</span>*w*(e[j]=e[j&gt;&gt;<span class="number">1</span>])%P;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="keyword">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="keyword">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">\</script><h1 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h1><h2 id="1-分治-NTT"><a href="#1-分治-NTT" class="headerlink" title="1.分治+NTT"></a>1.分治+NTT</h2><p>常用于处理多个<strong>计数背包</strong>的快速合并 (实际<strong>无权值01背包</strong>也是可以的)</p>
+<p>我们可以用NTT$n\log n$合并两个大小为$n$的背包</p>
+<p>分治时，每次合并两个分治子问题，总共的时间就是$\sum size\log n$</p>
+<p>每个背包的$size$会被计算$\log n$次，所以总共复杂度是$n \log ^2 n$</p>
+<script type="math/tex; mode=display">\</script><h2 id="2-CDQ-NTT"><a href="#2-CDQ-NTT" class="headerlink" title="2.CDQ+NTT"></a>2.CDQ+NTT</h2><p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4721">模板题传送门</a></p>
+<p>对于形如$dp_i=\sum_{j=0}^{i-1}dp_jg_{i-j}$的$dp$转移(就是dp转移与差值有关)</p>
+<p>由于求$dp_i$时，需要保证$dp_0,dp_1,\cdots,dp_{i-1}$才能卷积，这个限制，我们可以用<strong>CDQ分治</strong>解决</p>
+<p>对于当前分治区间$[L,R]$</p>
+<p>依次考虑$[L,mid]$内部转移，$[L,mid]$向$[mid+1,R]$的转移(用FFT/NTT解决)，$[mid+1,R]$内部转移</p>
+<p>算法流程</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Solve</span><span class="params">(l,r)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(l==r) <span class="keyword">return</span>;</span><br><span class="line">    mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">    <span class="built_in">Solve</span>(l,mid);</span><br><span class="line">    (l,mid)-&gt;(mid+<span class="number">1</span>,r);</span><br><span class="line">    <span class="built_in">Solve</span>(mid+<span class="number">1</span>,r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">\</script><h2 id="3-MTT-任意模数NTT"><a href="#3-MTT-任意模数NTT" class="headerlink" title="3.MTT(任意模数NTT)"></a>3.<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13498834.html">MTT(任意模数NTT)</a></h2><script type="math/tex; mode=display">\</script><h2 id="4-n-元点值式"><a href="#4-n-元点值式" class="headerlink" title="4.$n$元点值式"></a>4.<a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13498798.html">$n$元点值式</a></h2><script type="math/tex; mode=display">\</script><p>练习建议：</p>
+<p>1.<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1919">高精度乘法</a></p>
+<p>2.简单应用：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=4609">HDU-4609</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12092699.html">题解</a></p>
+<p>3.卷积构造模板： <a target="_blank" rel="noopener" href="https://www.lydsy.com/JudgeOnline/problem.php?id=3527">BZOJ-3527</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12092699.html">题解</a></p>
+<p>4.拓展卷积构造：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5885">HDU-5885</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12097980.html">题解</a></p>
+<p>5.构造卷积的应用：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=6061">HDU-6061</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12098078.html">题解</a></p>
+<p>6.$CDQ$分治+$FFT$：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5730">HDU-5730</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101353.html">题解</a></p>
+<p>7.$CDQ$+NTT/降次前缀和优化$dp$：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5322">HDU-5332</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101410.html">题解</a></p>
+<p>8.容斥+$MTT$：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=6088">HDU-6088</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101456.html">题解</a></p>
+<p>9.图上$dp$：</p>
+<p>联通图个数：BZOJ-3456 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12103345.html">题解</a></p>
+<p>带环联通图个数：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5552">HDU-5552</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12103411.html">题解</a></p>
+<p>森林数量和带限制森林数量：<a target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5279">HDU - 5279</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12106476.html">题解</a></p>
+<p>10.点分治+FFT：<a target="_blank" rel="noopener" href="https://www.codechef.com/problems/PRIMEDST">CodeChef-PRIMEDST</a> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12120855.html">题解</a></p>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<h2 id="更多应用和优化参见毛啸2016论文"><a href="#更多应用和优化参见毛啸2016论文" class="headerlink" title="更多应用和优化参见毛啸2016论文"></a>更多应用和优化参见毛啸2016论文</h2><p>(如：两次FFT做卷积，4次FFT做MTT。。。)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/37786.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1391,95 +1613,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/57864.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/57864.html" class="post-title-link" itemprop="url">「CodePlus 2017 11 月赛」Yazid 的新生舞会              </a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-11-29 19:52:12" itemprop="dateCreated datePublished" datetime="2020-11-29T19:52:12+08:00">2020-11-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:52:51" itemprop="dateModified" datetime="2021-05-31T20:52:51+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「CodePlus-2017-11-月赛」Yazid-的新生舞会"><a href="#「CodePlus-2017-11-月赛」Yazid-的新生舞会" class="headerlink" title="「CodePlus 2017 11 月赛」Yazid 的新生舞会"></a>「CodePlus 2017 11 月赛」Yazid 的新生舞会</h1><p>最基本的分析这里只保留：$cnt&gt;\frac{len} {2}\Rightarrow 2cnt&gt;len$</p>
-<p>对于每一个合法的区间，合法的众数显然只有一个</p>
-<p>考虑对于每一个众数计算答案，把$x$出现的位置拿出来成一个序列$A_i$</p>
-<p>如果选择的区间恰好包含$A_i,A_{i+1},\cdots ,A_j$，那么合法的情况就是$2(j-i+1)&gt;R-L+1,L\in[A_{i-1}+1,A_i],R\in[A_{j},A_{j},A_{j+1}-1]$</p>
-<p>参数分离得到$2j-R&gt;2i-L$</p>
-<p>如果对于每一个$L$更新答案，那么更新的是一段区间，不妨设其为$UL,UR$</p>
-<p>对于每个$R$查询则是一段前缀 和 的区间 </p>
-<p>我们知道树状数组维护区间修改区间查询需要做一次差分，而这次是区间前缀和</p>
-<p>也就是说是再高一维。。</p>
-<p>不妨在$UL$上加,$UR$上减，那么在$p$处的更新对于在$k$处的查询的贡献是</p>
-<p>$\cfrac{(k-p+1)(k-p+2)} {2}=\cfrac{k^2+p^2-2pk+3k-3p+2} {2}$</p>
-<p>那么直接处理这个式子即可，需要维护$updval,p\cdot updval,p^2\cdot updval$</p>
-<p>查询时加入$k$的贡献</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> ll=<span class="keyword">long</span> <span class="keyword">long</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s=<span class="number">0</span>; <span class="keyword">char</span> c;</span><br><span class="line">	<span class="keyword">while</span>(c=<span class="built_in">getchar</span>(),c&lt;<span class="number">48</span>);</span><br><span class="line">	<span class="keyword">do</span> s=s*<span class="number">10</span>+c-<span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">	<span class="keyword">while</span>(c=<span class="built_in">getchar</span>(),c&gt;<span class="number">47</span>);</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">enum</span>&#123;</span>N=<span class="number">1000010</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; A[N];</span><br><span class="line">ll ans,s1[N],s2[N],s3[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,ll x)</span> </span>&#123;</span><br><span class="line">	p--; ll a=x,b=x*p,c=x*p*p;</span><br><span class="line">	<span class="keyword">for</span>(p+=n+<span class="number">1</span>;p&lt;=n*<span class="number">2</span>;p+=p&amp;-p) s1[p]+=a,s2[p]+=b,s3[p]+=c;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> x)</span> </span>&#123; <span class="built_in">Add</span>(l,x),<span class="built_in">Add</span>(r+<span class="number">1</span>,-x); &#125;</span><br><span class="line"><span class="function">ll <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p)</span> </span>&#123;</span><br><span class="line">	ll r1=<span class="number">0</span>,r2=<span class="number">0</span>,r3=<span class="number">0</span>,tp=p;</span><br><span class="line">	<span class="keyword">for</span>(p+=n;p;p-=p&amp;-p) r1+=s1[p],r2+=s2[p],r3+=s3[p];</span><br><span class="line">	<span class="keyword">return</span> ((tp*tp+tp)*r1-(<span class="number">2</span>*tp+<span class="number">1</span>)*r2+r3)/<span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">ll <span class="title">Que</span><span class="params">(<span class="keyword">int</span> l,<span class="keyword">int</span> r)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">Que</span>(r)-<span class="built_in">Que</span>(l<span class="number">-1</span>); &#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">	<span class="built_in">freopen</span>(<span class="string">&quot;party.in&quot;</span>,<span class="string">&quot;r&quot;</span>,stdin),n=<span class="built_in">rd</span>(),<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) A[<span class="built_in">rd</span>()].<span class="built_in">push_back</span>(i);</span><br><span class="line">	<span class="built_in">rep</span>(k,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(A[k].<span class="built_in">size</span>()) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,A[k].<span class="built_in">size</span>()<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> p=A[k][i],l=i?A[k][i<span class="number">-1</span>]:<span class="number">0</span>,r=i&lt;(<span class="keyword">int</span>)A[k].<span class="built_in">size</span>()<span class="number">-1</span>?A[k][i+<span class="number">1</span>]:n+<span class="number">1</span>;</span><br><span class="line">			<span class="built_in">Add</span>(<span class="number">2</span>*i-p+<span class="number">1</span>,<span class="number">2</span>*i-l,<span class="number">1</span>);</span><br><span class="line">			ans+=<span class="built_in">Que</span>(<span class="number">2</span>*(i+<span class="number">1</span>)-r,<span class="number">2</span>*(i+<span class="number">1</span>)-p<span class="number">-1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,A[k].<span class="built_in">size</span>()<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> p=A[k][i],l=i?A[k][i<span class="number">-1</span>]:<span class="number">0</span>;</span><br><span class="line">			<span class="built_in">Add</span>(<span class="number">2</span>*i-p+<span class="number">1</span>,<span class="number">2</span>*i-l,<span class="number">-1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">fprintf</span>(<span class="built_in">fopen</span>(<span class="string">&quot;party.out&quot;</span>,<span class="string">&quot;w&quot;</span>),<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1553,20 +1686,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">253</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-count">62</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1664,7 +1797,6 @@
   </div>
 
   
-  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
@@ -1680,6 +1812,7 @@
 <script src="/js/next-boot.js"></script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
 
 
   

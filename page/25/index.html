@@ -201,6 +201,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/52810.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/52810.html" class="post-title-link" itemprop="url">[BZOJ1852] [MexicoOI06]最长不下降序列(贪心)</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-02 21:52:27" itemprop="dateCreated datePublished" datetime="2020-06-02T21:52:27+08:00">2020-06-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:47:32" itemprop="dateModified" datetime="2021-05-31T20:47:32+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="BZOJ1852-MexicoOI06-最长不下降序列-贪心"><a href="#BZOJ1852-MexicoOI06-最长不下降序列-贪心" class="headerlink" title="[BZOJ1852] [MexicoOI06]最长不下降序列(贪心)"></a>[BZOJ1852] [MexicoOI06]最长不下降序列(贪心)</h1><p>考虑如下贪心</p>
+<p>（我将问题反过来考虑，也就是要满足$A_i &gt; \max_{j=1}^{j &lt; i} {B_j}$）</p>
+<p>首先对于读入的$(A,B)$，按照$B$的值递增排序</p>
+<p><strong>(选出的答案序列不一定是其中一个有序的子序列)</strong></p>
+<p>答案序列存在若干个$B$递增的位置，设它们是$\{a_i\},a_{i-1}&lt;a_i$</p>
+<p>合法的递增序列需要满足的限制是$A_{a_i}&gt;B_{a_{i-1} }$</p>
+<p>考虑剩下的部分即$j\in[a_{i-1}+1,a_i-1]$，那么这些点放在$a_i$后面一定是最优的(因为此时不会改变最大的$B$)，此时限制它们的$B$就是$B_{a_i}$</p>
+<p>即这一部分中满足$A_j&gt;B_{a_i}$的$j$均可以选出来</p>
+<p>为了便于表示，设$C(l,r)=|\{i|i\in[l,r],A_i&gt;B_{r+1} \}|$，可以通过一个主席树维护</p>
+<hr>
+<p>定义$dp_i$表示当前以$i$为最大的$B$的答案，特别的，$dp_0$表示序列为空$A_0=B_0=-\infty$</p>
+<p>枚举每个$i$进行转移</p>
+<p>朴素的转移就是可以枚举上一个位置$j$，$O(n^2)$转移</p>
+<p>需要找到前面第一个能把$i$接上去的$j$即可，即第一个$B_r&lt;A_i(j\ge 0)$的位置，那么合法的决策位置就是$[0,r]$</p>
+<p>则$dp_i=\max_0^r\{dp_j+1+C(j+1,i-1)\}$</p>
+<p>设最优决策点为$k\in[0,r]$，影响最优决策点位置的有两个方面</p>
+<p>从$[j+1,i-1]$这一段点考虑，$j$越小时，就会有越多的点对被$B_i$限制，也就是说$j$越大，对于中间这一段来说越优</p>
+<p>但是从$dp_j$的角度考虑，并不是$j$越大越好，因为可能存在一个$A_j$特别小限制了前面递增点列的选择</p>
+<blockquote>
+<p> 推论：如果前面存在一个$A_j&gt;B_i$，那么$k\ge j$</p>
+</blockquote>
+<p>事实上应该说成$dp_j+C(j+1,i-1)\ge\forall d\in[0,j-1],dp_d+C(d+1,i-1)$</p>
+<p>综合上面两条来看，如果$A_j&gt;B_i$意味着把它放进递增序列里绝对是优的，因为不会对前面的点产生不良限制</p>
+<p>消除了不良限制之后，就满足最优性了</p>
+<p>所以发现最优决策点的范围缩小到了$[l=\max\{k|A_k&gt;B_i\},r]$</p>
+<p>发现决策范围内的$C(l+1,i-1)=C(l+2,i-1)=\cdots=C(r+1,i-1)$</p>
+<p>所以$\displaystyle dp_i=\max_l^r\{dp_j\}+C(r+1,i-1)=\max_0^r\{dp_j\}+C(r+1,i-1)$</p>
+<p>所以可以直接维护一个前缀最大值，每次二分找到那个$r$，求出$C(r+1,i-1)$即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>,K=<span class="number">15</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> a,b;</span><br><span class="line">    <span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (<span class="keyword">const</span> Node __) <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> b&lt;__.b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;A[N];</span><br><span class="line"><span class="keyword">int</span> h[N],hc;</span><br><span class="line"><span class="keyword">int</span> dp[N];</span><br><span class="line"> </span><br><span class="line"><span class="keyword">int</span> rt[N*K],s[N*K],ls[N*K],rs[N*K],cnt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> pre,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">    s[p]=s[pre]+<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(l==r) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">    ls[p]=ls[pre],rs[p]=rs[pre];</span><br><span class="line">    x&lt;=mid?<span class="built_in">Add</span>(ls[p]=++cnt,ls[pre],l,mid,x):<span class="built_in">Add</span>(rs[p]=++cnt,rs[pre],mid+<span class="number">1</span>,r,x);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> pl,<span class="keyword">int</span> pr,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> ql,<span class="keyword">int</span> qr)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(ql&gt;qr) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span>(ql==l&amp;&amp;qr==r) <span class="keyword">return</span> s[pr]-s[pl];</span><br><span class="line">    <span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(qr&lt;=mid) <span class="keyword">return</span> <span class="built_in">Que</span>(ls[pl],ls[pr],l,mid,ql,qr);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(ql&gt;mid) <span class="keyword">return</span> <span class="built_in">Que</span>(rs[pl],rs[pr],mid+<span class="number">1</span>,r,ql,qr);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">Que</span>(ls[pl],ls[pr],l,mid,ql,mid)+<span class="built_in">Que</span>(rs[pl],rs[pr],mid+<span class="number">1</span>,r,mid+<span class="number">1</span>,qr);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n=<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        A[i].a=<span class="built_in">rd</span>(),A[i].b=<span class="built_in">rd</span>();</span><br><span class="line">        h[++hc]=A[i].a,h[++hc]=A[i].b;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">sort</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>),hc=<span class="built_in">unique</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>)-h<span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">sort</span>(A+<span class="number">1</span>,A+n+<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">        A[i].a=<span class="built_in">lower_bound</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>,A[i].a)-h;</span><br><span class="line">        A[i].b=<span class="built_in">lower_bound</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>,A[i].b)-h;</span><br><span class="line">        <span class="built_in">Add</span>(rt[i]=++cnt,rt[i<span class="number">-1</span>],<span class="number">1</span>,hc,A[i].a);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">        <span class="keyword">int</span> l=<span class="number">1</span>,r=i<span class="number">-1</span>,res=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;=r) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span>(A[mid].b&lt;A[i].a) l=mid+<span class="number">1</span>,res=mid;</span><br><span class="line">            <span class="keyword">else</span> r=mid<span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        dp[i]=<span class="built_in">max</span>(dp[i<span class="number">-1</span>],dp[res]+<span class="number">1</span>+<span class="built_in">Que</span>(rt[res],rt[i<span class="number">-1</span>],<span class="number">1</span>,hc,A[i].b+<span class="number">1</span>,hc));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> ans=dp[n];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> </span><br></pre></td></tr></table></figure>
+<p>附：离线做法</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;cstdio&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;cctype&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> reg register</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(reg int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(reg int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s=<span class="number">0</span>,f=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>())) f|=(IO==<span class="string">&#x27;-&#x27;</span>);</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> f?-s:s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>,K=<span class="number">15</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> a,b;</span><br><span class="line">	<span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (<span class="keyword">const</span> Node __)<span class="keyword">const</span>&#123; <span class="keyword">return</span> b&lt;__.b; &#125;</span><br><span class="line">&#125;A[N];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Query</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> x,p,id,k;</span><br><span class="line">	<span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (<span class="keyword">const</span> Query __)<span class="keyword">const</span>&#123; <span class="keyword">return</span> p&lt;__.p; &#125;</span><br><span class="line">&#125;Q[N&lt;&lt;<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> qc,h[N],hc,dp[N];</span><br><span class="line"><span class="keyword">int</span> L[N],Ans[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> s[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Add</span><span class="params">(<span class="keyword">int</span> p,<span class="keyword">int</span> x)</span></span>&#123; <span class="keyword">while</span>(p) s[p]+=x,p-=p&amp;-p; &#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Que</span><span class="params">(<span class="keyword">int</span> p)</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(p&lt;=hc) res+=s[p],p+=p&amp;-p;</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n=<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		A[i].a=<span class="built_in">rd</span>(),A[i].b=<span class="built_in">rd</span>();</span><br><span class="line">		h[++hc]=A[i].a,h[++hc]=A[i].b;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">sort</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>),hc=<span class="built_in">unique</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>)-h<span class="number">-1</span>;</span><br><span class="line">	<span class="built_in">sort</span>(A+<span class="number">1</span>,A+n+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		A[i].a=<span class="built_in">lower_bound</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>,A[i].a)-h;</span><br><span class="line">		A[i].b=<span class="built_in">lower_bound</span>(h+<span class="number">1</span>,h+hc+<span class="number">1</span>,A[i].b)-h;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> l=<span class="number">1</span>,r=i<span class="number">-1</span>,res=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span>(l&lt;=r) &#123;</span><br><span class="line">			<span class="keyword">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">if</span>(A[mid].b&lt;A[i].a) l=mid+<span class="number">1</span>,res=mid;</span><br><span class="line">			<span class="keyword">else</span> r=mid<span class="number">-1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		L[i]=res;</span><br><span class="line">		<span class="keyword">if</span>(i<span class="number">-1</span>&gt;L[i]) Q[++qc]=(Query)&#123;A[i].b+<span class="number">1</span>,i<span class="number">-1</span>,i,<span class="number">1</span>&#125;,Q[++qc]=(Query)&#123;A[i].b+<span class="number">1</span>,L[i],i,<span class="number">-1</span>&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">sort</span>(Q+<span class="number">1</span>,Q+qc+<span class="number">1</span>);</span><br><span class="line">	<span class="keyword">int</span> p=<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n) &#123;</span><br><span class="line">		<span class="keyword">if</span>(i) <span class="built_in">Add</span>(A[i].a,<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">while</span>(p&lt;=qc &amp;&amp; Q[p].p&lt;=i) Ans[Q[p].id]+=Q[p].k*<span class="built_in">Que</span>(Q[p].x),p++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) dp[i]=<span class="built_in">max</span>(dp[i<span class="number">-1</span>],dp[L[i]]+<span class="number">1</span>+Ans[i]);</span><br><span class="line">	<span class="keyword">int</span> ans=dp[n];</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/25202.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1272,123 +1377,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/32895.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/32895.html" class="post-title-link" itemprop="url">Python 基础学习笔记</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-10-05 13:51:00" itemprop="dateCreated datePublished" datetime="2019-10-05T13:51:00+08:00">2019-10-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-06-01 10:14:36" itemprop="dateModified" datetime="2021-06-01T10:14:36+08:00">2021-06-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Python-基础学习笔记"><a href="#Python-基础学习笔记" class="headerlink" title="Python 基础学习笔记"></a>Python 基础学习笔记</h1><h2 id="变量声明"><a href="#变量声明" class="headerlink" title="变量声明"></a>变量声明</h2><p>直接用赋值语句就相当于声明了变量，确定了类型</p>
-<h2 id="注释语句"><a href="#注释语句" class="headerlink" title="注释语句"></a>注释语句</h2><p>用’#’号开头即可</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#handsome boy!</span></span><br></pre></td></tr></table></figure>
-<h2 id="逻辑语句"><a href="#逻辑语句" class="headerlink" title="逻辑语句"></a>逻辑语句</h2><p>if [执行条件] : </p>
-<p>else :</p>
-<h2 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h2><p>while [执行条件]:</p>
-<p>for [变量名] [迭代集合] :</p>
-<p>for 经常要用range()函数</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,n+<span class="number">1</span>):</span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
-<h1 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h1><h2 id="str字符串"><a href="#str字符串" class="headerlink" title="str字符串"></a>str字符串</h2><p>类型：不可修改</p>
-<p>表现形式：”” , ‘’(单引号或者双引号)</p>
-<p>举个栗子：$input()$函数返回单行输入的$str$类型</p>
-<p>为什么说不可修改？</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">a=<span class="built_in">input</span>()</span><br><span class="line">a[<span class="number">0</span>]=<span class="string">&#x27;a&#x27;</span></span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"></span><br><span class="line">输入</span><br><span class="line">b</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  line <span class="number">3</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    a[<span class="number">0</span>]=<span class="string">&#x27;a&#x27;</span></span><br><span class="line">TypeError: <span class="string">&#x27;str&#x27;</span> <span class="built_in">object</span> does <span class="keyword">not</span> support item assignment</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-<h2 id="int整数"><a href="#int整数" class="headerlink" title="int整数"></a>int整数</h2><p>类型：支持运算，但是不可变</p>
-<p>可以通过$int$函数将$str$或者是数转换成整数</p>
-<h2 id="List列表"><a href="#List列表" class="headerlink" title="List列表"></a>List列表</h2><p>类型：可修改</p>
-<p>表现形式$[a,b,c,…]$</p>
-<p>注意列表的使用</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">a=[<span class="number">1</span>,<span class="number">2</span>]</span><br><span class="line">b=a</span><br><span class="line">b[<span class="number">0</span>]=<span class="number">2</span></span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"><span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">output : </span><br><span class="line">[<span class="number">2</span>, <span class="number">2</span>]</span><br><span class="line">[<span class="number">2</span>, <span class="number">2</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>$b$变量入的列表是指向对象$a$的</p>
-<p>更改$b$等价于更改$a$</p>
-<p>正确表达</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">a=[<span class="number">1</span>,<span class="number">2</span>]</span><br><span class="line">b=a.copy()</span><br><span class="line">b[<span class="number">0</span>]=<span class="number">2</span></span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"><span class="built_in">print</span>(b)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">output:</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">[<span class="number">2</span>, <span class="number">2</span>]</span><br></pre></td></tr></table></figure>
-<p>这个性质适用于所有可变的类型</p>
-<p>同时在传入函数时也同样</p>
-<h2 id="tuple元组"><a href="#tuple元组" class="headerlink" title="tuple元组"></a>tuple元组</h2><p>类型：不可修改</p>
-<p>表现形式：$(a,b,c,…)$ (有些时候括号可以省略)</p>
-<p>函数传入值时就是以元组的形式传入的</p>
-<h2 id="List和tuple的一些基本应用"><a href="#List和tuple的一些基本应用" class="headerlink" title="List和tuple的一些基本应用"></a>List和tuple的一些基本应用</h2><h3 id="len长度函数"><a href="#len长度函数" class="headerlink" title="len长度函数"></a>len长度函数</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(a))</span><br><span class="line"><span class="comment"># 3</span></span><br></pre></td></tr></table></figure>
-<h3 id="切片函数"><a href="#切片函数" class="headerlink" title="切片函数"></a>切片函数</h3><p>var[start: end: pace ]</p>
-<p>变量名[起始位置: 结束位置: 步长]</p>
-<p>默认 [0:len:1]</p>
-<p>负数表示倒着来</p>
-<p>注意这些起始和结束都是左闭右开的，下表从0开始</p>
-<p>举个栗子</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">a=(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>)</span><br><span class="line"><span class="built_in">print</span>(a[<span class="number">0</span>:<span class="number">6</span>:<span class="number">2</span>])</span><br><span class="line"><span class="comment"># (1, 3, 5)</span></span><br><span class="line"><span class="built_in">print</span>(a[-<span class="number">6</span>:-<span class="number">1</span>])</span><br><span class="line"><span class="comment"># (2, 4, 6)</span></span><br><span class="line"><span class="built_in">print</span>(a[-<span class="number">1</span>:-<span class="number">6</span>:-<span class="number">2</span>])</span><br><span class="line"><span class="comment"># (7, 5, 3)</span></span><br></pre></td></tr></table></figure>
-<h2 id="dict-字典"><a href="#dict-字典" class="headerlink" title="dict 字典"></a>dict 字典</h2><p>同志们，这个就是map！</p>
-<p>由一个值映射另一个值</p>
-<p>键值可以是所有不可变类型!!</p>
-<p>字典可以由二元组组成的列表转化</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">a=<span class="built_in">dict</span>([(<span class="string">&#x27;name&#x27;</span>,<span class="string">&#x27;?&#x27;</span>),(<span class="string">&#x27;age&#x27;</span>,<span class="string">&#x27;?&#x27;</span>),(<span class="string">&#x27;school&#x27;</span>,<span class="string">&#x27;YQZL&#x27;</span>)])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># &#123;&#x27;name&#x27;: &#x27;?&#x27;, &#x27;age&#x27;: &#x27;?&#x27;, &#x27;school&#x27;: &#x27;YQZL&#x27;&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(a[<span class="string">&quot;name&quot;</span>]) <span class="comment">#访问</span></span><br><span class="line"><span class="comment"># ?</span></span><br><span class="line"><span class="keyword">del</span> a[<span class="string">&quot;name&quot;</span>]</span><br><span class="line"><span class="built_in">print</span>(a)</span><br><span class="line"><span class="comment"># &#123;&#x27;age&#x27;: &#x27;?&#x27;, &#x27;school&#x27;: &#x27;YQZL&#x27;&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(a))</span><br><span class="line"><span class="comment"># 2</span></span><br><span class="line">a[<span class="string">&quot;name&quot;</span>]=<span class="string">&quot;?&quot;</span>  <span class="comment">#增加对</span></span><br><span class="line"><span class="comment"># &#123;&#x27;age&#x27;: &#x27;?&#x27;, &#x27;school&#x27;: &#x27;YQZL&#x27;, &#x27;name&#x27;: &#x27;?&#x27;&#125;</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;name&quot;</span> <span class="keyword">in</span> a) <span class="comment">#检查是否存在</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;?&quot;</span> <span class="keyword">in</span> a)</span><br><span class="line"><span class="comment"># True</span></span><br><span class="line"><span class="comment"># False</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1462,20 +1450,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">253</span>
+          <span class="site-state-item-count">254</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-count">62</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1573,7 +1561,6 @@
   </div>
 
   
-  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
@@ -1589,6 +1576,7 @@
 <script src="/js/next-boot.js"></script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
 
 
   
