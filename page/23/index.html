@@ -201,6 +201,206 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/59752.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/59752.html" class="post-title-link" itemprop="url">多项式指定大小的单位根点值式求解(含Bluestein’s Algorithm)</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-13 21:04:42" itemprop="dateCreated datePublished" datetime="2020-08-13T21:04:42+08:00">2020-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:20:50" itemprop="dateModified" datetime="2021-05-31T20:20:50+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="多项式指定大小的单位根点值式求解-含Bluestein’s-Algorithm"><a href="#多项式指定大小的单位根点值式求解-含Bluestein’s-Algorithm" class="headerlink" title="多项式指定大小的单位根点值式求解(含Bluestein’s Algorithm)"></a>多项式指定大小的单位根点值式求解(含Bluestein’s Algorithm)</h1><p>下面的阐述建立于存在$n$阶单位根的前提下</p>
+<p>(如果是NTT，必须满足$n|(P-1)$ ，否则单位根可能会变成一个复杂的<strong>多维向量</strong>)</p>
+<script type="math/tex; mode=display">\</script><h2 id="用卷积解决多项式与点值式的转化-Bluestein’s-Algorithm"><a href="#用卷积解决多项式与点值式的转化-Bluestein’s-Algorithm" class="headerlink" title="用卷积解决多项式与点值式的转化:Bluestein’s Algorithm"></a>用卷积解决多项式与点值式的转化:Bluestein’s Algorithm</h2><p>设最终求得的点值式为$f(x^k)=\sum a_i\cdot \omega_n^{i k}$</p>
+<p>其中指数为$ik$，有一种简单的转化$i\cdot k=\cfrac{i^2+k^2-(i-k)^2} {2}$</p>
+<p>由于在模意义下，$x^{\frac{i} {2} }$次(二次剩余)是一个非常麻烦的东西，所以考虑一个更优的转化</p>
+<p>$i\cdot k=C(i+k,2)-C(i,2)-C(k,2)$</p>
+<p>这条式子的组合意义是：从集合$i,k$分别选一个，等价于从$i+k$选两个减去在$i,k$内部选两个</p>
+<p>通过这样的转化，我们可以对于每一个$a_i$计算其对于每个$f(x^k)$的贡献</p>
+<p>具体过程是简单的构造卷积，这里省略</p>
+<script type="math/tex; mode=display">\</script><h2 id="适用于特殊情况的转化方法"><a href="#适用于特殊情况的转化方法" class="headerlink" title="适用于特殊情况的转化方法"></a>适用于特殊情况的转化方法</h2><p>需要了解的是，多项式卷积的FFT/NTT不止适用与于二元分治</p>
+<p>对于多项式$F(x)$的$d$元分治，设分治子问题的答案为$G_j(x’_i),j\in[0,d-1]$，可以得到合并式子</p>
+<p>$\displaystyle  F(x_i)=\sum_{j=0}^{d-1}x_i^jG_j(x_i^d)=\sum_{i=0}^{d-1}x_i^jG_j(x’_{i\mod \frac{n} {d} })$</p>
+<p>对于$n$进行质因数分解，得到$n=\prod p_i$，带入上面的式子，带入$p_i$元分治强行求解，可以认为最终复杂度为</p>
+<p>$O(n\sum p_i)=O(n\cdot \max\{p_i\} \log n)$</p>
+<p>因此，这种方法使用于$p_i$较小的情况</p>
+<script type="math/tex; mode=display">\</script><h2 id="n元点值式的用途"><a href="#n元点值式的用途" class="headerlink" title="n元点值式的用途"></a>n元点值式的用途</h2><p>DFT的卷积是溢出的，$x^i$会溢出到$x^{i\mod n}$，系数之间存在着循环关系</p>
+<p>我们可以利用$n$元卷积做到指定大小的循环卷积，可以处理一些特定问题</p>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4191">例题:  [CTSC2010]性能优化</a>(使用$O(n\log n\log C)$的快速幂无法通过，尚未尝试Bluestein’s Algorithm)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/46470.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="遇到问题可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/46470.html" class="post-title-link" itemprop="url">伪WC2020游记</a>
+        </h2>
+
+        <div class="post-meta">
+		
+			
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-12 12:44:03" itemprop="dateCreated datePublished" datetime="2020-08-12T12:44:03+08:00">2020-08-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%B8%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">游记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="伪WC2020游记"><a href="#伪WC2020游记" class="headerlink" title="伪WC2020游记"></a>伪WC2020游记</h1><p>补</p>
+<p>是的，这是一场在8月举行的盛大的冬令营！</p>
+<p>而且变成了自由报名！</p>
+<p>~奇妙的网课体验祭~</p>
+<h4 id="Day1"><a href="#Day1" class="headerlink" title="Day1:"></a>Day1:</h4><p>哇路由器，哇bitmap</p>
+<p>哇Minhash，哇随机投影，哇并行计算</p>
+<p>工程学习祭。。。。</p>
+<p>晚上:？？？果然是集训队选手讲题？？？</p>
+<h4 id="Day2"><a href="#Day2" class="headerlink" title="Day2"></a>Day2</h4><p>嗯，是神仙讲题!</p>
+<p>嗯，还是神仙讲题!诶怎么锅了，诶怎么又锅了?诶怎么拖了15分钟还没讲完?</p>
+<p>晚上:？？？果然又是集训队选手讲题？？？</p>
+<p><br></p>
+<h4 id="Day3"><a href="#Day3" class="headerlink" title="Day3"></a>Day3</h4><p>哇怎么都变成讲神仙题目了?</p>
+<h4 id="Day4"><a href="#Day4" class="headerlink" title="Day4"></a>Day4</h4><p>台风困在寝室祭。。。</p>
+<p>在寝室度过了完美的补觉日，直接错过所有讲课。。。</p>
+<h4 id="Day5"><a href="#Day5" class="headerlink" title="Day5"></a>Day5</h4><p>赶回家考试祭。。。</p>
+<p>T1</p>
+<p> 看起来十分可写，于是乎又搞了一年没搞出来</p>
+<p>是不是大家都A了，我是不是又完蛋了，只写了暴力</p>
+<p>T2</p>
+<p><del>推出了阶的表示性质，然后误以为要$dp$，直接跳过现场</del></p>
+<p>T3</p>
+<p>看起来十分可写，令人想到某道皮配题</p>
+<p>shi一般的代码写了一年，终于在最后一分钟交上去了哈哈哈哈</p>
+<p>果然十分可写，爆搜+dp感觉要自己要升天</p>
+<p>出来</p>
+<p>哇果然升天了!!题目锅了哈哈哈哈哈哈!!只有50哈哈哈哈哈哈!!<del>(WCWCWC)</del></p>
+<p>T1果然大家都没A哈哈哈哈<del>(读入错了挂掉10分祭)</del></p>
+<p>T2果然大家都A了哈哈哈哈</p>
+<p>T3这个非集选手平均分哈哈哈哈</p>
+<p>完事儿只有100分，划水本质又暴露了。。。</p>
+<h4 id="Day6"><a href="#Day6" class="headerlink" title="Day6"></a>Day6</h4><p>没错闭幕式在hdu多校期间，于是乎.~.~.~.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/29814.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -966,173 +1166,6 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/29540.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/29540.html" class="post-title-link" itemprop="url">「APIO2019」桥梁(询问分块+并查集)</a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-07-26 13:38:06" itemprop="dateCreated datePublished" datetime="2020-07-26T13:38:06+08:00">2020-07-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 22:17:00" itemprop="dateModified" datetime="2021-05-31T22:17:00+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「APIO2019」桥梁-询问分块-并查集"><a href="#「APIO2019」桥梁-询问分块-并查集" class="headerlink" title="「APIO2019」桥梁(询问分块+并查集)"></a>「APIO2019」桥梁(询问分块+并查集)</h1><p>询问每$S$个分块后，每次对于所有块内未被更改的边 及 所有询问 排序，然后依次加入并查集，这一部分复杂度为$O(m \frac{q} {S}(\log m+\alpha(n)))$</p>
-<p>对于$S$条被改变的边，对于每个询问分别考虑这些边的贡献，复杂度为$O(qS)$，由于涉及到并查集回撤的问题，可以使用按秩合并，复杂度为$O(qS\log S)$</p>
-<p>按照上面两步暴力实现，复杂度大概可以做到$O((m+q)\sqrt{q}\log n)$</p>
-<p>实际可行的优化有：</p>
-<p>用平衡树实现排序，每次暴力遍历，第一部分复杂度降为$O(q\log m+m\frac{q} {S} \alpha(n))$</p>
-<p>由于最多访问到$O(S)$个联通块，第二部分用$dfs$遍历来实现，复杂度降为$O(q S \alpha(n))$(遍历过程中要访问联通块编号)</p>
-<p>复杂度可以降到约$O((m+q)\sqrt {q} \cdot \alpha(n))$</p>
-<p>以下是暴力实现的代码</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> pb push_back</span></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1e5</span>+<span class="number">10</span>;</span><br><span class="line"><span class="keyword">int</span> n,m,S,q,qc;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> u,v,w;</span><br><span class="line">	<span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (Edge __) <span class="keyword">const</span> &#123; <span class="keyword">return</span> w&lt;__.w; &#125;</span><br><span class="line">&#125; A[N],B[N],Q[N];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span> <span class="keyword">int</span> t,w; &#125;;</span><br><span class="line">vector &lt;Node&gt; G[N];</span><br><span class="line"><span class="keyword">int</span> uid[N],uc,fa[N],sz[N],ux[N],uy[N],rc,ans[N];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123; <span class="keyword">while</span>(fa[x]!=x) x=fa[fa[x]]; <span class="keyword">return</span> x; &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Union</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">	x=<span class="built_in">Find</span>(x),y=<span class="built_in">Find</span>(y);</span><br><span class="line">	<span class="keyword">if</span>(x==y) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span>(sz[x]&gt;sz[y]) <span class="built_in">swap</span>(x,y);</span><br><span class="line">	ux[++rc]=x,uy[rc]=y;</span><br><span class="line">	fa[x]=y,sz[y]+=sz[x]; <span class="comment">// 按秩合并用于回撤</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) A[i].u=<span class="built_in">rd</span>(),A[i].v=<span class="built_in">rd</span>(),A[i].w=<span class="built_in">rd</span>();</span><br><span class="line">	S=<span class="built_in">sqrt</span>(<span class="number">3</span>*(n+m));</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,q=<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		ans[i]=<span class="number">-1</span>;</span><br><span class="line">		<span class="keyword">int</span> opt=<span class="built_in">rd</span>(),x=<span class="built_in">rd</span>(),y=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="keyword">if</span>(opt==<span class="number">1</span>) G[x].<span class="built_in">pb</span>((Node)&#123;i,y&#125;);</span><br><span class="line">		<span class="keyword">else</span> Q[++qc]=(Edge)&#123;i,x,y&#125;;</span><br><span class="line">		<span class="keyword">if</span>(qc%S==<span class="number">0</span> || i==q) &#123;</span><br><span class="line">			<span class="keyword">if</span>(!qc) <span class="keyword">continue</span>;</span><br><span class="line">			<span class="keyword">int</span> c=<span class="number">0</span>;</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(!G[i].<span class="built_in">size</span>()) B[++c]=A[i];</span><br><span class="line">			<span class="keyword">else</span> uid[++uc]=i;</span><br><span class="line">			<span class="built_in">sort</span>(B+<span class="number">1</span>,B+c+<span class="number">1</span>),<span class="built_in">sort</span>(Q+<span class="number">1</span>,Q+qc+<span class="number">1</span>);</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,n) fa[i]=i,sz[i]=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">int</span> p=c;</span><br><span class="line">			<span class="built_in">drep</span>(i,qc,<span class="number">1</span>) &#123;</span><br><span class="line">				<span class="keyword">while</span>(p &amp;&amp; B[p].w&gt;=Q[i].w) <span class="built_in">Union</span>(B[p].u,B[p].v),p--;</span><br><span class="line">				rc=<span class="number">0</span>;</span><br><span class="line">				<span class="built_in">rep</span>(j,<span class="number">1</span>,uc) &#123;</span><br><span class="line">					<span class="keyword">int</span> x=uid[j],w=A[x].w;</span><br><span class="line">					<span class="keyword">for</span>(<span class="keyword">auto</span> k:G[x]) <span class="keyword">if</span>(k.t&lt;=Q[i].u) w=k.w;</span><br><span class="line">					<span class="keyword">else</span> <span class="keyword">break</span>; <span class="comment">// 找到询问时这条边的权值</span></span><br><span class="line">					<span class="keyword">if</span>(w&gt;=Q[i].w) <span class="built_in">Union</span>(A[x].u,A[x].v);</span><br><span class="line">				&#125;</span><br><span class="line">				ans[Q[i].u]=sz[<span class="built_in">Find</span>(Q[i].v)];</span><br><span class="line">				<span class="built_in">drep</span>(j,rc,<span class="number">1</span>) fa[ux[j]]=ux[j],fa[uy[j]]=uy[j],sz[uy[j]]-=sz[ux[j]];<span class="comment">// 回撤</span></span><br><span class="line">				rc=<span class="number">0</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">1</span>,uc) A[uid[i]].w=G[uid[i]].<span class="built_in">rbegin</span>()-&gt;w,G[uid[i]].<span class="built_in">clear</span>();</span><br><span class="line">			uc=qc=<span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,q) <span class="keyword">if</span>(~ans[i]) <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans[i]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/44528.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="遇到问题可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/44528.html" class="post-title-link" itemprop="url">「APIO2019」奇怪装置 </a>
-        </h2>
-
-        <div class="post-meta">
-		
-			
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-07-26 12:12:55" itemprop="dateCreated datePublished" datetime="2020-07-26T12:12:55+08:00">2020-07-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 22:16:47" itemprop="dateModified" datetime="2021-05-31T22:16:47+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「APIO2019」奇怪装置"><a href="#「APIO2019」奇怪装置" class="headerlink" title="「APIO2019」奇怪装置"></a>「APIO2019」奇怪装置</h1><p>找到循环就很简单了</p>
-<p>很显然$y$是每$B$次一循环的，对于每个相邻的$y$循环$x$的值均相差$B+1 \pmod A$</p>
-<p>因此总的循环就是$B+1$对于$A$的循环乘上$B$</p>
-<p>即$\frac{A} {gcd(A,B+1)}\cdot B$</p>
-<p>知道循环节之后，把查询分成$O(n)$个区间，排序之后直接解决即可</p>
-<p>如果使用基数排序即可做到$O(n)$</p>
-<p>以下是快排版本</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> ll=<span class="keyword">long</span> <span class="keyword">long</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> mp make_pair</span></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="function">ll <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	ll s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> n,c,i;</span><br><span class="line">ll A,B,ans,r=<span class="number">-1</span>,L,R;</span><br><span class="line">pair &lt;ll,ll&gt; S[<span class="number">2000010</span>];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(n=<span class="built_in">rd</span>(),A=<span class="built_in">rd</span>(),B=<span class="built_in">rd</span>(),A=<span class="built_in">min</span>(<span class="number">1.0</span>*B*(A/__gcd(A,B+<span class="number">1</span>)),<span class="number">1e18</span>),i=<span class="number">1</span>;i&lt;=n;++i) &#123;</span><br><span class="line">		L=<span class="built_in">rd</span>(),R=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="keyword">if</span>(R-L+<span class="number">1</span>&gt;=A) <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,A),<span class="number">0</span>;</span><br><span class="line">		L%=A,R%=A;</span><br><span class="line">		L&lt;=R?S[++c]=<span class="built_in">mp</span>(L,R):(S[++c]=<span class="built_in">mp</span>(L,A<span class="number">-1</span>),S[++c]=<span class="built_in">mp</span>(<span class="number">0</span>,R));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span>(<span class="built_in">sort</span>(S+<span class="number">1</span>,S+c+<span class="number">1</span>),i=<span class="number">1</span>;i&lt;=c;++i) <span class="keyword">if</span>(r&lt;=S[i].second) ans+=S[i].second-<span class="built_in">max</span>(r,S[i].first<span class="number">-1</span>),r=S[i].second;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1206,7 +1239,7 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">254</span>
+          <span class="site-state-item-count">256</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
