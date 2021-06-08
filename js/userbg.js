@@ -1,6 +1,6 @@
 /* change background */
 
-Timeinterval= 2*60*1000; //ms
+Timeinterval= 1*60*1000; //ms
 a=[
 "background.png",
 "background3.jpg",
