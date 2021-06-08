@@ -11,9 +11,9 @@ a=[
 ];
 console.log("loaded userbg.js");
 var obj=document.body;//document.getElementById("body");
-console.log(obj);
+//console.log(obj);
 temp=obj.style.cssText;
-console.log(temp);
+//console.log(temp);
 var pos=-1;
 changeBackground=function(){
 	pos=parseInt(Math.random()*a.length);
@@ -23,8 +23,8 @@ changeBackground=function(){
 	+ "background-attachment:fixed;" // 固定住背景图片
 	+ "background-position:50% 50%;" // 图片位置：居中
 	+ "background-size: cover";
-	console.log(obj.style.cssText);
+	//console.log(obj.style.cssText);
 };
-console.log(temp);
+//console.log(temp);
 setInterval(changeBackground,Timeinterval);
 
