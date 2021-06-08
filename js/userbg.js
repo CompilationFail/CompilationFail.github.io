@@ -27,6 +27,7 @@ changeBackground=function(){
 	+ "background-size: cover";
 	//console.log(obj.style.cssText);
 };
+changeBackground();
 //console.log(temp);
 setInterval(changeBackground,Timeinterval);
 
