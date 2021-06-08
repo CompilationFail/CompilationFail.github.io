@@ -7,7 +7,10 @@ a=[
 "background4.png",
 "background5.png",
 "background6.jpg",
-"background7.jpg"
+"background7.jpg",
+"background8.jpg",
+"background9.jpg",
+"background10.png"
 ];
 console.log("loaded userbg.js");
 var obj=document.body;//document.getElementById("body");
