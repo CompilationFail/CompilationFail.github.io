@@ -203,6 +203,100 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/49768.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/49768.html" class="post-title-link" itemprop="url">COCI2011/2012 Contest 1 F  状压加速dp</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-27 20:12:36" itemprop="dateCreated datePublished" datetime="2020-08-27T20:12:36+08:00">2020-08-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:08:10" itemprop="dateModified" datetime="2021-05-31T21:08:10+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="COCI2011-2012-Contest-1-F-状压加速dp"><a href="#COCI2011-2012-Contest-1-F-状压加速dp" class="headerlink" title="COCI2011/2012 Contest#1 F  状压加速dp"></a>COCI2011/2012 Contest#1 F  状压加速dp</h1><p>首先是一个非常Naive的dp，令$dp[i][x][y]$表示$i$时刻$x,y$是否能被跳到</p>
+<p>枚举，然后转移，如果滚动数组，就可以做到$O(n^2)$空间，$O(Tn^2)$时间复杂度</p>
+<p>这显然是TLE的。。。</p>
+<script type="math/tex; mode=display">\</script><p>注意到题目的$n\leq 30$，可以直接用一个int存在某一行/列的答案</p>
+<p>设时刻$i$第$j$列的答案为$dp[i][j]$</p>
+<p>假设不考虑答案的限制，两之间转移可以做到$O(1)$，即</p>
+<p>1.$dp[i][j\pm 1]$左/右移两位</p>
+<p>2.$dp[i][j\pm 2]$左/右移一位</p>
+<p>两者转移即可，但是涉及到倍数的限制，设$can[i][j]$为$i$时刻$j$列的可行跳跃位置</p>
+<p>则只需要最后的时候让$dp[i][j]$与$can[i][j]$取交集即可</p>
+<p>如果直接枚举倍数，复杂度上限是$O(n^2 T)$</p>
+<p>考虑分块决策，设将$[1,D]$的因数挑出来额外记录一个数组$can2[x][j]$表示值为$x$的第$j$列有那些</p>
+<p>不直接枚举他们，而是在每次访问时考虑他们对于$can[i][j]$的贡献</p>
+<p>在优秀实现下，复杂度上限为$O(n^2\frac{T} {D+1}+T (D+\sum_{t=1}^{D} \frac{1} {t} n))=O(n^2\frac{T} {D+1}+T (n\ln D+D))$</p>
+<p>这个实现上来说，就是枚举时间$i$后，判断是否满足$t|i $，然后再将$can2[t][j]$贡献到$can[i][j]$</p>
+<p>显然，$t|i$成立的次数就是$T\sum_{t=1}^{D} \frac{1} {t} $，也就是要循环这么多次取贡献$j$这一维</p>
+<p>调整一下$D$的参数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> GCC optimize(2)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> reg register</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(reg int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(reg int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">30</span>,D=<span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m,a[N][N],dp[<span class="number">2</span>][N];</span><br><span class="line"><span class="keyword">int</span> can[<span class="number">1000010</span>][N],t[D+<span class="number">1</span>][N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>,&amp;n,&amp;m);</span><br><span class="line">	<span class="keyword">int</span> sx,sy; <span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>,&amp;sx,&amp;sy),sx--,sy--;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i][j]);</span><br><span class="line">		<span class="keyword">if</span>(a[i][j]&lt;=D) t[a[i][j]][i]|=<span class="number">1</span>&lt;&lt;j;</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">for</span>(reg <span class="keyword">int</span> T=a[i][j];T&lt;=m;T+=a[i][j]) can[T][i]|=<span class="number">1</span>&lt;&lt;j;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> cur=<span class="number">0</span>; dp[cur][sx]=<span class="number">1</span>&lt;&lt;sy;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">1</span>,D) <span class="keyword">if</span>(i%j==<span class="number">0</span>) <span class="built_in">rep</span>(k,<span class="number">0</span>,n<span class="number">-1</span>) can[i][k]|=t[j][k];</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">			dp[!cur][j]=<span class="number">0</span>;</span><br><span class="line">			<span class="keyword">if</span>(j) &#123;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j<span class="number">-1</span>]&lt;&lt;<span class="number">2</span>;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j<span class="number">-1</span>]&gt;&gt;<span class="number">2</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(j&lt;n<span class="number">-1</span>) &#123;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j+<span class="number">1</span>]&lt;&lt;<span class="number">2</span>;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j+<span class="number">1</span>]&gt;&gt;<span class="number">2</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(j&gt;<span class="number">1</span>) &#123;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j<span class="number">-2</span>]&lt;&lt;<span class="number">1</span>;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j<span class="number">-2</span>]&gt;&gt;<span class="number">1</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(j&lt;n<span class="number">-2</span>) &#123;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j+<span class="number">2</span>]&lt;&lt;<span class="number">1</span>;</span><br><span class="line">				dp[!cur][j]|=dp[cur][j+<span class="number">2</span>]&gt;&gt;<span class="number">1</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			dp[!cur][j]&amp;=can[i][j];</span><br><span class="line">		&#125;</span><br><span class="line">		cur^=<span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(dp[cur][i]&amp;(<span class="number">1</span>&lt;&lt;j)) ans++;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="built_in">rep</span>(j,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(dp[cur][i]&amp;(<span class="number">1</span>&lt;&lt;j)) <span class="built_in">printf</span>(<span class="string">&quot;%d %d\n&quot;</span>,i+<span class="number">1</span>,j+<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/12466.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1085,94 +1179,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/5845.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/5845.html" class="post-title-link" itemprop="url">单位根反演</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-13 22:07:25" itemprop="dateCreated datePublished" datetime="2020-08-13T22:07:25+08:00">2020-08-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="单位根反演"><a href="#单位根反演" class="headerlink" title="单位根反演"></a>单位根反演</h1><p>最基础的用途是用于FFT中点值式转多项式</p>
-<p>即对于$G(i)=F(\omega_n^i)$，由$G(i)$反演得到$[x^i]F(i)$的过程，称之为单位根反演</p>
-<p>式子非常简单</p>
-$\sum_{j=0}^{n-1}\omega_n^{ij}= \left\{\begin{aligned} \frac{\omega_n^{in}-1} {\omega_n^i-1}=0  && i\ne 0\\ n  && i=0\end{aligned} \right.$
-<p>更简洁的式子为$\begin{aligned}\frac{\sum_{j=0}^{n-1}\omega_n^{ij} } {n}=[n|i]\end{aligned}$</p>
-<p>在生成函数的化简与构造中，常用于解决$\mod n=0$的限制</p>
-<p>如$\sum_{n|i}\frac{x^i} {i!}$</p>
-<p>通过单位根反演转化为 </p>
-$ \begin{aligned}\sum_{n|i}\frac{x^i} {i!}=\sum_{i=0}^{\infty}\frac{\sum_{j=0}^{n-1}\omega_n^{ij} } {n} \cdot \frac{x^i} {i!}=\sum_{i=0}^{\infty}\sum_{j=0}^{n-1} \frac{(x\omega_n^j)^i} {i!}=\sum_{j=0}^{n-1}e^{x\omega_n^j}\end{aligned}$
-<p>作为无穷级数压缩的一种方法</p>
-<p>但是单位根反演转化有一个非常明显的局限，就是在模意义下，$n$阶单位根很可能无法求解</p>
-<p>现在笔者还不会求模意义下特定的$n$阶单位根。。。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1246,7 +1252,7 @@ $ \begin{aligned}\sum_{n|i}\frac{x^i} {i!}=\sum_{i=0}^{\infty}\frac{\sum_{j=0}^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">257</span>
+          <span class="site-state-item-count">258</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1259,7 +1265,7 @@ $ \begin{aligned}\sum_{n|i}\frac{x^i} {i!}=\sum_{i=0}^{\infty}\frac{\sum_{j=0}^{
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-count">63</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
