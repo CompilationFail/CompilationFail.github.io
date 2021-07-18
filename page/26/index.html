@@ -209,6 +209,119 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/11852.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/11852.html" class="post-title-link" itemprop="url">Berlekamp-Massey 算法(最短线性递推)</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-12 17:58:21" itemprop="dateCreated datePublished" datetime="2020-06-12T17:58:21+08:00">2020-06-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 20:07:23" itemprop="dateModified" datetime="2021-05-31T20:07:23+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Berlekamp-Massey-算法-最短线性递推"><a href="#Berlekamp-Massey-算法-最短线性递推" class="headerlink" title="Berlekamp-Massey 算法(最短线性递推)"></a>Berlekamp-Massey 算法(最短线性递推)</h1><p>参考文献：2019集训队论文，钟子谦《两类递推数列的性质和应用》给出了详细阐述</p>
+<h2 id="算法简介"><a href="#算法简介" class="headerlink" title="算法简介"></a>算法简介</h2><p>对于一个$n$个元素的数列$a_{1,\cdots, n}$，求出它的<strong>最短线性递推式</strong></p>
+<p>即求最小的$m$和对应的$r_1,\cdots r_m$使得$\forall i\in [m+1,n],a_i=\sum_{j=1}^{m}a_{i-j}r_j$</p>
+<p>很显然使用<strong>高斯消元</strong>算法可以在$O(n^3)$的时间内求解</p>
+<p>而$\text{Berlekamp-Massey(BM)}$算法是通过依次对于前$i$项构造，</p>
+<p>添加每一项时在$O(n)$的时间内找到一个可行的构造方法，将复杂度降低到了$O(n^2)$</p>
+<script type="math/tex; mode=display">\</script><script type="math/tex; mode=display">\</script><h2 id="算法过程"><a href="#算法过程" class="headerlink" title="算法过程"></a>算法过程</h2><p>为了更好描述，设</p>
+<p>$r$的阶为$d(r)$</p>
+<p>$\lambda(n,r)=\sum_{i=1}^{d(r)}a_{n-i}r_i$</p>
+<p>$\Delta(n,r)=a_n-\lambda (n,r)$</p>
+<p>考虑依次加入每个数$a_i$，设当前$d(r)=m$，上一次的递推是$p$,$p$出现不匹配的位置是$f$</p>
+<p>特别的，初始状态的递推是$r=\{ \},f=0$</p>
+<p>$1.\Delta(i,r)=0$，那么不需要扩展</p>
+<p>2.$\Delta(i,r)\ne 0$</p>
+<p>$\text{i}.m=0$，即插入了第一个$a_i\ne 0$，初始化$d(r’)=i,r_j=0$，此时显然成立</p>
+<p>$\text{ii}.m\ne 0$</p>
+<p>我们的构造思路是找到一个$r’$使得$\forall j\in[d(r’),i-1],\lambda(j,r’)=0\vee  \lambda (n,r’)=\Delta(i-1,r)$</p>
+<p>那么当前合法的转移就是$r+r’$</p>
+<p>设$t=\frac{\Delta(n,r)} {\Delta(f,p)}$</p>
+<p>构造$r’=t \cdot x^{i-f-1}(1-p)$</p>
+<p>写出来就是</p>
+<p>$r’=\{\underbrace{0,\cdots,0},t\cdot (1-p)\}$</p>
+<p>$ \ \ \ \ \ \ \ \ i-f-1$个$0$</p>
+<p>$r’=\{\underbrace{0,\cdots,0},t,-t\cdot p_{1},-t\cdot p_{2}\cdots,-t\cdot p_{d(p)} \}$</p>
+<p>$ \ \ \ \ \ \ \ \ i-f-1$个$0$</p>
+<p>此时，$d(r’)=i-f+d(p)$</p>
+<p>当$j\in [d(r’)+1,i-1]$时，$\lambda(j,r’)=\sum_{k=i-f}^{d(r’)}a_{j-k}r’_k$</p>
+<p>$=t\cdot( a_{j-(i-f)}-\lambda(j-(i-f),p))$</p>
+<p>由于$p$对于$j\in[d(r’)+1-(i-f),i-1-(i-f)]=[d(p)+1,f-1]$，$p$这个递推式成立</p>
+<p>即$\lambda(j,r’)=0$</p>
+<p>当$j=i$时，</p>
+<p>$\lambda(i,r’)=t\cdot (a_{i-(i-f)}-\lambda(i-(i-f),p))=t\cdot \Delta(f,p)$</p>
+<p>即$\lambda (i,r’)=\Delta(n,r)$</p>
+<p>完成了我们想要的构造，所以每次记录上一次的失配位置，即可找到最小递推式</p>
+<p>然后，上面的构造方法只满足构造出一个合法的线性递推式，并没有证明是$m$是最小的</p>
+<p>但是在OI竞赛中，通常我们只是需要快速求出递推式，并不要求最短线性递推</p>
+<p>如果想要看到严谨的证明还请移步2019集训队论文</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/11012.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1066,114 +1179,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/63720.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/63720.html" class="post-title-link" itemprop="url">「CTS2019 | CTSC2019」重复(Kmp)</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-05-22 13:18:31" itemprop="dateCreated datePublished" datetime="2020-05-22T13:18:31+08:00">2020-05-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 22:03:23" itemprop="dateModified" datetime="2021-05-31T22:03:23+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「CTS2019-CTSC2019」重复-Kmp"><a href="#「CTS2019-CTSC2019」重复-Kmp" class="headerlink" title="「CTS2019 | CTSC2019」重复(Kmp)"></a>「CTS2019 | CTSC2019」重复(Kmp)</h1><hr>
-<h2 id="Part1"><a href="#Part1" class="headerlink" title="Part1"></a>Part1</h2><p>首先我们考虑对于一个已经确定的$t$串，如何检查是否合法</p>
-<p>对于$s$串建立$\text{kmp}$($\text{kmp}$自动机当然可以)，</p>
-<p>如果当前$\text{kmp}$指针$j$在$\text{fail}$树上的祖先所对应的所有下一个位置$s[ancestor+1]$中，存在一个字符，$t$中当前位置的字符$t[i]&lt;s[ancestor+1]$</p>
-<p>那么就是存在一个”有意义的串”,并且这个串和s串第一个不同的位置就是$ancestor+1$</p>
-<p>所以可以预处理一个$fail$树上祖先最大的$s[ancestor+1],Max[state]$</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,n) Max[i<span class="number">-1</span>]=s[i];</span><br><span class="line">Max[n]=<span class="string">&#x27;a&#x27;</span>;<span class="comment">//边界条件</span></span><br><span class="line"><span class="built_in">cmax</span>(Max[<span class="number">1</span>],Max[<span class="number">0</span>]);</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">2</span>,n) &#123;</span><br><span class="line">	<span class="keyword">int</span> j=nxt[i<span class="number">-1</span>];</span><br><span class="line">	<span class="keyword">while</span>(j &amp;&amp; s[i]!=s[j+<span class="number">1</span>]) j=nxt[j];</span><br><span class="line">	<span class="keyword">if</span>(s[i]==s[j+<span class="number">1</span>]) ++j;</span><br><span class="line">	nxt[i]=j;</span><br><span class="line">	<span class="built_in">cmax</span>(Max[i],Max[j]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//预处理Max</span></span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">0</span>,n) &#123;</span><br><span class="line">	<span class="keyword">if</span>(i&lt;n) Trans[i][s[i+<span class="number">1</span>]-<span class="string">&#x27;a&#x27;</span>]=i+<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(j,<span class="number">0</span>,<span class="number">25</span>) <span class="keyword">if</span>(j!=s[i+<span class="number">1</span>]-<span class="string">&#x27;a&#x27;</span>) Trans[i][j]=Trans[nxt[i]][j];</span><br><span class="line">&#125;<span class="comment">//kmp自动机，不要再暴力了</span></span><br><span class="line"><span class="built_in">rep</span>(i,m+<span class="number">1</span>,n+m) t[i]=t[i-m]; <span class="comment">// 延长到n+m就够了</span></span><br><span class="line"><span class="keyword">int</span> j=<span class="number">0</span>,f=<span class="number">0</span>;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,n+m)&#123;</span><br><span class="line">	<span class="keyword">if</span>(t[i]&lt;Max[j]) &#123; <span class="comment">// 存在一个位置满足即可</span></span><br><span class="line">		f=<span class="number">1</span>;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	j=Trans[j][t[i]-<span class="string">&#x27;a&#x27;</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>配合dfs枚举，可以拿到pts10</p>
-<hr>
-<h2 id="Part2"><a href="#Part2" class="headerlink" title="Part2"></a>Part2</h2><p>设状态转移为$Trans[state][c]$</p>
-<p>把kmp状态压进dp状态里</p>
-<p>如果把问题直接放到无穷意义下来看</p>
-<p>那么跑够长度之后，后面的任意加入$m$次字符都会构成一个循环</p>
-<p>枚举循环开始状态为$st$，$\text{dp}$走了$m$步回到$st$的方案数</p>
-<p>如果计算合法方案数，那么还要多一维，所以直接计算不合法方案，也就是</p>
-<p>$Trans[state][Max[state]..25]$这一段转移是不会出现合法情况的</p>
-<p>最后减一下</p>
-<p>复杂度$O(m\cdot n^2)$</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> pt2&#123;</span><br><span class="line">	<span class="keyword">int</span> dp[<span class="number">2</span>][N];</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Solve</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">int</span> cur=<span class="number">0</span>,ans=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(st,<span class="number">0</span>,n) &#123; <span class="comment">// 枚举初始状态</span></span><br><span class="line">			<span class="built_in">rep</span>(i,<span class="number">0</span>,n) dp[cur][i]=dp[!cur][i]=<span class="number">0</span>;</span><br><span class="line">			dp[cur][st]=<span class="number">1</span>;</span><br><span class="line">			<span class="built_in">rep</span>(t,<span class="number">1</span>,m) &#123;</span><br><span class="line">				cur^=<span class="number">1</span>;</span><br><span class="line">				<span class="built_in">rep</span>(i,<span class="number">0</span>,n) <span class="keyword">if</span>(dp[!cur][i])&#123;</span><br><span class="line">					<span class="built_in">rep</span>(c,Max[i]-<span class="string">&#x27;a&#x27;</span>,<span class="number">25</span>) &#123;<span class="comment">//只转移不合法的</span></span><br><span class="line">						dp[cur][Trans[i][c]]+=dp[!cur][i];</span><br><span class="line">						<span class="built_in">Mod1</span>(dp[cur][Trans[i][c]]);</span><br><span class="line">					&#125;</span><br><span class="line">					dp[!cur][i]=<span class="number">0</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;<span class="comment">// 走m步回到st</span></span><br><span class="line">			ans+=dp[cur][st],<span class="built_in">Mod1</span>(ans);</span><br><span class="line">		&#125;</span><br><span class="line">		ans=(<span class="built_in">qpow</span>(<span class="number">26</span>,m)-ans+P)%P;<span class="comment">//减一下</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<hr>
-<h2 id="Part3"><a href="#Part3" class="headerlink" title="Part3"></a>Part3</h2><p>观察上面一档情况，合法的转移$Trans[state][Max[state]..25]$</p>
-<p>如果枚举下一个字符$c&gt;Max[state]$，那么在$s$串中就找不到任何匹配了，下一个状态就是$0$</p>
-<p>否则，下一个状态就是$Trans[state][c]$</p>
-<p>也就是说，每个点出发其实只有两种情况，一种是一定会经过$0$的</p>
-<p>所以对于这个环是否经过$0$进行讨论</p>
-<p>如果不经过$0$，那么考虑直接从$st$出发走$m$步非0转移即可</p>
-<p>经过$0$的，预处理一个从$0$出发，走了$i$步第一次回到$0$的方案数</p>
-<p>$[st\rightarrow 0,0\rightarrow 0,0\rightarrow 0…,0\rightarrow st]$</p>
-<p>长成这个样子的转移</p>
-<p>枚举第一个$st\rightarrow 0$的时间，后面可以预处理出来</p>
-<p>复杂度$O(n\cdot m)$</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> pb push_back</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> reg register</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Mod1(x) ((x&gt;=P)&amp;&amp;(x-=P))</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> Mod2(x) ((x&lt;0)&amp;&amp;(x+=P))</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span> <span class="function"><span class="keyword">void</span> <span class="title">cmin</span><span class="params">(T &amp;a, T b)</span></span>&#123; ((a&gt;b)&amp;&amp;(a=b)); &#125;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span> <span class="function"><span class="keyword">void</span> <span class="title">cmax</span><span class="params">(T &amp;a, T b)</span></span>&#123; ((a&lt;b)&amp;&amp;(a=b)); &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>=</span><span class="keyword">int</span>&gt; <span class="function">T <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	T s=<span class="number">0</span>; <span class="keyword">int</span> f=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>())) <span class="keyword">if</span>(IO==<span class="string">&#x27;-&#x27;</span>) f=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> f?-s:s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2010</span>,P=<span class="number">998244353</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">char</span> s[N];</span><br><span class="line"><span class="keyword">int</span> Max[N],nxt[N],Trans[N][<span class="number">26</span>];</span><br><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span> </span>&#123;</span><br><span class="line">	ll res=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> st[N][N]; <span class="comment">// 从i出发，走了j步第一次到0</span></span><br><span class="line"><span class="keyword">int</span> dp[N][N]; <span class="comment">// 从0出发，走了i步，到了j,如果到0就不进行转移 </span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">freopen</span>(<span class="string">&quot;repeat.in&quot;</span>,<span class="string">&quot;r&quot;</span>,stdin),<span class="built_in">freopen</span>(<span class="string">&quot;repeat.out&quot;</span>,<span class="string">&quot;w&quot;</span>,stdout);</span><br><span class="line">	m=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,s+<span class="number">1</span>),n=<span class="built_in">strlen</span>(s+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) Max[i<span class="number">-1</span>]=s[i];</span><br><span class="line">	Max[n]=<span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">	<span class="built_in">cmax</span>(Max[<span class="number">1</span>],Max[<span class="number">0</span>]);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">2</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> j=nxt[i<span class="number">-1</span>];</span><br><span class="line">		<span class="keyword">while</span>(j &amp;&amp; s[i]!=s[j+<span class="number">1</span>]) j=nxt[j];</span><br><span class="line">		<span class="keyword">if</span>(s[i]==s[j+<span class="number">1</span>]) ++j;</span><br><span class="line">		nxt[i]=j;</span><br><span class="line">		<span class="built_in">cmax</span>(Max[i],Max[j]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n) &#123;</span><br><span class="line">		<span class="keyword">if</span>(i&lt;n) Trans[i][s[i+<span class="number">1</span>]-<span class="string">&#x27;a&#x27;</span>]=i+<span class="number">1</span>;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,<span class="number">25</span>) <span class="keyword">if</span>(j!=s[i+<span class="number">1</span>]-<span class="string">&#x27;a&#x27;</span>) Trans[i][j]=Trans[nxt[i]][j];</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> ans=<span class="number">0</span>;	</span><br><span class="line">	st[<span class="number">0</span>][<span class="number">0</span>]++;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="keyword">int</span> j=i,f=<span class="number">1</span>;</span><br><span class="line">		<span class="built_in">rep</span>(k,<span class="number">1</span>,m) &#123;</span><br><span class="line">			st[i][k]+=<span class="number">25</span>-(Max[j]-<span class="string">&#x27;a&#x27;</span>),j=Trans[j][Max[j]-<span class="string">&#x27;a&#x27;</span>];</span><br><span class="line">			<span class="keyword">if</span>(!j) &#123;</span><br><span class="line">				st[i][k]++,f=<span class="number">0</span>;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(j==i) ans+=f;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	dp[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,n) <span class="keyword">if</span>(dp[i<span class="number">-1</span>][j]) &#123;</span><br><span class="line">			dp[i][Trans[j][Max[j]-<span class="string">&#x27;a&#x27;</span>]]+=dp[i<span class="number">-1</span>][j],<span class="built_in">Mod1</span>(dp[i][Trans[j][Max[j]-<span class="string">&#x27;a&#x27;</span>]]);</span><br><span class="line">			dp[i][<span class="number">0</span>]=(dp[i][<span class="number">0</span>]+<span class="number">1ll</span>*(<span class="number">25</span>-(Max[j]-<span class="string">&#x27;a&#x27;</span>))*dp[i<span class="number">-1</span>][j])%P;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n) &#123; <span class="comment">// 枚举初始状态</span></span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,m) <span class="keyword">if</span>(st[i][j] &amp;&amp; dp[m-j][i]) &#123; <span class="comment">// 枚举走了几步第一次到0</span></span><br><span class="line">			ans=(ans+<span class="number">1ll</span>*st[i][j]*dp[m-j][i])%P;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	ans=(<span class="built_in">qpow</span>(<span class="number">26</span>,m)-ans+P)%P;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1247,7 +1252,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">267</span>
+          <span class="site-state-item-count">268</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1260,7 +1265,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">64</span>
+        <span class="site-state-item-count">65</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
