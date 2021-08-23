@@ -209,6 +209,117 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/60011.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/60011.html" class="post-title-link" itemprop="url">CF1366G - Construct the String</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-08 18:48:27" itemprop="dateCreated datePublished" datetime="2021-05-08T18:48:27+08:00">2021-05-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:32:50" itemprop="dateModified" datetime="2021-05-31T21:32:50+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1366G-Construct-the-String"><a href="#CF1366G-Construct-the-String" class="headerlink" title="CF1366G - Construct the String"></a>CF1366G - Construct the String</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>给定一个初始串$S$和目标串$T$</p>
+<p>其中$S$除了包含字母外还包含删除标记’.’</p>
+<p>具体的$S$表示的字符串$f(S)$，就是依次加入每个字母，或者在删除标记处删除上一个字符（不存在这个字符则非法）</p>
+<p>求删除$S$中最少的字符，使得$f(S’)=T$</p>
+<p><br></p>
+<h3 id="吐槽"><a href="#吐槽" class="headerlink" title="吐槽"></a>吐槽</h3><p>$O(n^2)$出$n\leq 10^4$???</p>
+<p><br></p>
+<p><br></p>
+<h3 id="朴素dp分析"><a href="#朴素dp分析" class="headerlink" title="朴素dp分析"></a>朴素dp分析</h3><p>这种题目容易想到记录在$T$中匹配位置的$dp$，通过枚举$S$的每一个字符</p>
+<p>1.匹配</p>
+<p>2.手动删除</p>
+<p>3.被’.’删除</p>
+<p>然而被’.’删除的情况实际难以处理，因为无法额外记录待定的’.’个数</p>
+<p><br></p>
+<h3 id="基于括号树的思路"><a href="#基于括号树的思路" class="headerlink" title="基于括号树的思路"></a>基于括号树的思路</h3><p>考虑对于不完全的括号序列的包含关系建立树，注意到</p>
+<p>1.一个已经和’.’匹配的字符，不需要考虑它被手动删除的情况</p>
+<p>2.一个字符能够保留，当且仅当所有跨过其的右括号被删除</p>
+<p>跨过其的右括号即祖先中的右括号</p>
+<p>所以此时dp决策可以简单地归纳为</p>
+<p>1.保留一整个匹配括号的子树，进入后面的匹配</p>
+<p>2.否则，删除右括号，并且决定自己这个字符是否匹配，然后递归进入子树</p>
+<p><del>代码没写</del></p>
+<p><br></p>
+<h3 id="更简洁的表述"><a href="#更简洁的表述" class="headerlink" title="更简洁的表述"></a>更简洁的表述</h3><p>实际上与上面类似，但是更加简化了模型，转移可以简单归纳为</p>
+<p>1.匹配当前字符</p>
+<p>2.删除当前字符</p>
+<p>3.找到当前字符匹配右括号，跳过这一段</p>
+<p>原理：</p>
+<p>实际上朴素dp缺陷就在于：</p>
+<p>如果当前这个字符被后面的某一个’.’删除，却又无法匹配时，无法被加入状态</p>
+<p>此时手动补充直接跳到删除这个字符的位置</p>
+<p>充分性理解：在新串中匹配该字符的右括号 和 当前后缀中匹配该字符的括号相同</p>
+<p>如果要让这个字符被’.’删除，那么到当前后缀中匹配该字符的括号为止，中间的部分不可能保留</p>
+<p>手动删除只会让匹配该字符的括号右移，这不会更优</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">10010</span>,P=<span class="number">1e9</span>+<span class="number">7</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">char</span> s[N],t[N];</span><br><span class="line"><span class="keyword">int</span> dp[N][N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s%s&quot;</span>,s,t),n=<span class="built_in">strlen</span>(s),m=<span class="built_in">strlen</span>(t);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,n) <span class="built_in">memset</span>(dp[i],<span class="number">63</span>,(<span class="built_in">min</span>(m,i)+<span class="number">2</span>)&lt;&lt;<span class="number">2</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,*dp[<span class="number">0</span>]=<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span>(s[i]!=<span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> j=i,c=<span class="number">0</span>;</span><br><span class="line">			<span class="keyword">do</span> c+=s[j++]==<span class="string">&#x27;.&#x27;</span>?<span class="number">-1</span>:<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(c &amp;&amp; j&lt;n);</span><br><span class="line">			<span class="keyword">if</span>(!c) <span class="built_in">rep</span>(k,<span class="number">0</span>,<span class="built_in">min</span>(m,i)) <span class="built_in">cmin</span>(dp[j][k],dp[i][k]);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,<span class="built_in">min</span>(m,i)) &#123;</span><br><span class="line">			<span class="built_in">cmin</span>(dp[i+<span class="number">1</span>][j],dp[i][j]+<span class="number">1</span>);</span><br><span class="line">			<span class="keyword">if</span>(s[i]==t[j]) <span class="built_in">cmin</span>(dp[i+<span class="number">1</span>][j+<span class="number">1</span>],dp[i][j]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,dp[n][m]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/11072.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1186,89 +1297,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/28590.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/28590.html" class="post-title-link" itemprop="url">CF1515G - Phoenix and Odometers</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-06 11:58:26" itemprop="dateCreated datePublished" datetime="2021-05-06T11:58:26+08:00">2021-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 21:44:06" itemprop="dateModified" datetime="2021-05-31T21:44:06+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="CF1515G-Phoenix-and-Odometers"><a href="#CF1515G-Phoenix-and-Odometers" class="headerlink" title="CF1515G - Phoenix and Odometers"></a>CF1515G - Phoenix and Odometers</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>给定一张带权有向图，每次查询$v,s,t$表示从$v$出发并且回到$v$，可以经过重边</p>
-<p>判断是否存在经过路径总长$l$满足$l+s\equiv 0 \pmod t$</p>
-<script type="math/tex; mode=display">\</script><h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>显然$v$只能在其自己的强连通分量里走，并且分量内部的任意一个环都是可达的</p>
-<p>由于是模意义下，所以环的贡献可以抵消，环之间可以无限叠加</p>
-<p>根据裴蜀定理，能够生成的数就是是$\gcd(len_i)$的倍数</p>
-<p>只需预处理强连通分量内部的环，判断$\gcd(len_i,t)|\gcd(s,t)$即可</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> to,nxt,w;</span><br><span class="line">&#125;e[N];</span><br><span class="line"><span class="keyword">int</span> head[N],ecnt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w)</span></span>&#123;</span><br><span class="line">	e[++ecnt]=(Edge)&#123;v,head[u],w&#125;;</span><br><span class="line">	head[u]=ecnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll G[N],S[N];</span><br><span class="line"><span class="function">ll <span class="title">gcd</span><span class="params">(ll a,ll b)</span></span>&#123; <span class="keyword">return</span> b==<span class="number">0</span>?a:<span class="built_in">gcd</span>(b,a%b); &#125;</span><br><span class="line"><span class="keyword">int</span> t[N],low[N],dfn,stk[N],ins[N],top,id[N],scc;</span><br><span class="line">ll dis[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u)</span></span>&#123;</span><br><span class="line">	ins[stk[++top]=u]=<span class="number">1</span>,low[u]=t[u]=++dfn;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) &#123;</span><br><span class="line">		<span class="keyword">int</span> v=e[i].to;</span><br><span class="line">		<span class="keyword">if</span>(!t[v]) &#123;</span><br><span class="line">			dis[v]=dis[u]+e[i].w;</span><br><span class="line">			<span class="built_in">dfs</span>(v),<span class="built_in">cmin</span>(low[u],low[v]);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(ins[v]) &#123;	</span><br><span class="line">            <span class="comment">// 不管是横边还是返祖边，长度都是dis[u]-dis[v]!!!</span></span><br><span class="line">			<span class="built_in">cmin</span>(low[u],t[v]);</span><br><span class="line">			G[u]=<span class="built_in">gcd</span>(G[u],dis[u]-dis[v]+e[i].w);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(low[u]==t[u]) &#123;</span><br><span class="line">		++scc;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> v=<span class="number">-1</span>;v!=u;) &#123;</span><br><span class="line">			ins[v=stk[top--]]=<span class="number">0</span>;</span><br><span class="line">			id[v]=scc,S[scc]=<span class="built_in">gcd</span>(S[scc],G[v]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>(),w=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="built_in">AddEdge</span>(u,v,w);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(!t[i]) <span class="built_in">dfs</span>(i);</span><br><span class="line">	<span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),s=<span class="built_in">rd</span>(),t=<span class="built_in">rd</span>();</span><br><span class="line">		s=<span class="built_in">gcd</span>(s,t),t=<span class="built_in">gcd</span>(t,S[id[u]]);</span><br><span class="line">		<span class="built_in">puts</span>(s%t==<span class="number">0</span>?<span class="string">&quot;YES&quot;</span>:<span class="string">&quot;NO&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1342,7 +1370,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">271</span>
+          <span class="site-state-item-count">272</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1355,7 +1383,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-count">66</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

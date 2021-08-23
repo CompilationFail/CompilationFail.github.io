@@ -1,6 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>2021百度之星复赛部分题解</title>
+    <url>/43836.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="2021百度之星复赛部分题解"><a href="#2021百度之星复赛部分题解" class="headerlink" title="2021百度之星复赛部分题解"></a>2021百度之星复赛部分题解</h1><h3 id="T1"><a href="#T1" class="headerlink" title="T1"></a>T1</h3><p> $n,m\leq 2$的情况需要特殊讨论</p>
+<p>其余的，$m$为奇数时是二分图，一定成立</p>
+<p>$m$为偶数时，只有$n=m$​成立</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">        <span class="keyword">if</span>(n&gt;<span class="number">1</span> &amp;&amp; (m&amp;<span class="number">1</span> || (n&gt;<span class="number">2</span> &amp;&amp; m==n))) &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;Yes!&quot;</span>);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;No!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="T2"><a href="#T2" class="headerlink" title="T2"></a>T2</h3><p>有点难度的计数题，将序列剖分成相同符号的连续段，每段个数为$a_i$</p>
+<p>则按照+号和*谁开头谁末尾分成4类讨论，再枚举分段数</p>
+<p>即可把问题转化为若干个这样的子问题： 把+号分成$x$段，把*号分成$y$段</p>
+<p>容易发现这就是盒子有序的第二类斯特林数，可以$O(n^2)$预处理，$O(n)$​​完成一组询问的查询</p>
+<span id="more"></span>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">6010</span>,P=<span class="number">1e9</span>+<span class="number">7</span>;</span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="keyword">int</span> S[N][N];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">    S[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,N<span class="number">-1</span>) <span class="built_in">rep</span>(j,<span class="number">1</span>,i) S[i][j]=<span class="number">1ll</span>*j*(S[i<span class="number">-1</span>][j<span class="number">-1</span>]+S[i<span class="number">-1</span>][j])%P;</span><br><span class="line">    <span class="comment">// 盒子有序的斯特林数</span></span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">        <span class="keyword">int</span> ans=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,<span class="built_in">min</span>(n,m)+<span class="number">1</span>) &#123;</span><br><span class="line">            ans=(ans+<span class="number">2ll</span>*S[n][i]*S[m][i]%P+<span class="number">1ll</span>*S[n][i]*S[m][i<span class="number">-1</span>]+<span class="number">1ll</span>*S[n][i]*S[m][i+<span class="number">1</span>])%P;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="T3"><a href="#T3" class="headerlink" title="T3"></a>T3</h3><p><del>贪心题真的搞心态，开始写了一个堆贪心又T又wa</del></p>
+<p>首先考虑$b_i=1$的简单版本，此时容易发现就是最大化连边的数量</p>
+<p>每个点优先向儿子连，有多再丢给父亲即可，可以用一个dfs贪心处理</p>
+<p>一般的情况，可以做一个转化得到一个类似的问题：</p>
+<p>每个点有$b_i$个，最多连$p_i$次 $\Longrightarrow$ 每个点最多连$b_i\cdot p_i$条边</p>
+<p>一条边$(u,v)$可以连$\min\{b_u,b_v\}$次</p>
+<p>将容易发现转化后一种连边方案最终总可以构造得到一组合法的连边方案</p>
+<p>如上，同样可以通过dfs来得到答案，为总点数-连边数</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">4e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> to,nxt;</span><br><span class="line">&#125; e[N&lt;&lt;<span class="number">1</span>];</span><br><span class="line"><span class="keyword">int</span> head[N],ecnt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v)</span> </span>&#123;</span><br><span class="line">    e[++ecnt]=(Edge)&#123;v,head[u]&#125;;</span><br><span class="line">    head[u]=ecnt;</span><br><span class="line">&#125;</span><br><span class="line">ll a[N],c[N],ans;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> f)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) &#123;</span><br><span class="line">        <span class="keyword">int</span> v=e[i].to;</span><br><span class="line">        <span class="keyword">if</span>(v==f) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="built_in">dfs</span>(v,u);</span><br><span class="line">        ll w=<span class="built_in">min</span>(<span class="built_in">min</span>(a[u],a[v]),<span class="built_in">min</span>(c[u],c[v]));</span><br><span class="line">        c[u]-=w,c[v]-=w,ans-=w;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        n=<span class="built_in">rd</span>(),ecnt=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,n) head[i]=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">2</span>,n) &#123;</span><br><span class="line">            <span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>();</span><br><span class="line">            <span class="built_in">AddEdge</span>(u,v),<span class="built_in">AddEdge</span>(v,u);</span><br><span class="line">        &#125;</span><br><span class="line">        ans=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">            <span class="keyword">int</span> b=<span class="built_in">rd</span>(),p=<span class="built_in">rd</span>();</span><br><span class="line">            ans+=a[i]=b,c[i]=<span class="number">1ll</span>*b*p;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">dfs</span>(<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="T4"><a href="#T4" class="headerlink" title="T4"></a>T4</h3><p>是一个经典的dp优化题，可以预处理树上两点距离</p>
+<p>先考虑对于一个给定序列的求解，容易发现是一个经典的区间dp的问题</p>
+<p>这类问题想要优化复杂度，最常见的办法是决策单调性</p>
+<p>感性理解可以直接套用四边形不等式进行决策优化，在$O(n^2)$时间内求解</p>
+<p>回到原题，发现这些dp会出现共用一部分dp答案的情况</p>
+<p>我们给每一个元素定一个编号，原先$dp_{l,r}$用$l,r$的编号替换为$dp_{i,j}$</p>
+<p>这样每次插入一个元素，计算以这个元素$j$为结尾，序列前面每一个$i$所对应的$dp_{i,j}$</p>
+<p>同时维护区间总和，区间决策点（用于决策单调性）</p>
+<p>访问前面每一个位置可以通过记录一个前驱来实现，这样就能完成共用dp答案</p>
+<p>复杂度为$O(m^2+(n+r)^2)$​，由于数组访问比较不连续，常数较大</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1510</span>,M=<span class="number">300</span>+N,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m,q;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> to,nxt,w;</span><br><span class="line">&#125; e[N&lt;&lt;<span class="number">1</span>];</span><br><span class="line"><span class="keyword">int</span> head[N],ecnt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w)</span> </span>&#123;</span><br><span class="line">    e[++ecnt]=(Edge)&#123;v,head[u],w&#125;;</span><br><span class="line">    head[u]=ecnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll dis[N][N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> rt,<span class="keyword">int</span> u,<span class="keyword">int</span> f)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) &#123;</span><br><span class="line">        <span class="keyword">int</span> v=e[i].to;</span><br><span class="line">        <span class="keyword">if</span>(v==f) <span class="keyword">continue</span>;</span><br><span class="line">        dis[rt][v]=dis[rt][u]+e[i].w;</span><br><span class="line">        <span class="built_in">dfs</span>(rt,v,u);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll ans[M],dp[M][M],s[M][M];</span><br><span class="line"><span class="comment">// ans为答案，dp[i][j]为区间dp数组</span></span><br><span class="line"><span class="comment">// s[i][j] 为区间距离总和</span></span><br><span class="line"><span class="keyword">int</span> g[M][M];</span><br><span class="line"><span class="comment">// g[i][j]为dp决策点</span></span><br><span class="line"><span class="keyword">int</span> pre[M],v[M]; <span class="comment">// v记录这个元素的值，pre记录前驱</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Get</span><span class="params">(<span class="keyword">int</span> i,<span class="keyword">int</span> f,<span class="keyword">int</span> x)</span> </span>&#123; </span><br><span class="line">    pre[i]=f,v[i]=x;</span><br><span class="line">    dp[i][i]=s[i][i]=<span class="number">0</span>,g[i][i]=<span class="number">-1</span>;</span><br><span class="line">    ll sum=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> j=f,lst=i;~j;lst=j,j=pre[j]) &#123;</span><br><span class="line">        sum+=<span class="number">2</span>*dis[v[j]][x];</span><br><span class="line">        s[i][j]=s[f][j]+sum;</span><br><span class="line">        <span class="comment">// 四边形不等式优化dp</span></span><br><span class="line">        <span class="keyword">int</span> l=~g[i][lst]?g[i][lst]:i,r=~g[f][j]?g[f][j]:lst;</span><br><span class="line">        ll mi=<span class="number">9e18</span>;</span><br><span class="line">        g[i][j]=<span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> k=l;;k=pre[k]) &#123;</span><br><span class="line">            ll v=dp[i][k]+dp[pre[k]][j];</span><br><span class="line">            <span class="keyword">if</span>(mi&gt;v) mi=v,g[i][j]=k;</span><br><span class="line">            <span class="keyword">if</span>(k==r) <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        dp[i][j]=mi+s[i][j];</span><br><span class="line">        ans[i]=dp[i][j];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>(),q=<span class="built_in">rd</span>();</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n) head[i]=<span class="number">0</span>;</span><br><span class="line">        ecnt=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">            <span class="keyword">int</span> f=<span class="built_in">rd</span>(),w=<span class="built_in">rd</span>();</span><br><span class="line">            <span class="built_in">AddEdge</span>(i,f,w),<span class="built_in">AddEdge</span>(f,i,w);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n) <span class="built_in">dfs</span>(i,i,<span class="number">-1</span>);</span><br><span class="line">        v[<span class="number">1</span>]=<span class="built_in">rd</span>(),pre[<span class="number">1</span>]=<span class="number">-1</span>,ans[<span class="number">1</span>]=dp[<span class="number">1</span>][<span class="number">1</span>]=s[<span class="number">1</span>][<span class="number">1</span>]=<span class="number">0</span>,g[<span class="number">1</span>][<span class="number">1</span>]=<span class="number">-1</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">2</span>,m) <span class="built_in">Get</span>(i,i<span class="number">-1</span>,<span class="built_in">rd</span>());</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans[m]);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">rep</span>(i,m+<span class="number">1</span>,m+q) &#123;</span><br><span class="line">            <span class="keyword">int</span> f=<span class="built_in">rd</span>()+m,x=<span class="built_in">rd</span>();</span><br><span class="line">            <span class="built_in">Get</span>(i,f,x);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3 id="T5"><a href="#T5" class="headerlink" title="T5"></a>T5</h3><p>由带入T2代码可以得到，最劣情况下，本质不同的方案数达到$3\cdot 10^5$</p>
+<p>即便数据随机也有大量极限情况，而且枚举有常数，故不可以通过</p>
+<p>实际上可以直接meet in the middle</p>
+<p>枚举前5个数，后五个数，方案数为$\binom{10}{5}=252$</p>
+<p>再搜索两部分的答案，第一部分带入$x$，第二部分初始带入0，最坏情况下两边各有46种</p>
+<p>最终的答案就是 ： 第一部分答案 $\cdot$ 第二部分乘积+第二部分答案</p>
+<p>枚举之后已经确定了乘积，故两部分是分离的，只需要相加即可</p>
+<p>相加求最小值可以尺取进行，枚举的情况上界很松，实际极限复杂度达不到$252\cdot 46\cdot \log$</p>
+<p>因此较大常数的实现也可以在1s左右出解</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> n,m,ans;</span><br><span class="line"><span class="keyword">char</span> op[N];</span><br><span class="line"><span class="keyword">int</span> v[N];</span><br><span class="line"><span class="keyword">int</span> S,bin[<span class="number">1</span>&lt;&lt;<span class="number">10</span>];</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Mod</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x&gt;=P?x-P:x;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> st[<span class="number">100000</span>],c,st2[<span class="number">100000</span>],c2;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> S,<span class="keyword">int</span> x,<span class="keyword">int</span> lst1,<span class="keyword">int</span> lst2)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!S) <span class="keyword">return</span> st[++c]=x,<span class="built_in"><span class="keyword">void</span></span>();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> T=S;T;T&amp;=T<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> i=bin[T&amp;-T];</span><br><span class="line">        <span class="keyword">if</span>(op[i]==<span class="string">&#x27;+&#x27;</span> &amp;&amp; lst1&lt;i) <span class="built_in">dfs</span>(S-(<span class="number">1</span>&lt;&lt;i),<span class="built_in">Mod</span>(x+v[i]),i,<span class="number">-1</span>);</span><br><span class="line">        <span class="keyword">if</span>(op[i]==<span class="string">&#x27;*&#x27;</span> &amp;&amp; lst2&lt;i) <span class="built_in">dfs</span>(S-(<span class="number">1</span>&lt;&lt;i),<span class="number">1ll</span>*x*v[i]%P,<span class="number">-1</span>,i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> cnt[<span class="number">1</span>&lt;&lt;<span class="number">10</span>];</span><br><span class="line"><span class="keyword">int</span> X[<span class="number">6</span>][<span class="number">500</span>],Xc[<span class="number">6</span>];</span><br><span class="line"><span class="keyword">int</span> Y[<span class="number">6</span>][<span class="number">500</span>],Yc[<span class="number">6</span>];</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> A=<span class="number">1023</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> Med;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">0</span>,<span class="number">9</span>) bin[<span class="number">1</span>&lt;&lt;i]=i;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,A) cnt[i]=cnt[i&amp;(i<span class="number">-1</span>)]+<span class="number">1</span>;</span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        ans=P;</span><br><span class="line"></span><br><span class="line">        n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span>(op[i]=<span class="built_in">getchar</span>(), op[i]!=<span class="string">&#x27;*&#x27;</span> &amp;&amp; op[i]!=<span class="string">&#x27;+&#x27;</span>);</span><br><span class="line">            v[i]=<span class="built_in">rd</span>();</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 这里是我写蠢了，直接枚举10个数的子集，大小为5的讨论就好了。。</span></span><br><span class="line">        <span class="keyword">int</span> S=<span class="number">0</span>;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(op[i]==<span class="string">&#x27;*&#x27;</span>) S|=<span class="number">1</span>&lt;&lt;i;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n) Xc[i]=Yc[i]=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> T=S;;T=(T<span class="number">-1</span>)&amp;S) &#123;</span><br><span class="line">            <span class="keyword">if</span>(cnt[T]&gt;<span class="number">5</span>) <span class="keyword">continue</span>;</span><br><span class="line">            X[cnt[T]][++Xc[cnt[T]]]=T;</span><br><span class="line">            <span class="keyword">if</span>(!T) <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        S=A^S;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> T=S;;T=(T<span class="number">-1</span>)&amp;S) &#123;</span><br><span class="line">            <span class="keyword">if</span>(cnt[T]&gt;<span class="number">5</span>) <span class="keyword">continue</span>;</span><br><span class="line">            Y[cnt[T]][++Yc[cnt[T]]]=T;</span><br><span class="line">            <span class="keyword">if</span>(!T) <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,<span class="number">5</span>) &#123;</span><br><span class="line">            <span class="built_in">rep</span>(a,<span class="number">1</span>,Xc[i]) <span class="built_in">rep</span>(b,<span class="number">1</span>,Yc[<span class="number">5</span>-i]) &#123;</span><br><span class="line">                <span class="keyword">int</span> x=X[i][a],y=Y[<span class="number">5</span>-i][b];</span><br><span class="line">                <span class="keyword">int</span> w=<span class="number">1</span>;</span><br><span class="line">                <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(x&amp;(<span class="number">1</span>&lt;&lt;i)) w=<span class="number">1ll</span>*w*v[i]%P;</span><br><span class="line">                c=<span class="number">0</span>;</span><br><span class="line">                <span class="built_in">dfs</span>(A^(x|y),m,<span class="number">-1</span>,<span class="number">-1</span>);</span><br><span class="line">                <span class="built_in">rep</span>(i,<span class="number">1</span>,c2=c) st2[i]=<span class="number">1ll</span>*st[i]*w%P;</span><br><span class="line">                c=<span class="number">0</span>;</span><br><span class="line">                <span class="built_in">dfs</span>(x|y,<span class="number">0</span>,<span class="number">-1</span>,<span class="number">-1</span>);</span><br><span class="line">                <span class="built_in">sort</span>(st+<span class="number">1</span>,st+c+<span class="number">1</span>),<span class="built_in">sort</span>(st2+<span class="number">1</span>,st2+c2+<span class="number">1</span>);</span><br><span class="line">                <span class="keyword">int</span> p=<span class="number">1</span>;</span><br><span class="line">                <span class="built_in">drep</span>(i,c,<span class="number">1</span>) &#123;</span><br><span class="line">                    <span class="built_in">cmin</span>(ans,st[i]+st2[<span class="number">1</span>]);</span><br><span class="line">                    <span class="keyword">while</span>(p&lt;c2 &amp;&amp; st[i]+st2[p]&lt;P) p++;</span><br><span class="line">                    <span class="built_in">cmin</span>(ans,(st[i]+st2[p])%P);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,ans);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>贪心</tag>
+        <tag>dp</tag>
+        <tag>决策单调性</tag>
+        <tag>meet in the middle</tag>
+        <tag>dp计数</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>NOI2021游记</title>
     <url>/24510.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="NOI2021-游记"><a href="#NOI2021-游记" class="headerlink" title="NOI2021 游记"></a>NOI2021 游记</h1><h2 id="Day"><a href="#Day" class="headerlink" title="Day $-?$"></a>Day $-?$</h2><p>一如既往遨游于机房之中，但随时日渐去，颇有大限将至之感</p>
@@ -1104,8 +1163,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -1411,8 +1470,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp计数</tag>
         <tag>贪心</tag>
+        <tag>dp计数</tag>
         <tag>Atcoder</tag>
       </tags>
   </entry>
@@ -1474,8 +1533,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>暴力</tag>
       </tags>
   </entry>
@@ -1535,8 +1594,8 @@
       </categories>
       <tags>
         <tag>技巧</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>性质</tag>
       </tags>
   </entry>
@@ -1635,8 +1694,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>Codeforces</tag>
         <tag>dp</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -1666,9 +1725,9 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
+        <tag>dp</tag>
         <tag>Codeforces</tag>
         <tag>树</tag>
-        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -1691,8 +1750,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>概率|期望</tag>
       </tags>
   </entry>
@@ -1767,9 +1826,9 @@
       <tags>
         <tag>生成函数/多项式</tag>
         <tag>技巧</tag>
+        <tag>meet in the middle</tag>
         <tag>Codeforces</tag>
         <tag>暴力</tag>
-        <tag>meet in the middle</tag>
       </tags>
   </entry>
   <entry>
@@ -1882,8 +1941,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>暴力</tag>
         <tag>计算几何</tag>
       </tags>
@@ -1999,8 +2058,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
         <tag>性质</tag>
       </tags>
   </entry>
@@ -2092,8 +2151,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2161,9 +2220,9 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>dp</tag>
         <tag>Codeforces</tag>
         <tag>性质</tag>
-        <tag>dp</tag>
         <tag>数位dp</tag>
         <tag>笛卡尔树</tag>
       </tags>
@@ -2230,8 +2289,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2717,8 +2776,8 @@
       </categories>
       <tags>
         <tag>生成函数/多项式</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2743,8 +2802,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -2773,8 +2832,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>概率|期望</tag>
       </tags>
   </entry>
@@ -2899,8 +2958,8 @@
       </categories>
       <tags>
         <tag>数据结构</tag>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3214,9 +3273,9 @@
       </categories>
       <tags>
         <tag>技巧</tag>
+        <tag>dp</tag>
         <tag>Codeforces</tag>
         <tag>树</tag>
-        <tag>dp</tag>
         <tag>虚树</tag>
       </tags>
   </entry>
@@ -3262,8 +3321,8 @@
       </categories>
       <tags>
         <tag>Number Theory</tag>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3360,8 +3419,8 @@
       </categories>
       <tags>
         <tag>线性代数</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>暴力</tag>
       </tags>
   </entry>
@@ -3495,8 +3554,8 @@
       </categories>
       <tags>
         <tag>字符串</tag>
-        <tag>Codeforces</tag>
         <tag>dp</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3543,9 +3602,9 @@
       </categories>
       <tags>
         <tag>字符串</tag>
+        <tag>dp</tag>
         <tag>Codeforces</tag>
         <tag>暴力</tag>
-        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -3643,8 +3702,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>Codeforces</tag>
         <tag>meet in the middle</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3671,8 +3730,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3861,8 +3920,8 @@
       </categories>
       <tags>
         <tag>字符串</tag>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
         <tag>性质</tag>
       </tags>
   </entry>
@@ -3929,8 +3988,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -3998,8 +4057,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp计数</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -4053,8 +4112,8 @@
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>Codeforces</tag>
         <tag>贪心</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -4082,8 +4141,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>Codeforces</tag>
         <tag>dp</tag>
+        <tag>Codeforces</tag>
       </tags>
   </entry>
   <entry>
@@ -4211,9 +4270,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>dp</tag>
         <tag>Atcoder</tag>
         <tag>性质</tag>
-        <tag>dp</tag>
       </tags>
   </entry>
   <entry>
@@ -5683,9 +5742,9 @@
         <category>题解</category>
       </categories>
       <tags>
+        <tag>dp</tag>
         <tag>暴力</tag>
         <tag>各省OI</tag>
-        <tag>dp</tag>
         <tag>打牌题</tag>
       </tags>
   </entry>
@@ -6894,8 +6953,8 @@
       </categories>
       <tags>
         <tag>乱搞</tag>
-        <tag>暴力</tag>
         <tag>贪心</tag>
+        <tag>暴力</tag>
         <tag>性质</tag>
         <tag>ROI</tag>
       </tags>
@@ -7884,8 +7943,8 @@ $\begin{aligned}O(Q \ \cdot 2^{ \begin{aligned}\ \ \ \ \ \ \ \ \ \ \min\lbrace 1
         <category>题解</category>
       </categories>
       <tags>
-        <tag>dp计数</tag>
         <tag>meet in the middle</tag>
+        <tag>dp计数</tag>
         <tag>JOI</tag>
       </tags>
   </entry>
@@ -9212,8 +9271,8 @@ $\begin{aligned} \max \lbrace S\rbrace =\sum_{T\subseteq  S} (-1)^{|T|+1}\min\lb
       </categories>
       <tags>
         <tag>图论</tag>
-        <tag>各省OI</tag>
         <tag>dp</tag>
+        <tag>各省OI</tag>
       </tags>
   </entry>
   <entry>
@@ -9637,8 +9696,8 @@ $\begin{aligned} 1-\frac{C(sz[u],k)} {C(m,k)}-\frac{C(m-sz[u],k)} {C(m,k)}\end{a
         <category>题解</category>
       </categories>
       <tags>
-        <tag>暴力</tag>
         <tag>dp</tag>
+        <tag>暴力</tag>
         <tag>COCI</tag>
       </tags>
   </entry>
@@ -9808,8 +9867,8 @@ $\begin{aligned} 1-\frac{C(sz[u],k)} {C(m,k)}-\frac{C(m-sz[u],k)} {C(m,k)}\end{a
         <category>题解</category>
       </categories>
       <tags>
-        <tag>暴力</tag>
         <tag>dp</tag>
+        <tag>暴力</tag>
       </tags>
   </entry>
   <entry>
@@ -10793,8 +10852,8 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
         <category>题解</category>
       </categories>
       <tags>
-        <tag>各大OJ</tag>
         <tag>贪心</tag>
+        <tag>各大OJ</tag>
       </tags>
   </entry>
   <entry>

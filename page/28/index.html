@@ -209,6 +209,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/46577.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/46577.html" class="post-title-link" itemprop="url">Johnson算法：多源最短路</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-19 18:54:00" itemprop="dateCreated datePublished" datetime="2019-08-19T18:54:00+08:00">2019-08-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-06-01 10:14:36" itemprop="dateModified" datetime="2021-06-01T10:14:36+08:00">2021-06-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Johnson算法"><a href="#Johnson算法" class="headerlink" title="Johnson算法"></a><a target="_blank" rel="noopener" href="https://www.baidu.com/s?ie=UTF-8&amp;wd=Johnson">Johnson算法</a></h1><p>请不要轻易点击标题</p>
+<p>一个适用于求可含负边权的稀疏图的多源最短路算法</p>
+<p>时间复杂度$O(n \cdot m \cdot log \ m+n \cdot m)$</p>
+<p>空间复杂度$O(n+m)$</p>
+<p>该算法综合利用了Dijkstra算法和Bellman-Ford算法(不要慌,虽然有负边但Dijkstra可以跑!)</p>
+<p>在开始讲解之前，我们将其与floyd算法进行比较</p>
+<hr>
+<h3 id="text-floyd-算法"><a href="#text-floyd-算法" class="headerlink" title="$\text{floyd}$算法"></a>$\text{floyd}$算法</h3><p>时间复杂度$O(n^3+m)$</p>
+<p>空间复杂度$O(n^2)$</p>
+<p>可以看出，$\text{floyd}$复杂度与$m$无关 , 适用于稠密图的最短路，而$\text{Johnson}$算法则是适用于稀疏图最短路</p>
+<hr>
+<script type="math/tex; mode=display">\</script><h3 id="text-Johnson-算法"><a href="#text-Johnson-算法" class="headerlink" title="$\text{Johnson}$算法"></a>$\text{Johnson}$算法</h3><p>我对该算法的理解</p>
+<p>限制条件:没有负环即可</p>
+<p>在有负权边的图上，$Dijkstra$的转移受到限制，我们需要进行一定处理</p>
+<p>核心 : 将边权$reweight$，保证边权非负后，即可跑$n$遍$Dijkstra$,复杂度稳定$n \cdot m \cdot log \ m$(相较于SPFA来说稳定很多)</p>
+<script type="math/tex; mode=display">\</script><hr>
+<h4 id="Reweight过程"><a href="#Reweight过程" class="headerlink" title="Reweight过程"></a>Reweight过程</h4><p>1.建立超级源点0号节点，向$1 - n$号节点建立边权为0的有向边</p>
+<p>2.利用Bellman-Ford(或SPFA)求得$dis[0][1..n]$</p>
+<p>3.将边$(u,v,w)$的边权$w$加上$dis[0][u]-dis[0][v]$，使得边权非负</p>
+<p>4.在非负边权的图上，使用$n$次堆优化Dijkstra求得最短路</p>
+<p>5.将$dis[u][v]$加上$dis[0][v]-dis[0][u]$还原</p>
+<hr>
+<script type="math/tex; mode=display">\</script><p>关于Reweight的正确性</p>
+<p>1.边权非负性：根据三角不等式$dis[v]\leq dis[u]+w$,移项得到$w+dis[u]-dis[v] \ge 0$,故Reweight后边权非负</p>
+<p>2.最短路的保留：对于一条最短路$\lbrace p_1,p_2,..,p_k\rbrace$</p>
+<p>Reweight后更改的权值即$dis[p1]-dis[p2]+dis[p2]-dis[p3]…-dis[p_k]$</p>
+<p>即$dis[0][v]-dis[0][u]$，两点间最短路只会有常数修改，因此对于任意两点保留了最短路</p>
+<p>所以我们可以直接用这个算法解决一些<a target="_blank" rel="noopener" href="https://ac.nowcoder.com/acm/contest/920/C">特殊的问题</a></p>
+<p>当然这个也被应用于优化费用流，即Dijkstra费用流</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/641.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -429,7 +534,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">271</span>
+          <span class="site-state-item-count">272</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -442,7 +547,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-count">66</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
