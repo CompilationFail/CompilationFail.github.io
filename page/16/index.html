@@ -209,6 +209,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/38292.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/38292.html" class="post-title-link" itemprop="url">「USACO 2021.1 Platinum」Paint by Letters</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-02 13:29:25" itemprop="dateCreated datePublished" datetime="2021-03-02T13:29:25-08:00">2021-03-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 07:29:49" itemprop="dateModified" datetime="2021-05-31T07:29:49-07:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="「USACO-2021-1-Platinum」Paint-by-Letters"><a href="#「USACO-2021-1-Platinum」Paint-by-Letters" class="headerlink" title="「USACO 2021.1 Platinum」Paint by Letters"></a>「USACO 2021.1 Platinum」Paint by Letters</h1><p>统计连通块问题，暴力是$O(qn^2)$，而且常数大</p>
+<p>容易想到 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/14246463.html">平面图的欧拉定理</a> 优化</p>
+<p>下文和代码中，$V,E,F$分别为点集，边集，区域集合</p>
+<p>其中$|V|$可以直接得到，$|E|$可以$O(n^2)$前缀和预处理出来，$O(1)$查询</p>
+<p>下面处理区域个数</p>
+<h3 id="Solution1"><a href="#Solution1" class="headerlink" title="Solution1"></a>Solution1</h3><p>前缀和所有大小为1（即被四个点包住的）区域，暴力预处理所有大小$&gt;1$的区域，个数为$O(\frac{nm} {4})$</p>
+<p>然后可以转化为一个对于给定矩形查询包含的 矩形个数 的问题</p>
+<p>实际上这个题目$q$小直接枚举就是了。。</p>
+<p>复杂度为$O(nm+q\frac{nm} {4})$，足够通过时限</p>
+<p>写的够丑可以得到这个<a target="_blank" rel="noopener" href="https://loj.ac/s/1080403">代码</a></p>
+<p>矩形区间查询问题 ，不知道有没有什么更好的方法</p>
+<p>ps:垃圾数据没有卡，因此实际上数据中的空白块数量非常少，预处理写得稍微好一点可能还比下面的做法常数小</p>
+<script type="math/tex; mode=display">\</script><h3 id="Solution2"><a href="#Solution2" class="headerlink" title="Solution2"></a>Solution2</h3><p>用$(x,y)$表示$(x,y),(x+1,y),(x,y+1),(x+1,y+1)$中间的一个空白区域</p>
+<p>这些空白块会被染色块之间的边隔开，但是依然可以形成四联通块</p>
+<p>预处理出所有空白区域的连通块，每个连通块选取一个代表点$S_i$</p>
+<p>我们要统计一个区域中的空白连通块个数，注意到</p>
+<p>跨出区域范围的空白点，并不是断开了，而是和最外层的无穷空白区合并在一起</p>
+<p>因此可以先求出在区域中存在的连通块个数，然后将连通到区域外的部分去掉</p>
+<p>具体实现上：</p>
+<p>前缀和预处理出$S_i$的位置，每次查询区域中的$S_i$个数（这样的统计不完全）</p>
+<p>然后将$S_i$在区域中，且跨出区域的白色连通块删掉即可</p>
+<p>跨出部分枚举四条边界即可</p>
+<p>每次查询枚举边界，因此复杂度为$O(nm+q(n+m))$</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1e3</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> dx[]=&#123;<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">-1</span>&#125;,dy[]=&#123;<span class="number">1</span>,<span class="number">-1</span>,<span class="number">0</span>,<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m,q;</span><br><span class="line"><span class="keyword">char</span> A[N][N];</span><br><span class="line"><span class="keyword">int</span> vis[N*N],I[N][N],E[<span class="number">4</span>][N][N],S[N][N];</span><br><span class="line"><span class="comment">// B,C预处理上/左边个数</span></span><br><span class="line"><span class="keyword">int</span> B[N][N],C[N][N];</span><br><span class="line"><span class="keyword">int</span> X[N*N],Y[N*N],cnt;</span><br><span class="line"><span class="comment">// 搜索空白连通块</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">	I[x][y]=cnt;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,<span class="number">3</span>) <span class="keyword">if</span>(E[x][y][i]) &#123;</span><br><span class="line">		<span class="keyword">int</span> x1=x+dx[i],y1=y+dy[i];</span><br><span class="line">		<span class="keyword">if</span>(!x1 || !y1||x1&gt;=n || y1&gt;=m || I[x1][y1]) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="built_in">dfs</span>(x1,y1);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Sum</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> A[N][N],<span class="keyword">int</span> x1,<span class="keyword">int</span> y1,<span class="keyword">int</span> x2,<span class="keyword">int</span> y2)</span></span>&#123;</span><br><span class="line">	x1--,y1--;</span><br><span class="line">	<span class="keyword">return</span> A[x2][y2]-A[x1][y2]-A[x2][y1]+A[x1][y1];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d%d%d&quot;</span>,&amp;n,&amp;m,&amp;q);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,A[i]+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(j,<span class="number">1</span>,m) &#123;</span><br><span class="line">		E[<span class="number">0</span>][i][j<span class="number">-1</span>]=E[<span class="number">1</span>][i][j]=A[i][j]!=A[i+<span class="number">1</span>][j];</span><br><span class="line">		E[<span class="number">2</span>][i<span class="number">-1</span>][j]=E[<span class="number">3</span>][i][j]=A[i][j]!=A[i][j+<span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 处理一下空白点之间的边</span></span><br><span class="line">		<span class="keyword">if</span>(A[i<span class="number">-1</span>][j]==A[i][j]) B[i][j]++;</span><br><span class="line">		<span class="keyword">if</span>(A[i][j]==A[i][j<span class="number">-1</span>]) C[i][j]++;</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">// 预处理空白点之间的集合</span></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="built_in">rep</span>(j,<span class="number">1</span>,m<span class="number">-1</span>) <span class="keyword">if</span>(!I[i][j]) &#123;</span><br><span class="line">		X[++cnt]=i,Y[cnt]=j,vis[cnt]=q+<span class="number">1</span>;</span><br><span class="line">		<span class="built_in">dfs</span>(i,j),S[i][j]++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(j,<span class="number">1</span>,m) &#123;</span><br><span class="line">		B[i][j]+=B[i<span class="number">-1</span>][j]+B[i][j<span class="number">-1</span>]-B[i<span class="number">-1</span>][j<span class="number">-1</span>];</span><br><span class="line">		C[i][j]+=C[i<span class="number">-1</span>][j]+C[i][j<span class="number">-1</span>]-C[i<span class="number">-1</span>][j<span class="number">-1</span>];</span><br><span class="line">		S[i][j]+=S[i<span class="number">-1</span>][j]+S[i][j<span class="number">-1</span>]-S[i<span class="number">-1</span>][j<span class="number">-1</span>];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">while</span>(q--) &#123;</span><br><span class="line">		<span class="keyword">int</span> lx,ly,rx,ry; <span class="built_in">scanf</span>(<span class="string">&quot;%d%d%d%d&quot;</span>,&amp;lx,&amp;ly,&amp;rx,&amp;ry);</span><br><span class="line">		<span class="keyword">int</span> V=(rx-lx+<span class="number">1</span>)*(ry-ly+<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">int</span> E=<span class="built_in">Sum</span>(B,lx+<span class="number">1</span>,ly,rx,ry)+<span class="built_in">Sum</span>(C,lx,ly+<span class="number">1</span>,rx,ry);</span><br><span class="line">		<span class="keyword">int</span> F=<span class="built_in">Sum</span>(S,lx,ly,rx<span class="number">-1</span>,ry<span class="number">-1</span>);</span><br><span class="line">		<span class="keyword">auto</span> Check=[&amp;](<span class="keyword">int</span> i)&#123; <span class="keyword">if</span>(vis[i]!=q &amp;&amp; lx&lt;=X[i] &amp;&amp; X[i]&lt;rx &amp;&amp; ly&lt;=Y[i] &amp;&amp; Y[i]&lt;ry) vis[i]=q,F--; &#125;;</span><br><span class="line">		<span class="built_in">rep</span>(i,lx,rx<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span>(::E[<span class="number">0</span>][i][ry<span class="number">-1</span>]) <span class="built_in">Check</span>(I[i][ry<span class="number">-1</span>]);</span><br><span class="line">			<span class="keyword">if</span>(::E[<span class="number">1</span>][i][ly]) <span class="built_in">Check</span>(I[i][ly]);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">rep</span>(i,ly,ry<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span>(::E[<span class="number">2</span>][rx<span class="number">-1</span>][i]) <span class="built_in">Check</span>(I[rx<span class="number">-1</span>][i]);</span><br><span class="line">			<span class="keyword">if</span>(::E[<span class="number">3</span>][lx][i]) <span class="built_in">Check</span>(I[lx][i]);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,V-E+F);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/12544.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1094,99 +1194,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/5369.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/5369.html" class="post-title-link" itemprop="url">「JOI 2021 Final」机器人</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-02-23 14:54:50" itemprop="dateCreated datePublished" datetime="2021-02-23T14:54:50-08:00">2021-02-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 06:56:29" itemprop="dateModified" datetime="2021-05-31T06:56:29-07:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="「JOI-2021-Final」机器人"><a href="#「JOI-2021-Final」机器人" class="headerlink" title="「JOI 2021 Final」机器人"></a>「JOI 2021 Final」机器人</h1><p>原问题中颜色什么时候改没有影响</p>
-<p>显然不能记录每条边的颜色，显然在行走过程中不会回到原先的点</p>
-<p>因此考虑简化状态</p>
-<p>从一个点出去时，走了一条边$(u,v,c,w)$，从$u$出发颜色为$c$的边$w$之和为$S_{u,c}$，则有两种转移：</p>
-<p>1.走过来时的边被改变了，权值$w$</p>
-<p>2.改变了其他同种颜色的边，权值$S_{u,c}-w$</p>
-<p>对于2情况在前面修改的边，在后面不会产生贡献（否则可以直接通过这条边过去，而不需要绕路）</p>
-<p>可以直接转移到对应节点</p>
-<p>1类转移的贡献相当于下次走这种颜色时，可以少改变一条边的颜色</p>
-<p>即下一次转移2时，权值变为$S_{v,c}-w-w’$</p>
-<p>可以增加一个额外权值$-w$，然后对于下一个点$v$所有颜色为$c$的出边转移，这可以通过构建虚点解决</p>
-<p>实际上总权值就是$0$</p>
-<p>考虑到一种不合法的情况，即走回$u$，但是这样的转移权值就是$S_{v,c}-w’\ge 0$</p>
-<p>非法情况无影响</p>
-<p>最终得到的转移就是一个非负边权的最短路图，可以跑$Dijkstra$解决</p>
-<p>总点数$\leq n+2m$，总边数$\leq 6m$</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> pb push_back</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">5e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n,m,k;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> v,c,w;</span><br><span class="line">&#125;;</span><br><span class="line">vector &lt;Edge&gt; G[N];</span><br><span class="line"><span class="keyword">int</span> U[N],V[N],C[N],W[N];</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> u; ll d;</span><br><span class="line">	<span class="keyword">bool</span> <span class="keyword">operator</span> &lt; (<span class="keyword">const</span> Node __) <span class="keyword">const</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> d&gt;__.d;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line">priority_queue &lt;Node&gt; que;</span><br><span class="line">ll dis[N],S[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Upd</span><span class="params">(<span class="keyword">int</span> u,ll d)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(dis[u]&lt;=d) <span class="keyword">return</span>;</span><br><span class="line">	dis[u]=d,que.<span class="built_in">push</span>((Node)&#123;u,d&#125;);</span><br><span class="line">&#125;</span><br><span class="line">map &lt;<span class="keyword">int</span>,<span class="keyword">int</span>&gt; st[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> c,<span class="keyword">int</span> w)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!st[u].<span class="built_in">count</span>(c)) &#123;</span><br><span class="line">		st[u][c]=++k;</span><br><span class="line">		G[u].<span class="built_in">pb</span>((Edge)&#123;k,<span class="number">0</span>,<span class="number">0</span>&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> t=st[u][c];</span><br><span class="line">	G[t].<span class="built_in">pb</span>((Edge)&#123;v,c,w&#125;),S[t]+=w;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Dijkstra</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">memset</span>(dis,<span class="number">63</span>,<span class="keyword">sizeof</span> dis);</span><br><span class="line">	dis[<span class="number">1</span>]=<span class="number">0</span>,que.<span class="built_in">push</span>((Node)&#123;<span class="number">1</span>,<span class="number">0</span>&#125;);</span><br><span class="line">	<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=que.<span class="built_in">top</span>().u; ll d=que.<span class="built_in">top</span>().d; que.<span class="built_in">pop</span>();</span><br><span class="line">		<span class="keyword">if</span>(dis[u]&lt;d) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="keyword">if</span>(u&lt;=n) &#123;</span><br><span class="line">			<span class="keyword">for</span>(Edge dd:G[u]) &#123;</span><br><span class="line">				<span class="keyword">int</span> t=dd.v;</span><br><span class="line">				<span class="keyword">for</span>(Edge i:G[t]) &#123;</span><br><span class="line">					<span class="built_in">Upd</span>(i.v,d+<span class="built_in">min</span>((ll)i.w,S[t]-i.w));</span><br><span class="line">					<span class="built_in">Upd</span>(st[i.v][i.c],d);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">for</span>(Edge i:G[u]) <span class="built_in">Upd</span>(i.v,d+S[u]-i.w);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,dis[n]&lt;<span class="number">1e17</span>?dis[n]:<span class="number">-1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">freopen</span>(<span class="string">&quot;robot.in&quot;</span>,<span class="string">&quot;r&quot;</span>,stdin),<span class="built_in">freopen</span>(<span class="string">&quot;robot.out&quot;</span>,<span class="string">&quot;w&quot;</span>,stdout);</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>(),k=n;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>(),c=<span class="built_in">rd</span>(),w=<span class="built_in">rd</span>();</span><br><span class="line">		<span class="built_in">AddEdge</span>(u,v,c,w),<span class="built_in">AddEdge</span>(v,u,c,w);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">Dijkstra</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1260,7 +1267,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">274</span>
+          <span class="site-state-item-count">275</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

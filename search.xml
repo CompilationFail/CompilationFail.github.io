@@ -1,6 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>[水]dp多维状态的分步优化</title>
+    <url>/60189.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="水-dp多维状态的分步优化"><a href="#水-dp多维状态的分步优化" class="headerlink" title="[水]dp多维状态的分步优化"></a>[水]dp多维状态的分步优化</h1><p>面对一个多维dp问题，根据维度之间联系的紧密程度，我们可以选择</p>
+<p>1.维度之间紧密相关，只能直接枚举</p>
+<p>2.维度之间完全无关，只是贡献通过某种形式相加，可以割裂为两个dp处理</p>
+<p>3.介于1,2之间，不能割裂计算，但是可以将转移过程割裂为若干步来优化</p>
+<h3 id="e-g-1-选区间1"><a href="#e-g-1-选区间1" class="headerlink" title="e.g.1: 选区间1"></a>e.g.1: 选区间1</h3><h4 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h4><p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z}, a\leq b)$，给出了其权值$w_{a,b}$</p>
+<p>现在求一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$，满足$a_1&lt;a_2,b_2&lt;b_1$</p>
+<p>定义$\displaystyle w_A=\sum w_{a_i,b_i}+\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_A$</p>
+<h4 id="原dp"><a href="#原dp" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{a,b}$表示最后一个元组为$a,b$时的最大权值，状态数为$O(n^2)$</p>
+<p>直接转移复杂度为$O(n^2)$，总复杂度为$O(n^4)$</p>
+<h4 id="分布转移"><a href="#分布转移" class="headerlink" title="分布转移"></a>分布转移</h4><p>两维的状态决定了权值，因此不可以割裂</p>
+<p>但是两个维度在转移时并没有必然联系，因为只涉及$a_{i}$和$a_{i+1}$，$b_i$和$b_{i+1}$的关系</p>
+<p>因此可以先转移$a$这一维，然后再转移$b$这一维</p>
+<p>具体的，转移可以描述如下</p>
+<p>1.$dp_{a,b}+w_{a,c}\rightarrow f_{c,b}$</p>
+<p>2.$f_{c,b}+w_{d,b}+w_{c,d}\rightarrow dp_{c,d}$</p>
+<p>优化后转移复杂度为$O(n)$，状态数虽然加倍但是不影响量级</p>
+<p>总复杂度为$O(n^3)$</p>
+<p><br></p>
+<h3 id="e-g-2-选区间2"><a href="#e-g-2-选区间2" class="headerlink" title="e.g.2: 选区间2"></a>e.g.2: 选区间2</h3><h4 id="问题描述-1"><a href="#问题描述-1" class="headerlink" title="问题描述"></a>问题描述</h4><p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z}, a\leq b)$，给出了其权值$w_{a,b}$</p>
+<p>现在求一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$，满足$a_1&lt;a_2,b_2&lt;b_1$</p>
+<p>定义$\displaystyle w_A=\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_A$</p>
+<h4 id="原dp-1"><a href="#原dp-1" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{a,b}$表示最后一个元组为$a,b$时的最大权值，状态数为$O(n^2)$</p>
+<p>直接转移复杂度为$O(n^2)$，总复杂度为$O(n^4)$</p>
+<h4 id="分布转移-1"><a href="#分布转移-1" class="headerlink" title="分布转移"></a>分布转移</h4><p>容易发现这个问题同样适用选区间1的优化</p>
+<h4 id="割裂"><a href="#割裂" class="headerlink" title="割裂"></a>割裂</h4><p>容易发现权值由$a_i,a_{i+1}$，$b_i,b_{i+1}$决定，不需要知道过程中每一个$a_i,b_i$的组，只需要知道数量</p>
+<p>而$a,b$有单调性，所以关于$a\leq b$的限制只需要最后满足即可</p>
+<p>令$f_{i,j}$表示已经枚举了$i$个元素，最后一个$a_i=j$时的最大值</p>
+<p>同理，令$g_{i,j}$已经枚举了$i$个元素，最后一个$b_i=j$时的最大值</p>
+<p>状态数为$O(n^2)$，转移复杂度为$O(n)$，最后可以在$O(n^2)$时间内合并$f,g$的贡献</p>
+<p>总复杂度为$O(n^3)$</p>
+<p><br></p>
+<h3 id="e-g-3-足球"><a href="#e-g-3-足球" class="headerlink" title="e.g.3: 足球"></a>e.g.3: 足球</h3><p>Source: COCI2012/2013 Contest#5 F</p>
+<h4 id="问题描述-2"><a href="#问题描述-2" class="headerlink" title="问题描述"></a>问题描述</h4><p>有$2n$个人踢球，两队各$n$个人，一开始球在A队1号</p>
+<p>每秒钟，按照一定概率球可能会被某一些对手抢走，或者传给某一些队友，或者射门</p>
+<p>射门只有一定概率$p_i$射中，每次射门之后球会到对方1号队员</p>
+<p>求$T$秒后比分为$a,b$的概率，如果一队得分达到$r$，视作胜利，比赛结束</p>
+<p>为了便于分析，$O(n)=O(T)$</p>
+<h4 id="原dp-2"><a href="#原dp-2" class="headerlink" title="原dp"></a>原dp</h4><p>记录时间、比分、球的位置，状态数为$O(Tnr^2)=O(n^2r^2)$</p>
+<p>转移枚举的情况不超过$2n$，转移复杂度为$O(n)$，总复杂度为$O(n^3r^2)$</p>
+<h4 id="割裂-1"><a href="#割裂-1" class="headerlink" title="割裂"></a>割裂</h4><p>在记录比分的同时记录球的位置并没有意义，因为实际上关键事件实际上就是射门，每次射门之后球所在位置情况是$O(1)$的</p>
+<p>那么新的dp将 <strong>球的位置</strong> 和 <strong>比分情况</strong> 割裂开来</p>
+<p>1.处理球的位置，令$f_{i,j,k}$表示一开始球在$i$队1号时，第一次射门是在$j$时刻，由球员$k$射门（$k$可以是两队中任何一个）</p>
+<p>状态数为$O(Tn)$，转移为$O(n)$，这一部分复杂度为$O(n^3)$</p>
+<p>2.比分情况</p>
+<p>令$g_{i,j,a,b}$表示$i$时刻，球在$j$队1号，当前比分为$a:b$的概率</p>
+<p>状态数为$O(Tr^2)$，转移为$O(T)$，总复杂度为$O(T^2r^2)$</p>
+<p><br></p>
+<h3 id="e-g-4-异或"><a href="#e-g-4-异或" class="headerlink" title="e.g.4: 异或"></a>e.g.4: 异或</h3><p>Source: CSP-S 2020 初赛完善程序2 （大雾</p>
+<p>给定长度为$n$的序列$a_i\in[0,m),m=2^{16}$，$n\leq 10^{5}$</p>
+<p>设$w(x)=\text{pop_count}(x)+x$，求一个子序列$b_i$</p>
+<p>最大化$\sum w(b_i\oplus b_{i+1})$</p>
+<h4 id="原dp-3"><a href="#原dp-3" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{x}$表示子序列最后一个元素为$x$时的答案，状态数为$O(m)$</p>
+<p>对于每个数$a_i$，枚举前驱状态进行转移，复杂度为$O(m)$</p>
+<p>总复杂度为$O(nm)$</p>
+<h4 id="分布转移-2"><a href="#分布转移-2" class="headerlink" title="分布转移"></a>分布转移</h4><p>这道题看似是一个1维dp，但是实际上实际上权值是分位处理的</p>
+<p>我们不如先看一个类似的选区间问题的变体</p>
+<blockquote>
+<p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z})$，给出了其权值$w_{a,b}$</p>
+<p>给定了一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$</p>
+<p>现在要选出$A$的一个子序列$B$，定义$\displaystyle w_B=\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_B$</p>
+</blockquote>
+<p>实际上这两个问题是完全相同的，但是由于限制了$a_i,b_i$为子序列，导致分布显得比较奇怪</p>
+<p>分布转移的过程中，转移状态应该是这样的</p>
+<p>$(a_1,b_1)\rightarrow (a_2, b_1) \rightarrow (a_2,b_2)$</p>
+<p>容易发现这个过渡状态$(a_2,b_1)$实际上并不是一个存在的元组，并不满足匹配关系</p>
+<p>那么我们如何得到这个过渡状态呢？</p>
+<p>1.我们手里有$(a_1,b_1)$的dp值$dp_{a,b}$</p>
+<p>2.我们并不知道$a_2$，于是需要向所有可能的$a_2$转移，得到$f_{c,b}$</p>
+<p>$\forall c,dp_{a_1,b_1}+w(b_1,c)\rightarrow f_{c,b_1}$</p>
+<p>3.当拿到$a_2,b_2$时，此时我们已经知道了$a_2$，但是不知道$b_1$，因此需要从所有$b_1$中得到$dp_{a_2,b_2}$的值</p>
+<p>而为了分布转移，我们在中间过程中并不需要</p>
+<p>$\forall c,f_{a_2,c}+w(c,b_2)\rightarrow dp_{a_2,b_2}$</p>
+<p>分析会发现，$dp_{a,b}$反而在这个过程中只是一个过渡值，并不需要开数组记录</p>
+<p>于是就得到了完善程序的dp</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>dp</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ 的异常捕获</title>
     <url>/35309.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="C-的异常捕获"><a href="#C-的异常捕获" class="headerlink" title="C++ 的异常捕获"></a>C++ 的异常捕获</h1><p>异常在程序不同环节间传递异常，直到被特定位置捕获</p>
@@ -137,8 +223,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>贪心</tag>
         <tag>dp</tag>
+        <tag>贪心</tag>
         <tag>决策单调性</tag>
         <tag>meet in the middle</tag>
         <tag>dp计数</tag>
@@ -561,8 +647,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>dp</tag>
+        <tag>数据结构</tag>
       </tags>
   </entry>
   <entry>
@@ -722,8 +808,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>dp</tag>
+        <tag>数据结构</tag>
       </tags>
   </entry>
   <entry>
@@ -1525,8 +1611,8 @@
       </categories>
       <tags>
         <tag>Number Theory</tag>
-        <tag>数据结构</tag>
         <tag>技巧</tag>
+        <tag>数据结构</tag>
         <tag>Codeforces</tag>
         <tag>暴力</tag>
       </tags>
@@ -1809,8 +1895,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>dp</tag>
+        <tag>数据结构</tag>
         <tag>Codeforces</tag>
         <tag>树</tag>
       </tags>
@@ -2304,8 +2390,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>dp</tag>
+        <tag>技巧</tag>
         <tag>Codeforces</tag>
         <tag>性质</tag>
         <tag>数位dp</tag>
@@ -3357,8 +3443,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>dp</tag>
+        <tag>技巧</tag>
         <tag>Codeforces</tag>
         <tag>树</tag>
         <tag>虚树</tag>
@@ -3638,8 +3724,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>字符串</tag>
         <tag>dp</tag>
+        <tag>字符串</tag>
         <tag>Codeforces</tag>
       </tags>
   </entry>
@@ -3686,8 +3772,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>字符串</tag>
         <tag>dp</tag>
+        <tag>字符串</tag>
         <tag>Codeforces</tag>
         <tag>暴力</tag>
       </tags>
@@ -5804,8 +5890,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>dp</tag>
+        <tag>数据结构</tag>
         <tag>笛卡尔树</tag>
         <tag>JOI</tag>
       </tags>
@@ -9088,8 +9174,8 @@ $\begin{aligned} \max \lbrace S\rbrace =\sum_{T\subseteq  S} (-1)^{|T|+1}\min\lb
         <category>题解</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>dp</tag>
+        <tag>数据结构</tag>
         <tag>USACO</tag>
       </tags>
   </entry>
@@ -9653,8 +9739,8 @@ $\begin{aligned} 1-\frac{C(sz[u],k)} {C(m,k)}-\frac{C(m-sz[u],k)} {C(m,k)}\end{a
         <category>题解</category>
       </categories>
       <tags>
-        <tag>技巧</tag>
         <tag>dp</tag>
+        <tag>技巧</tag>
         <tag>COCI</tag>
       </tags>
   </entry>
@@ -11567,8 +11653,8 @@ $w(n)=\left\{\begin{aligned} (-1)^m  &&\nexists c_i>1,\\ 0 && \exists c_i>1\end{
         <category>笔记</category>
       </categories>
       <tags>
-        <tag>数据结构</tag>
         <tag>技巧</tag>
+        <tag>数据结构</tag>
       </tags>
   </entry>
   <entry>

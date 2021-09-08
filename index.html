@@ -209,6 +209,150 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/60189.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/60189.html" class="post-title-link" itemprop="url">[水]dp多维状态的分步优化</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-09-08 03:58:03 / Modified: 04:05:28" itemprop="dateCreated datePublished" datetime="2021-09-08T03:58:03-07:00">2021-09-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="水-dp多维状态的分步优化"><a href="#水-dp多维状态的分步优化" class="headerlink" title="[水]dp多维状态的分步优化"></a>[水]dp多维状态的分步优化</h1><p>面对一个多维dp问题，根据维度之间联系的紧密程度，我们可以选择</p>
+<p>1.维度之间紧密相关，只能直接枚举</p>
+<p>2.维度之间完全无关，只是贡献通过某种形式相加，可以割裂为两个dp处理</p>
+<p>3.介于1,2之间，不能割裂计算，但是可以将转移过程割裂为若干步来优化</p>
+<h3 id="e-g-1-选区间1"><a href="#e-g-1-选区间1" class="headerlink" title="e.g.1: 选区间1"></a>e.g.1: 选区间1</h3><h4 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h4><p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z}, a\leq b)$，给出了其权值$w_{a,b}$</p>
+<p>现在求一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$，满足$a_1&lt;a_2,b_2&lt;b_1$</p>
+<p>定义$\displaystyle w_A=\sum w_{a_i,b_i}+\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_A$</p>
+<h4 id="原dp"><a href="#原dp" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{a,b}$表示最后一个元组为$a,b$时的最大权值，状态数为$O(n^2)$</p>
+<p>直接转移复杂度为$O(n^2)$，总复杂度为$O(n^4)$</p>
+<h4 id="分布转移"><a href="#分布转移" class="headerlink" title="分布转移"></a>分布转移</h4><p>两维的状态决定了权值，因此不可以割裂</p>
+<p>但是两个维度在转移时并没有必然联系，因为只涉及$a_{i}$和$a_{i+1}$，$b_i$和$b_{i+1}$的关系</p>
+<p>因此可以先转移$a$这一维，然后再转移$b$这一维</p>
+<p>具体的，转移可以描述如下</p>
+<p>1.$dp_{a,b}+w_{a,c}\rightarrow f_{c,b}$</p>
+<p>2.$f_{c,b}+w_{d,b}+w_{c,d}\rightarrow dp_{c,d}$</p>
+<p>优化后转移复杂度为$O(n)$，状态数虽然加倍但是不影响量级</p>
+<p>总复杂度为$O(n^3)$</p>
+<p><br></p>
+<h3 id="e-g-2-选区间2"><a href="#e-g-2-选区间2" class="headerlink" title="e.g.2: 选区间2"></a>e.g.2: 选区间2</h3><h4 id="问题描述-1"><a href="#问题描述-1" class="headerlink" title="问题描述"></a>问题描述</h4><p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z}, a\leq b)$，给出了其权值$w_{a,b}$</p>
+<p>现在求一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$，满足$a_1&lt;a_2,b_2&lt;b_1$</p>
+<p>定义$\displaystyle w_A=\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_A$</p>
+<h4 id="原dp-1"><a href="#原dp-1" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{a,b}$表示最后一个元组为$a,b$时的最大权值，状态数为$O(n^2)$</p>
+<p>直接转移复杂度为$O(n^2)$，总复杂度为$O(n^4)$</p>
+<h4 id="分布转移-1"><a href="#分布转移-1" class="headerlink" title="分布转移"></a>分布转移</h4><p>容易发现这个问题同样适用选区间1的优化</p>
+<h4 id="割裂"><a href="#割裂" class="headerlink" title="割裂"></a>割裂</h4><p>容易发现权值由$a_i,a_{i+1}$，$b_i,b_{i+1}$决定，不需要知道过程中每一个$a_i,b_i$的组，只需要知道数量</p>
+<p>而$a,b$有单调性，所以关于$a\leq b$的限制只需要最后满足即可</p>
+<p>令$f_{i,j}$表示已经枚举了$i$个元素，最后一个$a_i=j$时的最大值</p>
+<p>同理，令$g_{i,j}$已经枚举了$i$个元素，最后一个$b_i=j$时的最大值</p>
+<p>状态数为$O(n^2)$，转移复杂度为$O(n)$，最后可以在$O(n^2)$时间内合并$f,g$的贡献</p>
+<p>总复杂度为$O(n^3)$</p>
+<p><br></p>
+<h3 id="e-g-3-足球"><a href="#e-g-3-足球" class="headerlink" title="e.g.3: 足球"></a>e.g.3: 足球</h3><p>Source: COCI2012/2013 Contest#5 F</p>
+<h4 id="问题描述-2"><a href="#问题描述-2" class="headerlink" title="问题描述"></a>问题描述</h4><p>有$2n$个人踢球，两队各$n$个人，一开始球在A队1号</p>
+<p>每秒钟，按照一定概率球可能会被某一些对手抢走，或者传给某一些队友，或者射门</p>
+<p>射门只有一定概率$p_i$射中，每次射门之后球会到对方1号队员</p>
+<p>求$T$秒后比分为$a,b$的概率，如果一队得分达到$r$，视作胜利，比赛结束</p>
+<p>为了便于分析，$O(n)=O(T)$</p>
+<h4 id="原dp-2"><a href="#原dp-2" class="headerlink" title="原dp"></a>原dp</h4><p>记录时间、比分、球的位置，状态数为$O(Tnr^2)=O(n^2r^2)$</p>
+<p>转移枚举的情况不超过$2n$，转移复杂度为$O(n)$，总复杂度为$O(n^3r^2)$</p>
+<h4 id="割裂-1"><a href="#割裂-1" class="headerlink" title="割裂"></a>割裂</h4><p>在记录比分的同时记录球的位置并没有意义，因为实际上关键事件实际上就是射门，每次射门之后球所在位置情况是$O(1)$的</p>
+<p>那么新的dp将 <strong>球的位置</strong> 和 <strong>比分情况</strong> 割裂开来</p>
+<p>1.处理球的位置，令$f_{i,j,k}$表示一开始球在$i$队1号时，第一次射门是在$j$时刻，由球员$k$射门（$k$可以是两队中任何一个）</p>
+<p>状态数为$O(Tn)$，转移为$O(n)$，这一部分复杂度为$O(n^3)$</p>
+<p>2.比分情况</p>
+<p>令$g_{i,j,a,b}$表示$i$时刻，球在$j$队1号，当前比分为$a:b$的概率</p>
+<p>状态数为$O(Tr^2)$，转移为$O(T)$，总复杂度为$O(T^2r^2)$</p>
+<p><br></p>
+<h3 id="e-g-4-异或"><a href="#e-g-4-异或" class="headerlink" title="e.g.4: 异或"></a>e.g.4: 异或</h3><p>Source: CSP-S 2020 初赛完善程序2 （大雾</p>
+<p>给定长度为$n$的序列$a_i\in[0,m),m=2^{16}$，$n\leq 10^{5}$</p>
+<p>设$w(x)=\text{pop_count}(x)+x$，求一个子序列$b_i$</p>
+<p>最大化$\sum w(b_i\oplus b_{i+1})$</p>
+<h4 id="原dp-3"><a href="#原dp-3" class="headerlink" title="原dp"></a>原dp</h4><p>令$dp_{x}$表示子序列最后一个元素为$x$时的答案，状态数为$O(m)$</p>
+<p>对于每个数$a_i$，枚举前驱状态进行转移，复杂度为$O(m)$</p>
+<p>总复杂度为$O(nm)$</p>
+<h4 id="分布转移-2"><a href="#分布转移-2" class="headerlink" title="分布转移"></a>分布转移</h4><p>这道题看似是一个1维dp，但是实际上实际上权值是分位处理的</p>
+<p>我们不如先看一个类似的选区间问题的变体</p>
+<blockquote>
+<p>对于所有二元组$a,b, (a,b\in[1,n]\cap \mathbb{Z})$，给出了其权值$w_{a,b}$</p>
+<p>给定了一个元组序列$A=(a_1,b_1),(a_2,b_2),\cdots$</p>
+<p>现在要选出$A$的一个子序列$B$，定义$\displaystyle w_B=\sum w_{a_{i-1},a_i}+\sum w_{b_{i-1},b_i}$ ，最大化$w_B$</p>
+</blockquote>
+<p>实际上这两个问题是完全相同的，但是由于限制了$a_i,b_i$为子序列，导致分布显得比较奇怪</p>
+<p>分布转移的过程中，转移状态应该是这样的</p>
+<p>$(a_1,b_1)\rightarrow (a_2, b_1) \rightarrow (a_2,b_2)$</p>
+<p>容易发现这个过渡状态$(a_2,b_1)$实际上并不是一个存在的元组，并不满足匹配关系</p>
+<p>那么我们如何得到这个过渡状态呢？</p>
+<p>1.我们手里有$(a_1,b_1)$的dp值$dp_{a,b}$</p>
+<p>2.我们并不知道$a_2$，于是需要向所有可能的$a_2$转移，得到$f_{c,b}$</p>
+<p>$\forall c,dp_{a_1,b_1}+w(b_1,c)\rightarrow f_{c,b_1}$</p>
+<p>3.当拿到$a_2,b_2$时，此时我们已经知道了$a_2$，但是不知道$b_1$，因此需要从所有$b_1$中得到$dp_{a_2,b_2}$的值</p>
+<p>而为了分布转移，我们在中间过程中并不需要</p>
+<p>$\forall c,f_{a_2,c}+w(c,b_2)\rightarrow dp_{a_2,b_2}$</p>
+<p>分析会发现，$dp_{a,b}$反而在这个过程中只是一个过渡值，并不需要开数组记录</p>
+<p>于是就得到了完善程序的dp</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/35309.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -969,96 +1113,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/43259.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/43259.html" class="post-title-link" itemprop="url">[水]短多项式复合</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-07-11 15:18:01 / Modified: 21:58:21" itemprop="dateCreated datePublished" datetime="2021-07-11T15:18:01-07:00">2021-07-11</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="水-短多项式复合"><a href="#水-短多项式复合" class="headerlink" title="[水]短多项式复合"></a>[水]短多项式复合</h1><p>问题描述：</p>
-<p>求$F(G(x))$，其中$F(x)$阶为$n$，$G(x)$阶为$k$（$k$为常数级）</p>
-<p>求出所有$O(nk)$项</p>
-<h3 id="方法0：套多项式复合的模板"><a href="#方法0：套多项式复合的模板" class="headerlink" title="方法0：套多项式复合的模板"></a><del>方法0：套多项式复合的模板</del></h3><h3 id="方法1：特征型：-G-x-x-k-c"><a href="#方法1：特征型：-G-x-x-k-c" class="headerlink" title="方法1：特征型：$G(x)=x^k+c$"></a>方法1：特征型：$G(x)=x^k+c$</h3><p>即$\text{Bluestein’s Algorithm}$，模拟二项展开</p>
-<p>不过注意，$G(x)=x^a+x^b$并不适用</p>
-<p><br></p>
-<h3 id="方法2：分治-text-NTT"><a href="#方法2：分治-text-NTT" class="headerlink" title="方法2：分治$\text{NTT}$"></a>方法2：分治$\text{NTT}$</h3><p>因为要求的是$\sum_{i} [x^i] F(x) G^i$，可以直接分治$\text{NTT}$</p>
-<p>设$\displaystyle H_{l,r}=\sum_{j=l}^r [x^j]F(x)^j G^{j-l}$</p>
-<p>则$H_{l,r}=H_{l,m}+G^{m-l+1} H_{m+1,r}$</p>
-<p>求得$H_{0,n}$即可，复杂度为$O(kn\log n\log {nk})$</p>
-<h3 id="方法3：求值-插值"><a href="#方法3：求值-插值" class="headerlink" title="方法3：求值|插值"></a>方法3：求值|插值</h3><p>带入$n$个点值$x_i$，求得$F(G(x_i))$，然后插值回去</p>
-<p>当然直接带入$x_i=\omega _{n} ^i$，最后的插值就只是一个$\text{IFFT}$，复杂度可以忽略</p>
-<p>只需要一次多点求值，需要对于一个长度为$n$的多项式求$nk$个点值，复杂度为$O(nk\log^2 nk)$</p>
-<p>用转移原理优化的版本，由于多项式长度与点值长度不同阶，常数还可以有所减小</p>
-<p>（虽然但是上限大约是2倍分治$\text{NTT}$的样子）</p>
-<p>然而实际上这个东西在$G(x)$有特殊性，</p>
-<p>如$G(x)=x+\frac{1}{x},G(x)=x^2+x+x^{-1}+x^{-2}$时，表现甚至可能更优异</p>
-<p>因为在处理它时，分治$\text{NTT}$需要处理负数项</p>
-<p>而由于单位根具有对称性，多点求值时的元数会减少</p>
-<p>变成$\displaystyle O(\frac{1}{\epsilon}nk\log^2 n)$（上面的$G(x)$时，$\epsilon=2$），甚至可以跑得更快</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1132,7 +1186,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">274</span>
+          <span class="site-state-item-count">275</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

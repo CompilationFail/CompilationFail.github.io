@@ -209,6 +209,100 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/22589.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/22589.html" class="post-title-link" itemprop="url">[COCI2010-2011 2] CRNI(单调栈)</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-23 18:51:24" itemprop="dateCreated datePublished" datetime="2020-08-23T18:51:24-07:00">2020-08-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 06:07:36" itemprop="dateModified" datetime="2021-05-31T06:07:36-07:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="COCI2010-2011-2-CRNI-单调栈"><a href="#COCI2010-2011-2-CRNI-单调栈" class="headerlink" title="[COCI2010-2011#2] CRNI(单调栈)"></a>[COCI2010-2011#2] CRNI(单调栈)</h1><h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><p>首先考虑两个不相交的矩形可能存在的位置关系，我将其分成</p>
+<p>1.左右</p>
+<p>2.上下</p>
+<p>3.左上右下</p>
+<p>4.左下右上</p>
+<p>发现1,2,3,4之间有相交,考虑四种情况的答案应该是1+2-3-4</p>
+<h2 id="统计方法"><a href="#统计方法" class="headerlink" title="统计方法"></a>统计方法</h2><p>核心: 统计以一个点作为顶点的矩形数量</p>
+<p>以统计$i,j$为右下角的矩形为例，先不考虑矩形大小&gt;1的限制</p>
+<p>显然可以在线性时间内处理得到每个$i,j$向上连续延伸的连续1长度，设其为$U_{i,j}$</p>
+<p>假设枚举了$i$，从左到右依次扫描$j$，则得到$i,j$位置的答案应该是</p>
+<p>$\displaystyle\sum_{k=1}^{j} \min_{d=k}^j\lbrace U_{i,d}\rbrace$</p>
+<p>这条式子中，相当于枚举了$i,(k,j)$为底，统计向上延伸的最长长度</p>
+<p>这个式子可以用<strong>单调栈</strong>在线性时间内求解，其过程可以描述为</p>
+<p>1.每次插入元素$U_{i,j}$，得到它的影响区间$k\in [L,j]$</p>
+<p>2.将原先单调栈内$k\in [L,j]$这段区间的答案减掉，改为$U_{i,j}\cdot (j-L+1)$</p>
+<p>类似的，可以通过改变循环顺序和额外记录向下延伸的长度$D_{i,j}$来统计四种顶点的答案(详细见代码)</p>
+<p>然后可以用前缀和帮助统计以上4种答案，枚举一个端点，另一个查询前缀和即可</p>
+<p>tips: 注意累和顺序，<del>前缀和要开long long</del></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">long</span> ll;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> IO;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>=</span><span class="keyword">int</span>&gt; <span class="function">T <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	T s=<span class="number">0</span>; <span class="keyword">int</span> f=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>())) <span class="keyword">if</span>(IO==<span class="string">&#x27;-&#x27;</span>) f=<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> f?-s:s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1e3</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">char</span> a[N][N];</span><br><span class="line"><span class="keyword">int</span> D[N][N],U[N][N]; <span class="comment">//i,j向下/上延伸的最长长度</span></span><br><span class="line"><span class="keyword">int</span> stk[N],c[N],top;</span><br><span class="line"><span class="keyword">int</span> CRR[N][N]; <span class="comment">// 以i,j为右下角的矩形个数</span></span><br><span class="line"><span class="keyword">int</span> CLL[N][N]; <span class="comment">// 以i,j为左上角的矩形个数</span></span><br><span class="line"><span class="keyword">int</span> CLR[N][N]; <span class="comment">// 以i,j为右上角的矩形个数</span></span><br><span class="line"><span class="keyword">int</span> CRL[N][N]; <span class="comment">// 以i,j为左下角的矩形个数</span></span><br><span class="line">ll SLL[N][N],SRL[N][N]; <span class="comment">// 前缀和</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,a[i]+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(j,<span class="number">1</span>,n) <span class="keyword">if</span>(a[i][j]==<span class="string">&#x27;C&#x27;</span>) U[i][j]=U[i<span class="number">-1</span>][j]+<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">drep</span>(i,n,<span class="number">1</span>) <span class="built_in">rep</span>(j,<span class="number">1</span>,n) <span class="keyword">if</span>(a[i][j]==<span class="string">&#x27;C&#x27;</span>) D[i][j]=D[i+<span class="number">1</span>][j]+<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="comment">// 统计四种端点的情况</span></span><br><span class="line">		top=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> now=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">1</span>,n) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=U[i][j],cnt=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(top &amp;&amp; stk[top]&gt;=x) cnt+=c[top],now-=c[top]*stk[top],top--;</span><br><span class="line">			stk[++top]=x,c[top]=cnt; now+=x*cnt;</span><br><span class="line">			CRR[i][j]=<span class="built_in">max</span>(now<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		now=top=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">1</span>,n) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=D[i][j],cnt=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(top &amp;&amp; stk[top]&gt;=x) cnt+=c[top],now-=c[top]*stk[top],top--;</span><br><span class="line">			stk[++top]=x,c[top]=cnt; now+=x*cnt;</span><br><span class="line">			CLR[i][j]=<span class="built_in">max</span>(now<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		now=top=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">drep</span>(j,n,<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=U[i][j],cnt=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(top &amp;&amp; stk[top]&gt;=x) cnt+=c[top],now-=c[top]*stk[top],top--;</span><br><span class="line">			stk[++top]=x,c[top]=cnt; now+=x*cnt;</span><br><span class="line">			CRL[i][j]=<span class="built_in">max</span>(now<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		now=top=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">drep</span>(j,n,<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x=D[i][j],cnt=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(top &amp;&amp; stk[top]&gt;=x) cnt+=c[top],now-=c[top]*stk[top],top--;</span><br><span class="line">			stk[++top]=x,c[top]=cnt; now+=x*cnt;</span><br><span class="line">			CLL[i][j]=<span class="built_in">max</span>(now<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">drep</span>(i,n,<span class="number">1</span>) <span class="built_in">drep</span>(j,n,<span class="number">1</span>) SLL[i][j]=SLL[i+<span class="number">1</span>][j]+SLL[i][j+<span class="number">1</span>]-SLL[i+<span class="number">1</span>][j+<span class="number">1</span>]+CLL[i][j];</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">drep</span>(j,n,<span class="number">1</span>) SRL[i][j]=SRL[i<span class="number">-1</span>][j]+SRL[i][j+<span class="number">1</span>]-SRL[i<span class="number">-1</span>][j+<span class="number">1</span>]+CRL[i][j];</span><br><span class="line">	<span class="comment">// 前缀和</span></span><br><span class="line"></span><br><span class="line">	ll ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(j,<span class="number">1</span>,n) <span class="keyword">if</span>(CRR[i][j]) ans+=CRR[i][j]*(SLL[i+<span class="number">1</span>][<span class="number">1</span>]+SLL[<span class="number">1</span>][j+<span class="number">1</span>]-SLL[i+<span class="number">1</span>][j+<span class="number">1</span>]);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(j,<span class="number">1</span>,n) ans-=CLR[i][j]*SRL[i<span class="number">-1</span>][j+<span class="number">1</span>];</span><br><span class="line">	<span class="comment">// 统计4种情况</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans%<span class="number">10007</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/22646.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1043,114 +1137,6 @@ $ \begin{aligned}\sum_{n|i}\frac{x^i} {i!}=\sum_{i=0}^{\infty}\frac{\sum_{j=0}^{
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/46470.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/46470.html" class="post-title-link" itemprop="url">伪WC2020游记</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-08-12 12:44:03" itemprop="dateCreated datePublished" datetime="2020-08-12T12:44:03-07:00">2020-08-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 05:07:23" itemprop="dateModified" datetime="2021-05-31T05:07:23-07:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%B8%B8%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">游记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="伪WC2020游记"><a href="#伪WC2020游记" class="headerlink" title="伪WC2020游记"></a>伪WC2020游记</h1><p>补</p>
-<p>是的，这是一场在8月举行的盛大的冬令营！</p>
-<p>而且变成了自由报名！</p>
-<p>~奇妙的网课体验祭~</p>
-<h4 id="Day1"><a href="#Day1" class="headerlink" title="Day1:"></a>Day1:</h4><p>哇路由器，哇bitmap</p>
-<p>哇Minhash，哇随机投影，哇并行计算</p>
-<p>工程学习祭。。。。</p>
-<p>晚上:？？？果然是集训队选手讲题？？？</p>
-<h4 id="Day2"><a href="#Day2" class="headerlink" title="Day2"></a>Day2</h4><p>嗯，是神仙讲题!</p>
-<p>嗯，还是神仙讲题!诶怎么锅了，诶怎么又锅了?诶怎么拖了15分钟还没讲完?</p>
-<p>晚上:？？？果然又是集训队选手讲题？？？</p>
-<p><br></p>
-<h4 id="Day3"><a href="#Day3" class="headerlink" title="Day3"></a>Day3</h4><p>哇怎么都变成讲神仙题目了?</p>
-<h4 id="Day4"><a href="#Day4" class="headerlink" title="Day4"></a>Day4</h4><p>台风困在寝室祭。。。</p>
-<p>在寝室度过了完美的补觉日，直接错过所有讲课。。。</p>
-<h4 id="Day5"><a href="#Day5" class="headerlink" title="Day5"></a>Day5</h4><p>赶回家考试祭。。。</p>
-<p>T1</p>
-<p> 看起来十分可写，于是乎又搞了一年没搞出来</p>
-<p>是不是大家都A了，我是不是又完蛋了，只写了暴力</p>
-<p>T2</p>
-<p><del>推出了阶的表示性质，然后误以为要$dp$，直接跳过现场</del></p>
-<p>T3</p>
-<p>看起来十分可写，令人想到某道皮配题</p>
-<p>shi一般的代码写了一年，终于在最后一分钟交上去了哈哈哈哈</p>
-<p>果然十分可写，爆搜+dp感觉要自己要升天</p>
-<p>出来</p>
-<p>哇果然升天了!!题目锅了哈哈哈哈哈哈!!只有50哈哈哈哈哈哈!!<del>(WCWCWC)</del></p>
-<p>T1果然大家都没A哈哈哈哈<del>(读入错了挂掉10分祭)</del></p>
-<p>T2果然大家都A了哈哈哈哈</p>
-<p>T3这个非集选手平均分哈哈哈哈</p>
-<p>完事儿只有100分，划水本质又暴露了。。。</p>
-<h4 id="Day6"><a href="#Day6" class="headerlink" title="Day6"></a>Day6</h4><p>没错闭幕式在hdu多校期间，于是乎.~.~.~.</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1224,7 +1210,7 @@ $ \begin{aligned}\sum_{n|i}\frac{x^i} {i!}=\sum_{i=0}^{\infty}\frac{\sum_{j=0}^{
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">274</span>
+          <span class="site-state-item-count">275</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
