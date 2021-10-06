@@ -214,6 +214,109 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/46058.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/46058.html" class="post-title-link" itemprop="url">CF1288F - Red-Blue Graph</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-11 18:38:09" itemprop="dateCreated datePublished" datetime="2021-05-11T18:38:09+08:00">2021-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-05-31 21:30:28" itemprop="dateModified" datetime="2021-05-31T21:30:28+08:00">2021-05-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CF1288F-Red-Blue-Graph"><a href="#CF1288F-Red-Blue-Graph" class="headerlink" title="CF1288F - Red-Blue Graph"></a>CF1288F - Red-Blue Graph</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>给定一个二部图，每条边可以为红色/蓝色/无色，且一条边为红色需要付出$r$的代价，为蓝色需要$b$的代价</p>
+<p>每个点可以为红色/蓝色/无色</p>
+<p>1.如果该点为红色，则其所连的边中红色边边数 <strong>严格大于</strong> 蓝色边边数</p>
+<p>2.如果该点为蓝色，则其所连的边中蓝色边边数 <strong>严格大于</strong> 红色边边数</p>
+<p>求最小化代价满足上述限制</p>
+<p><br></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p><del>二分图果然和网络流密不可分</del></p>
+<p>考虑从奇怪的题目中归纳一个费用流模型</p>
+<p>用一个点的流量表示红色边-蓝色边的数量，将问题描述为</p>
+<p>1.一条边如果为红色，那么所关联的点从$S$强制得到$1$的流量</p>
+<p>2.一个边如果选蓝色，那么所关联的点强制向$T$流$1$的流量</p>
+<p>3.如果一个点为红色，那么它最终应该仍然有流量多</p>
+<p>那么强制这个点必须还能向$T$流$1$的流量，剩余随意</p>
+<p>4.如果一个点为蓝色，那么它最终应该仍然流量不足</p>
+<p>那么强制这个点必须从$S$得到$1$的流量，剩余随意</p>
+<p>然而这个模型无法解决一条边对于其两端点的决策</p>
+<p><br></p>
+<p>常见的处理二分图思路：考虑将右半边图红蓝反着建立</p>
+<p>此时令一条边对应的中继节点从$S$得到$2$的流量</p>
+<p>这个节点向左边的点流0，表示这条边选择蓝色</p>
+<p>这个节点向左边的点流1，表示这条边选择白色</p>
+<p>这个节点向左边的点流2，表示这条边选择红色</p>
+<p>同时将代价加入即可</p>
+<p>这样给每个点额外增加了一个基准偏移的流量，需要简单处理一下</p>
+<p>用代价为$-\infty$的边表示这条边强制选择</p>
+<p>注意最终求出的是最小费用，而不是最大流</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">2e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n1,n2,S,T,V,m,r,b;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Edge</span>&#123;</span></span><br><span class="line">	<span class="keyword">int</span> to,nxt,w,c;</span><br><span class="line">&#125; e[N];</span><br><span class="line"><span class="keyword">int</span> head[N],ecnt=<span class="number">1</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddEdge</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w,<span class="keyword">int</span> c)</span></span>&#123;</span><br><span class="line">	e[++ecnt]=(Edge)&#123;v,head[u],w,c&#125;;</span><br><span class="line">	head[u]=ecnt;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Link</span><span class="params">(<span class="keyword">int</span> u,<span class="keyword">int</span> v,<span class="keyword">int</span> w,<span class="keyword">int</span> c)</span></span>&#123; <span class="built_in">AddEdge</span>(u,v,w,c),<span class="built_in">AddEdge</span>(v,u,<span class="number">0</span>,-c); &#125;</span><br><span class="line"></span><br><span class="line">ll ans,dis[N];</span><br><span class="line"><span class="keyword">char</span> s[N];</span><br><span class="line"><span class="keyword">int</span> inq[N],pre[N],w[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n1=<span class="built_in">rd</span>(),n2=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>(),r=<span class="built_in">rd</span>(),b=<span class="built_in">rd</span>(),S=n1+n2+<span class="number">1</span>,T=S+<span class="number">1</span>,V=T;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,s+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n1) &#123;</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;R&#x27;</span>) <span class="built_in">Link</span>(i,T,<span class="number">1</span>,-INF),ans+=INF,<span class="built_in">Link</span>(i,T,INF,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;B&#x27;</span>) <span class="built_in">Link</span>(S,i,<span class="number">1</span>,-INF),ans+=INF,<span class="built_in">Link</span>(S,i,INF,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;U&#x27;</span>) <span class="built_in">Link</span>(S,i,INF,<span class="number">0</span>),<span class="built_in">Link</span>(i,T,INF,<span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,s+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n2) &#123;</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;B&#x27;</span>) <span class="built_in">Link</span>(i+n1,T,<span class="number">1</span>,-INF),ans+=INF,<span class="built_in">Link</span>(i+n1,T,INF,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;R&#x27;</span>) <span class="built_in">Link</span>(S,i+n1,<span class="number">1</span>,-INF),ans+=INF,<span class="built_in">Link</span>(S,i+n1,INF,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span>(s[i]==<span class="string">&#x27;U&#x27;</span>) <span class="built_in">Link</span>(S,i+n1,INF,<span class="number">0</span>),<span class="built_in">Link</span>(i+n1,T,INF,<span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) &#123;</span><br><span class="line">		<span class="keyword">int</span> u=<span class="built_in">rd</span>(),v=<span class="built_in">rd</span>()+n1;</span><br><span class="line">		<span class="built_in">Link</span>(S,++V,<span class="number">2</span>,-INF),ans+=<span class="number">2</span>*INF;</span><br><span class="line">		<span class="built_in">Link</span>(V,u,<span class="number">1</span>,<span class="number">0</span>),<span class="built_in">Link</span>(V,v,<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">		<span class="built_in">Link</span>(V,u,<span class="number">1</span>,r),<span class="built_in">Link</span>(V,v,<span class="number">1</span>,b);</span><br><span class="line">		<span class="built_in">Link</span>(u,T,<span class="number">1</span>,-INF),ans+=INF;</span><br><span class="line">		<span class="built_in">Link</span>(v,T,<span class="number">1</span>,-INF),ans+=INF;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">static</span> queue &lt;<span class="keyword">int</span>&gt; que;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,V) dis[i]=<span class="number">1e18</span>;</span><br><span class="line">		dis[S]=<span class="number">0</span>,que.<span class="built_in">push</span>(S),w[S]=INF;</span><br><span class="line">		<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">			<span class="keyword">int</span> u=que.<span class="built_in">front</span>(); que.<span class="built_in">pop</span>();</span><br><span class="line">			inq[u]=<span class="number">0</span>;</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) &#123;</span><br><span class="line">				<span class="keyword">int</span> v=e[i].to,c=e[i].c;</span><br><span class="line">				<span class="keyword">if</span>(!e[i].w || dis[v]&lt;=dis[u]+c) <span class="keyword">continue</span>;</span><br><span class="line">				dis[v]=dis[u]+c,w[v]=<span class="built_in">min</span>(e[i].w,w[u]),pre[v]=i;</span><br><span class="line">				<span class="keyword">if</span>(!inq[v]) que.<span class="built_in">push</span>(v),inq[v]=<span class="number">1</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(dis[T]&gt;<span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">int</span> c=w[T]; ans+=dis[T]*c;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> u=T;u!=S;u=e[pre[u]^<span class="number">1</span>].to) &#123;</span><br><span class="line">			<span class="comment">//cout&lt;&lt;u&lt;&lt;endl;</span></span><br><span class="line">			e[pre[u]].w-=c,e[pre[u]^<span class="number">1</span>].w+=c;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(ans&gt;INF) <span class="built_in">puts</span>(<span class="string">&quot;-1&quot;</span>);</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>,ans);</span><br><span class="line">		<span class="built_in">rep</span>(u,T+<span class="number">1</span>,T+m) &#123;</span><br><span class="line">			<span class="keyword">int</span> c=<span class="number">0</span>;</span><br><span class="line">			<span class="keyword">for</span>(<span class="keyword">int</span> i=head[u];i;i=e[i].nxt) <span class="keyword">if</span>(e[i].to&lt;=n1) c+=e[i^<span class="number">1</span>].w;</span><br><span class="line">			<span class="built_in">putchar</span>(<span class="string">&quot;BUR&quot;</span>[c]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/18382.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1130,99 +1233,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/29892.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/29892.html" class="post-title-link" itemprop="url">平面图的欧拉定理</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-05-09 20:20:52" itemprop="dateCreated datePublished" datetime="2021-05-09T20:20:52+08:00">2021-05-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-05-31 20:24:10" itemprop="dateModified" datetime="2021-05-31T20:24:10+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="平面图的欧拉定理"><a href="#平面图的欧拉定理" class="headerlink" title="平面图的欧拉定理"></a>平面图的欧拉定理</h1><h3 id="平面图"><a href="#平面图" class="headerlink" title="平面图"></a>平面图</h3><p>平面图是一张无向图，顾名思义</p>
-<p>存在一种在平面上画点的方法，使得所有的边不会相交</p>
-<h3 id="欧拉定理"><a href="#欧拉定理" class="headerlink" title="欧拉定理"></a>欧拉定理</h3><p>对于一张平面图$G=(V,E)$，$F$为平面图上的边把平面划分的区域个数（注意统计最外层的无限区域），则</p>
-<p>一张平面图是连通的 $\Longleftrightarrow$ $|V|-|E|+|F|=2$</p>
-<p>下面是一个例子</p>
-<p><img src="https://i.loli.net/2021/01/07/38Omti1zofAV6HY.png" alt="Snipaste_2021-01-07_14-31-51.png"></p>
-<p>$|V|=5,|E|=8,F=5$ (包含最外层的区域)</p>
-<p>很显然这个定理也可以用来统计联通块的数量/区域的数量</p>
-<p>即$C=|V|-|E|+|F|-1$</p>
-<h3 id="欧拉定理与网格图"><a href="#欧拉定理与网格图" class="headerlink" title="欧拉定理与网格图"></a>欧拉定理与网格图</h3><p>当题目涉及到网格图染色问题时，不妨将所有染色的网格视为点，边即为四联通</p>
-<p><img src="https://i.loli.net/2021/01/07/x2IniXu6brhJA7y.png" alt="Snipaste_2021-01-07_14-35-46.png"></p>
-<p>此时构成一个特殊的平面图，且此时可以发现</p>
-<p>$F$为 4相邻块个数 + 空腔个数 + 1</p>
-<p>$|E|$为相邻对数</p>
-<p>$|V|$为染色个数</p>
-<p>由此可以在染色问题上把 <strong>空腔数量</strong> 与 <strong>连通性结合起来</strong></p>
-<p><del>作为一种可能出现的思路</del></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1296,7 +1306,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">277</span>
+          <span class="site-state-item-count">278</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

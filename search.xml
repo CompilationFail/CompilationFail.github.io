@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>[BZOJ2216][Poi2011]Lightning Conductor</title>
+    <url>/27230.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="BZOJ2216-Luogu-P3515-Poi2011-Lightning-Conductor-线性解法"><a href="#BZOJ2216-Luogu-P3515-Poi2011-Lightning-Conductor-线性解法" class="headerlink" title="[BZOJ2216|Luogu P3515] [Poi2011]Lightning Conductor (线性解法)"></a>[BZOJ2216|Luogu P3515] [Poi2011]Lightning Conductor (线性解法)</h1><p><del>老题了，当年写了决策单调性就没有管了</del></p>
+<h3 id="问题描述："><a href="#问题描述：" class="headerlink" title="问题描述："></a>问题描述：</h3><p>给定$a_i$，求$f_i=\max_j\{a_j-a_i+\sqrt{|i-j|}\}$</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>首先可以分$j&lt; i,j\ge i$两种情况考虑，下面只考虑$j&lt;i$的情况</p>
+<p>设$g_i(x)=\sqrt{x-i}+a_i$，比较$g_i(x),g_j(x)(i&lt;j)$在$[j,\infty)$上的大小关系时时，有几种情况</p>
+<span id="more"></span>
+<ol>
+<li><p>$g_i(x)$恒大于$g_j(x)$，即$a_i\ge a_j$</p>
+</li>
+<li><p>设$\delta(x)=g_i(x)-g_j(x)$，则$\displaystyle \delta’(x)=\frac{1}{2\sqrt{x-i}}-\frac{1}{2\sqrt{x-j}}&lt;0$</p>
+<ol>
+<li>$\delta(0)\leq 0$，则$g_i(x)$恒小于$g_j(x)$</li>
+<li>求得$\delta(x)$的零点，在零点左侧$g_i(x)$大，右侧$g_j(x)$大</li>
+</ol>
+</li>
+</ol>
+<p>容易发现这样函数之间的关系类似直线之间的关系，都是在某一界点处大小关系改变</p>
+<p>因此可以像维护直线凸包一样维护$g_i(x)$的凸包，再根据查询的单调性完成线性查询</p>
+<p>维护凸包时需要求$g_i(x),g_j(x)(i&lt;j)$的交点，这个方程大概可以归纳为</p>
+<script type="math/tex; mode=display">
+\sqrt{x+d}-\sqrt{x}=c</script><p>自然可以在整数域上二分求解这个方程的近似根，但是实际上可以用一点点数学手段$O(1)$求解准确根</p>
+<p>令$t=\sqrt x$，原方程变为$\sqrt {y^2+d}-y=c$</p>
+<p>即$y^2+d=y^2+c^2+2cy\Longrightarrow y=\frac{d-c^2}{2c}$</p>
+<p>故$\displaystyle x=(\frac{d-c^2}{2c})^2$</p>
+<p>计算常数略大，我写得也不是很好，所以不算太快</p>
+<p><a href="https://www.luogu.com.cn/record/59282486">Luogu Submission</a></p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">char</span> buf[<span class="number">200000</span>],*p1,*p2;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> getchar() (((p1==p2)&amp;&amp;(p2=(p1=buf)+fread(buf,1,200000,stdin))),*p1++)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">rd</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> s=<span class="number">0</span>; <span class="keyword">static</span> <span class="keyword">char</span> c;</span><br><span class="line">	<span class="keyword">while</span>(c=<span class="built_in">getchar</span>(),c&lt;<span class="number">48</span>);</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+c<span class="number">-48</span>;</span><br><span class="line">	<span class="keyword">while</span>(c=<span class="built_in">getchar</span>(),c&gt;<span class="number">47</span>);</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">5e5</span>+<span class="number">10</span>,INF=<span class="number">1e9</span>+<span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n;</span><br><span class="line"><span class="keyword">int</span> a[N],f[N],_sqrt[N];</span><br><span class="line"><span class="keyword">int</span> Q[N],L,R;</span><br><span class="line"></span><br><span class="line"><span class="function">db <span class="title">Cross</span><span class="params">(<span class="keyword">int</span> i,<span class="keyword">int</span> j)</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> d=j-i,c=a[j]-a[i];</span><br><span class="line">	<span class="keyword">if</span>(<span class="number">1ll</span>*c*c&gt;=d) <span class="keyword">return</span> <span class="number">-1e90</span>;</span><br><span class="line">	db t=(d<span class="number">-1ll</span>*c*c)/(<span class="number">2.</span>*c);</span><br><span class="line">	<span class="keyword">return</span> t*t+j;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Get</span><span class="params">(<span class="keyword">int</span> i,<span class="keyword">int</span> j)</span></span>&#123; <span class="keyword">return</span> _sqrt[j-i]+a[i]-a[j]; &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Solve</span><span class="params">()</span></span>&#123;</span><br><span class="line">	L=<span class="number">1</span>,R=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="keyword">while</span>(L&lt;R &amp;&amp; i&gt;=<span class="built_in">Cross</span>(Q[L],Q[L+<span class="number">1</span>])) L++;</span><br><span class="line">		<span class="keyword">if</span>(L&lt;=R) <span class="built_in">cmax</span>(f[i],<span class="built_in">Get</span>(Q[L],i));</span><br><span class="line">		<span class="keyword">if</span>(L&lt;=R &amp;&amp; a[Q[R]]&gt;=a[i]) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="keyword">while</span>(L&lt;R &amp;&amp; <span class="built_in">Cross</span>(Q[R<span class="number">-1</span>],Q[R])&gt;=<span class="built_in">Cross</span>(Q[R],i)) R--;</span><br><span class="line">		Q[++R]=i;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">wt</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!x) <span class="keyword">return</span> (<span class="keyword">void</span>)<span class="built_in">putchar</span>(<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">char</span> buf[<span class="number">20</span>];</span><br><span class="line">	<span class="keyword">int</span> l=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(x) buf[++l]=x%<span class="number">10</span>+<span class="string">&#x27;0&#x27;</span>,x/=<span class="number">10</span>;</span><br><span class="line">	<span class="keyword">while</span>(l) <span class="built_in">putchar</span>(buf[l--]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>,t=<span class="number">1</span>;i&lt;=n;++i) _sqrt[i]=t+=i&gt;t*t;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) a[i]=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">Solve</span>();</span><br><span class="line">	<span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n+<span class="number">1</span>),<span class="built_in">reverse</span>(f+<span class="number">1</span>,f+n+<span class="number">1</span>);</span><br><span class="line">	<span class="built_in">Solve</span>();</span><br><span class="line">	<span class="built_in">drep</span>(i,n,<span class="number">1</span>) <span class="built_in">wt</span>(f[i]),<span class="built_in">putchar</span>(<span class="string">&#x27;\n&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+      <tags>
+        <tag>凸包|斜率优化|李超树</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CF1540E - Tasty Dishes</title>
     <url>/20756.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="CF1540E-Tasty-Dishes"><a href="#CF1540E-Tasty-Dishes" class="headerlink" title="CF1540E - Tasty Dishes"></a><a href="https://codeforces.com/problemset/problem/1540/E">CF1540E - Tasty Dishes</a></h1><h2 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h2><p>给定序列$a_i$，保证$|a_i|\leq i$</p>
@@ -2221,9 +2258,9 @@
       <tags>
         <tag>数据结构</tag>
         <tag>Codeforces</tag>
+        <tag>凸包|斜率优化|李超树</tag>
         <tag>树</tag>
         <tag>点分治</tag>
-        <tag>凸包|斜率优化|李超树</tag>
       </tags>
   </entry>
   <entry>
@@ -2261,9 +2298,9 @@
       </categories>
       <tags>
         <tag>Codeforces</tag>
+        <tag>凸包|斜率优化|李超树</tag>
         <tag>性质</tag>
         <tag>概率|期望</tag>
-        <tag>凸包|斜率优化|李超树</tag>
       </tags>
   </entry>
   <entry>
@@ -7111,8 +7148,8 @@
         <category>题解</category>
       </categories>
       <tags>
-        <tag>计算几何</tag>
         <tag>凸包|斜率优化|李超树</tag>
+        <tag>计算几何</tag>
         <tag>ROI</tag>
       </tags>
   </entry>
@@ -9377,8 +9414,8 @@ $\begin{aligned} \max \lbrace S\rbrace =\sum_{T\subseteq  S} (-1)^{|T|+1}\min\lb
         <category>题解</category>
       </categories>
       <tags>
-        <tag>COCI</tag>
         <tag>凸包|斜率优化|李超树</tag>
+        <tag>COCI</tag>
       </tags>
   </entry>
   <entry>
@@ -9638,8 +9675,8 @@ $\begin{aligned} \max \lbrace S\rbrace =\sum_{T\subseteq  S} (-1)^{|T|+1}\min\lb
         <category>题解</category>
       </categories>
       <tags>
-        <tag>COCI</tag>
         <tag>凸包|斜率优化|李超树</tag>
+        <tag>COCI</tag>
       </tags>
   </entry>
   <entry>
