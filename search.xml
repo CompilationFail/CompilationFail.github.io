@@ -1,6 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>UOJ Round#6 懒癌</title>
+    <url>/55275.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="UOJ-Round-6-懒癌"><a href="#UOJ-Round-6-懒癌" class="headerlink" title="UOJ Round#6 懒癌"></a>UOJ Round#6 懒癌</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>有$n$条狗，其中至少有一条得了懒癌。每个人可以看到一部分狗的情况，并且每天进行一轮推断</p>
+<p>当它推断出自己的狗一定有懒癌时，就会将自己的狗枪毙，并且所有人停止推断。如果有多个人同时推断出则同枪毙</p>
+<p>求在所有$2^n-1$种情况中，所有有狗被杀的情况中，一共过了多少天，枪毙了多少狗。</p>
+<p><br></p>
+<span id="more"></span>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>首先考虑用状压$dp$来模拟所有的情况和转移，设$dp_{S}$表示集合$S$中的狗得了懒癌时的最小推断步数</p>
+<p>我们考虑通过反推的方式进行转移，显然一个没有懒癌的狗永远不会被枪毙。</p>
+<ol>
+<li><p>边界条件：当一个人能看到所有狗，并且其他狗都没有懒癌时，直接枪毙，$dp_S=1$</p>
+</li>
+<li><p>反证法：</p>
+<p> 对于一个有懒癌的狗$i$进行反证</p>
+<ol>
+<li>先假设自己的狗没有病</li>
+<li>枚举所有可能的状态，即枚举所有<strong>看不到的狗</strong>是否得了病，得到后继状态集合$\text{next}(S,i)$</li>
+<li><p>如果$k$步以内所有可能情况均已经达成了结束，在这个状态却没有，说明假设不成立，在$k+1$天就会枪毙自己的狗。</p>
+<p>此时，设所有可能状态集合为$\text{next}(S,i)$，则答案为$dp_{S,i}=\max_{T\in\text{next}(S,i)}\{dp_T\}+1$</p>
+</li>
+</ol>
+</li>
+<li><p>总转移：$\displaystyle dp_{S}=\min_{i\in S} \{\max_{T\in\text{next}(S,i)}\{dp_T\}+1\}$</p>
+</li>
+</ol>
+<p>所有不会成环的状态均有结束状态（这里并没有处理枪毙了多少狗）</p>
+<p><br></p>
+<h4 id="简化转移"><a href="#简化转移" class="headerlink" title="简化转移"></a>简化转移</h4><p>从上面的转移式中容易看出：</p>
+<blockquote>
+<p> 对于$U\sube V$，一定有$dp_{U}\leq dp_V$</p>
+</blockquote>
+<p>故在转移时，不再需要枚举看不到的狗是否得了病，只需要考虑它们全部得病的情况。</p>
+<p><br></p>
+<h4 id="转移出现环的性质"><a href="#转移出现环的性质" class="headerlink" title="转移出现环的性质"></a>转移出现环的性质</h4><p>对于每个$i$<strong>看不到</strong>$j$的关系（$i\ne j$），从$i$向$j$连一条边，如果第$i$条狗有懒癌，则第$i$个点为黑点，否则为白点。</p>
+<p>考虑简化之后的转移的过程，转移后继有着怎样的特点：</p>
+<ol>
+<li>选择了一个$S$中的元素$i$，并且将其删除；将$i$出边的所有点加入$S$</li>
+<li>S$中的元素均没有出边时，才能够保证到达边界状态</li>
+</ol>
+<p>故在建成的图上，对于一个大小$&gt;1$的强连通分量（也就是存在环的分量）</p>
+<p>一旦其中出现了黑点，该状态就永远无法到达边界状态</p>
+<p>同样的，如果一个点<strong>能够到达一个环</strong>，那么这个点也不能是黑点</p>
+<p>将这些非法点剔除之后，设新的图为包含$n$个节点的$\text{DAG}$</p>
+<p><br></p>
+<h4 id="在-text-DAG-上统计答案"><a href="#在-text-DAG-上统计答案" class="headerlink" title="在$\text{DAG}$上统计答案"></a>在$\text{DAG}$上统计答案</h4><p>上文已经提到了转移过程在$\text{DAG}$上的体现，那么考虑一个状态如何到达边界：</p>
+<ol>
+<li>选择某一个 <strong>没有其他黑点能到达</strong> 的黑点，将它删掉，加入它的出边</li>
+<li>当$\text{DAG}$上不存在黑点时，状态结束，1过程进行的次数就是答案</li>
+</ol>
+<ul>
+<li><p>第一问</p>
+<p>  只需要考虑每个点被进行1操作的次数。</p>
+<p>  容易发现，如果右一个黑点能够到达$i$，它就会被操作一次。</p>
+<p>  故只需要统计出有多少点能够到达$i$（包括$i$自己），设为$f_i$，答案就是$\sum (2^{f_i}-1)2^{n-f_i}$</p>
+</li>
+<li><p>第二问</p>
+<p>  显然我们需要统计每一条狗被枪毙的次数。</p>
+<p>  考虑上面的转移对应着一个怎样的推导过程：</p>
+<ol>
+<li>在一开始的集合枚举了一个点$i$，得到一个后继状态</li>
+<li>经过一系列后继状态的转移到达边界，发现矛盾</li>
+<li><p>一开始被枚举的那个$i$被枪毙</p>
+<p>那么被枪毙的狗，实际上就是 某一个 <strong>没有其他黑点能到达</strong> 的黑点。</p>
+<p>容易发现答案就是$\sum 2^{n-f_i}$</p>
+</li>
+</ol>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>题解</category>
+      </categories>
+  </entry>
+  <entry>
     <title>[BZOJ2216][Poi2011]Lightning Conductor</title>
     <url>/27230.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h1 id="BZOJ2216-Luogu-P3515-Poi2011-Lightning-Conductor-线性解法"><a href="#BZOJ2216-Luogu-P3515-Poi2011-Lightning-Conductor-线性解法" class="headerlink" title="[BZOJ2216|Luogu P3515] [Poi2011]Lightning Conductor (线性解法)"></a>[BZOJ2216|Luogu P3515] [Poi2011]Lightning Conductor (线性解法)</h1><p><del>老题了，当年写了决策单调性就没有管了</del></p>
