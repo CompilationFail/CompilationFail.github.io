@@ -214,6 +214,282 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/29790.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/29790.html" class="post-title-link" itemprop="url">优雅的万能欧几里得</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-01-17 00:59:24 / Modified: 01:07:49" itemprop="dateCreated datePublished" datetime="2022-01-17T00:59:24+08:00">2022-01-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="优雅的万能欧几里得"><a href="#优雅的万能欧几里得" class="headerlink" title="优雅的万能欧几里得"></a>优雅的万能欧几里得</h1><blockquote>
+<p>取自 CTT 2022 Day4 T3 （或许是2021?）</p>
+</blockquote>
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>考虑用以下方法描述一个万能欧几里得问题：</p>
+<p>有一条端点为 $(0,0)\rightarrow (A,B)$ 的有向线段 $OP$，我们认为其两端都是空的。</p>
+<p>其中 $A,B$ 是自然数，<strong>且</strong> $\gcd(A,B)=1$。（当 $g=\gcd(A,B)\ne 1$ 时，可以先求 $\frac{A}{g},\frac{B}{g}$ 的结果，然后将其复制 $g$ 次）。</p>
+<p>万能欧几里得问题要维护这样的一个过程：</p>
+<ol>
+<li><p>一开始我们有一个空字符串 $s$。</p>
+</li>
+<li><p>考虑点从 $O$ 移动到 $P$ 的过程：</p>
+<ol>
+<li>其 $x$ 坐标每经过一个整点，就向 $s$ 中加入字符 $\text{X}$。</li>
+<li>其 $y$ 坐标每经过一个整点，就向 $s$ 中加入字符 $\text{Y}$。</li>
+</ol>
+</li>
+</ol>
+<p>注意在 $O,P$ 处不加入字符。容易发现在 $\gcd(A,B)=1$ 时，不会出现同时经过 $x,y$ 上的整点。</p>
+<p>下图是 $P=(3,5)$ 时的例子，此时的字符串为 $\text{YXYYXY}$。</p>
+<p><img src="https://s2.loli.net/2022/01/15/uLNMmzbpjh8Gfi1.png" alt="line.png" style="zoom:50%;" /></p>
+<p>在实际的应用中，我们用 $\text{X,Y}$ 指代任何<strong>可拼接且满足结合律</strong>的操作（如矩阵）。</p>
+<h3 id="问题求解"><a href="#问题求解" class="headerlink" title="问题求解"></a>问题求解</h3><p>用四元组 $(A,B,\text{X},\text{Y})$ 描述这样的一个万能欧几里得问题，则可以如下递归求解：</p>
+<ol>
+<li>若 $B\ge A$，则每次在 $x$ 增加之前， $y$  都会增加 $\lfloor\frac{B}{A} \rfloor$ 个，可以转化为 $(A,B\mod A,\text{X},\text{X}\cdot \lfloor\frac{B}{A} \rfloor+\text{Y})$。</li>
+<li>若 $B&lt;A$，则可以直接翻转坐标系，转化为求解 $(B,A,\text{Y},\text{X})$。（而网上许多教程的翻转操作都需要处理复杂的边界条件）。</li>
+</ol>
+<h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p>设 $l=\lfloor\frac{B}{A} \rfloor$，递归时需要处理 $\text{X}\cdot l$，这是一个快速幂操作，其复杂度为 $\log l$。</p>
+<p>而 $B\mod A=B-A\cdot l\leq \frac{1}{l+1} B$，所以所有快速幂的复杂度总和为 $\log A+\log B$。</p>
+<h3 id="区间查询"><a href="#区间查询" class="headerlink" title="区间查询"></a>区间查询</h3><p>考虑万能欧几里得的过程，容易发现其中只有两种操作：</p>
+<ol>
+<li>快速幂</li>
+<li>直接拼接</li>
+</ol>
+<p>如果我们用一个节点描述一个操作，就可以用二叉树的结构维护拼接操作。</p>
+<p>对于快速幂，只需要对于节点进行可持久化。</p>
+<p>而万能欧几里得所产生的二叉树至多只有 $\log $ 层，在这样的二叉树上查询的复杂度与线段树相同。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/54771.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/54771.html" class="post-title-link" itemprop="url">「BalticOI 2021 Day1」Inside information</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-01-17 00:57:14 / Modified: 01:07:49" itemprop="dateCreated datePublished" datetime="2022-01-17T00:57:14+08:00">2022-01-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="「BalticOI-2021-Day1」Inside-information"><a href="#「BalticOI-2021-Day1」Inside-information" class="headerlink" title="「BalticOI 2021 Day1」Inside information"></a>「BalticOI 2021 Day1」Inside information</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>有 $n$ 个集合 $S_i$ ，一开始 $S_i=\{i\}$。</p>
+<p>执行 $m$ 个操作：</p>
+<ol>
+<li>选择 $u,v$ ，令 $S_u,S_v:=S_u\cup S_v$。</li>
+<li>对于 $u,x$，回答 $[x\in S_u]$。</li>
+<li>对于 $x$，回答 $\sum_i [x\in S_i]$。</li>
+</ol>
+<p>保证操作 $1$ 恰好出现 $n-1$ 次，且所有边 $(u,v)$ 构成一棵树。</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>题目保证或操作构成一棵树，考虑一个熟悉的问题：</p>
+<blockquote>
+<p> 每次选择两个点连边，维护连通块中的点集。</p>
+<p> 用并查集+线段树合并处理。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/54771.html#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/6893.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Header1000.jpg">
+      <meta itemprop="name" content="orangejuice">
+      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Orangejuice's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/6893.html" class="post-title-link" itemprop="url">「BalticOI 2021 Day1」A Difficult Choice</a>
+        </h2>
+
+        <div class="post-meta">
+		
+
+	
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-01-17 00:56:29 / Modified: 01:07:49" itemprop="dateCreated datePublished" datetime="2022-01-17T00:56:29+08:00">2022-01-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="「BalticOI-2021-Day1」A-Difficult-Choice"><a href="#「BalticOI-2021-Day1」A-Difficult-Choice" class="headerlink" title="「BalticOI 2021 Day1」A Difficult Choice"></a>「BalticOI 2021 Day1」A Difficult Choice</h1><h3 id="题目大意"><a href="#题目大意" class="headerlink" title="题目大意"></a>题目大意</h3><p>这是一道交互题，有一个长度为 $n$ 且未知的正整数序列 $a_i$，保证其单调递增。</p>
+<p>你可以用任意顺序询问其中至多 $S$ 个数，并且对于给定的阈值 $A$ 和大小 $k$，要求从 $n$ 个数中选出 $k$ 个数（不能重复），使得它们的和 $\in [A,2A]$。</p>
+<p><br></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/6893.html#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/64139.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -242,7 +518,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-11-17 14:48:42 / Modified: 14:49:05" itemprop="dateCreated datePublished" datetime="2021-11-17T14:48:42+08:00">2021-11-17</time>
+              <time title="Created: 2021-11-17 14:48:42 / Modified: 14:49:50" itemprop="dateCreated datePublished" datetime="2021-11-17T14:48:42+08:00">2021-11-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -794,265 +1070,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/65250.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/65250.html" class="post-title-link" itemprop="url">C++ lambda 表达式</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-09-05 19:25:42" itemprop="dateCreated datePublished" datetime="2021-09-05T19:25:42+08:00">2021-09-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-09-06 10:31:07" itemprop="dateModified" datetime="2021-09-06T10:31:07+08:00">2021-09-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="C-lambda-表达式"><a href="#C-lambda-表达式" class="headerlink" title="C++ lambda 表达式"></a>C++ lambda 表达式</h1><p>测试了一下关于lambda语法的一些小问题</p>
-<p>一个lambda表达式：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[定义capture外部变量的情况] (参数列表) -&gt;返回值类型 &#123; /.../; &#125;</span><br></pre></td></tr></table></figure>
-<p>这个表达式返回一个函数指针</p>
-<p>（在C++11里，一个函数指针的对象是类似<code>function &lt;int(int,int)&gt;</code>的，见<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/w/index.php?title=C%2B%2B11&amp;action=edit&amp;section=45">wiki：多态函数对象包装器</a>]）</p>
-<h3 id="1-capture外部变量"><a href="#1-capture外部变量" class="headerlink" title="1.capture外部变量"></a>1.capture外部变量</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/65250.html#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/43836.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/43836.html" class="post-title-link" itemprop="url">2021百度之星复赛部分题解</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-08-23 09:11:42 / Modified: 11:01:37" itemprop="dateCreated datePublished" datetime="2021-08-23T09:11:42+08:00">2021-08-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">题解</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="2021百度之星复赛部分题解"><a href="#2021百度之星复赛部分题解" class="headerlink" title="2021百度之星复赛部分题解"></a>2021百度之星复赛部分题解</h1><h3 id="T1"><a href="#T1" class="headerlink" title="T1"></a>T1</h3><p> $n,m\leq 2$的情况需要特殊讨论</p>
-<p>其余的，$m$为奇数时是二分图，一定成立</p>
-<p>$m$为偶数时，只有$n=m$​成立</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> n,m;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">    <span class="built_in">rep</span>(_,<span class="number">1</span>,<span class="built_in">rd</span>()) &#123;</span><br><span class="line">        n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>();</span><br><span class="line">        <span class="keyword">if</span>(n&gt;<span class="number">1</span> &amp;&amp; (m&amp;<span class="number">1</span> || (n&gt;<span class="number">2</span> &amp;&amp; m==n))) &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;Yes!&quot;</span>);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;No!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><br></p>
-<h3 id="T2"><a href="#T2" class="headerlink" title="T2"></a>T2</h3><p>有点难度的计数题，将序列剖分成相同符号的连续段，每段个数为$a_i$</p>
-<p>则按照+号和*谁开头谁末尾分成4类讨论，再枚举分段数</p>
-<p>即可把问题转化为若干个这样的子问题： 把+号分成$x$段，把*号分成$y$段</p>
-<p>容易发现这就是盒子有序的第二类斯特林数，可以$O(n^2)$预处理，$O(n)$​​完成一组询问的查询</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/43836.html#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/24510.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Header1000.jpg">
-      <meta itemprop="name" content="orangejuice">
-      <meta itemprop="description" content="有问题|闲逛|博客配置 可以看about">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Orangejuice's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/24510.html" class="post-title-link" itemprop="url">NOI2021游记</a>
-        </h2>
-
-        <div class="post-meta">
-		
-
-	
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-08-03 16:12:01 / Modified: 23:12:42" itemprop="dateCreated datePublished" datetime="2021-08-03T16:12:01+08:00">2021-08-03</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%B8%B8%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">游记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="NOI2021-游记"><a href="#NOI2021-游记" class="headerlink" title="NOI2021 游记"></a>NOI2021 游记</h1><h2 id="Day"><a href="#Day" class="headerlink" title="Day $-?$"></a>Day $-?$</h2><p>一如既往遨游于机房之中，但随时日渐去，颇有大限将至之感</p>
-<p>一波未平，一波又起，我的命运在烟花的风雨中将何去何从？</p>
-<p><br></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/24510.html#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/29/">29</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1122,7 +1143,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">280</span>
+          <span class="site-state-item-count">283</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1135,7 +1156,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-count">68</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1184,7 +1205,7 @@
 <div class="copyright">
   
   &copy; 2021:5:26 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="far fa-alicorn"></i>
   </span>
