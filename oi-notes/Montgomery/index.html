@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="title: &#39;Montgomery Reduction 算法流程与实际实现&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; Montgomery Reduction 算法流程与实际实现 下面默认对于模数 \(m\) 取模，由于这篇文章的重点是实现(其实就是我自己存一下板子)，因此没有证明。 使用注意： Montgomery Re">
+<meta property="og:type" content="article">
+<meta property="og:title" content="orangejuice&#39;s blog">
+<meta property="og:url" content="https://compilationfail.github.io/oi-notes/Montgomery/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="title: &#39;Montgomery Reduction 算法流程与实际实现&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; Montgomery Reduction 算法流程与实际实现 下面默认对于模数 \(m\) 取模，由于这篇文章的重点是实现(其实就是我自己存一下板子)，因此没有证明。 使用注意： Montgomery Re">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-12T04:32:40.520Z">
+<meta property="article:modified_time" content="2023-08-12T04:32:40.521Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-notes/Montgomery/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-notes/Montgomery/","path":"oi-notes/Montgomery/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#montgomery-reduction-%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E4%B8%8E%E5%AE%9E%E9%99%85%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">Montgomery Reduction
+算法流程与实际实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F"><span class="nav-number">1.0.1.</span> <span class="nav-text">使用注意：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#montgomery-reduction%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3%E7%AE%80%E4%BB%8B"><span class="nav-number">1.0.2.</span> <span class="nav-text">Montgomery
+Reduction算法思想简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8%E7%AE%80%E4%BB%8B"><span class="nav-number">1.0.3.</span> <span class="nav-text">编程上的应用简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86m"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">1. 预处理\(m&#39;\)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reduce%E6%96%B9%E6%B3%95"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">2. reduce方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E6%95%B0%E8%BD%ACmontgomery-reduction"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">3. 普通数转Montgomery
+Reduction</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#montomery%E8%BF%90%E7%AE%97"><span class="nav-number">1.0.3.4.</span> <span class="nav-text">4. Montomery运算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#montomery-reduction%E8%BD%AC%E6%99%AE%E9%80%9A%E6%95%B0"><span class="nav-number">1.0.3.5.</span> <span class="nav-text">5. Montomery Reduction转普通数</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">229</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/Montgomery/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><hr />
+<p>title: 'Montgomery Reduction 算法流程与实际实现' date: 'Sat Aug 12
+11:05:23 2023 categories: - oi-notes'</p>
+<h1 id="montgomery-reduction-算法流程与实际实现">Montgomery Reduction
+算法流程与实际实现</h1>
+<p>下面默认对于模数 <span class="math inline">\(m\)</span>
+取模，由于这篇文章的重点是实现<del>(其实就是我自己存一下板子)</del>，因此没有证明。</p>
+<h3 id="使用注意">使用注意：</h3>
+<p>Montgomery Reduction 相较于 Barret Reduction 来说，不需要使用
+__int128。</p>
+<p>但是有着更高的封装程度，因为<strong>涉及到普通数与 Montgomery
+Reduction 运算中间量的转化</strong>。</p>
+<p>另外，常见的 Montgomery Reduction 在编程竞赛中的应用
+<strong>要求模数为奇数</strong>。</p>
+<p>但是在 Min25 博客上来看，<strong>Montgomery
+似乎有着更高的效率</strong>。</p>
+<p>在工程领域， Montgomery 用于处理大二进制数的取模问题。</p>
+<span id="more"></span>
+<h3 id="montgomery-reduction算法思想简介">Montgomery
+Reduction算法思想简介</h3>
+<p>在计算取模运算的过程中，将每一个元素 <span
+class="math inline">\(T\)</span> 都乘上一个特定的值 <span
+class="math inline">\(R(R&gt;m,\gcd(R,m)=1)\)</span>。</p>
+<p>用特殊的方法处理相乘时除掉一个 <span class="math inline">\(R\)</span>
+的过程，从而避免取模运算。</p>
+<p>在使用的模数为常量时，编译器通常会自动加入 Barrett reduction
+的优化，因此实际上这个算法对于动态模数的情形更为适用。</p>
+<p><del>(你自己真不一定写得过STL，但是确实可以比STL块)</del></p>
+<p><br></p>
+<h3 id="编程上的应用简介">编程上的应用简介</h3>
+<p>对于 <span class="math inline">\(m\)</span> 为奇数的情况，取 <span
+class="math inline">\(R=2^{32}\)</span>，用
+<strong>自然溢出来代替取模/位运算位移代替除法</strong> 来加速运算。</p>
+<p>我们还需要令 <span class="math inline">\(m&#39; = -m^{-1} \mod
+R\)</span>，有结论：</p>
+<p>对于某一个数 <span class="math inline">\(T,0 \leq T &lt;
+mR\)</span>，若令 <span class="math inline">\(U = Tm’ \mod
+R\)</span>，则 <span class="math inline">\(\frac{T+Um}{R}\)</span>
+为整数，且 <span class="math inline">\(\frac{T+Um}{R}=TR^{-1} \mod
+m\)</span>。</p>
+<p>那么我们在计算 <span class="math inline">\(\frac{T}{R}\)</span>
+时，实际上只需要计算 <span
+class="math inline">\(\frac{T+Um}{R}\)</span>，可以预处理 <span
+class="math inline">\(m&#39;\)</span>，溢出计算 <span
+class="math inline">\(Tm&#39;\)</span>，位运算左移计算 <span
+class="math inline">\(\frac{T+Um}{R}\)</span>。</p>
+<p>实际使用时的实现，可以用一个类实现以下方法</p>
+<p>在实现时需要尤其注意不要出现溢出</p>
+<h4 id="预处理m">1. 预处理<span
+class="math inline">\(m&#39;\)</span></h4>
+<p><span class="math inline">\((R-\lfloor \frac{R}{m}\rfloor )\cdot
+(R\mod m)\)</span></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> u32=<span class="type">unsigned</span>;</span><br><span class="line"><span class="keyword">using</span> i32=<span class="type">int</span>;</span><br><span class="line"><span class="keyword">using</span> u64=<span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="keyword">using</span> i64=<span class="type">long</span> <span class="type">long</span>;</span><br><span class="line"><span class="comment">// inv=m&#x27;</span></span><br><span class="line">u32 m;</span><br><span class="line"><span class="function">u32 <span class="title">getinv</span><span class="params">()</span></span>&#123;</span><br><span class="line">	u32 inv=m;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">4</span>;++i) inv*=<span class="number">2</span>-inv*m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="reduce方法">2. reduce方法</h4>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">u32 <span class="title">reduce</span><span class="params">(u64 x)</span> </span>&#123;</span><br><span class="line">    u32 y = <span class="built_in">u32</span>(x &gt;&gt; <span class="number">32</span>) - <span class="built_in">u32</span>((<span class="built_in">u64</span>(<span class="built_in">u32</span>(x)*inv)*m) &gt;&gt; <span class="number">32</span>);</span><br><span class="line">    <span class="comment">// 先取u32(x)得到x mod R ，然后再转成u64进行乘法</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">i32</span>(y) &lt; <span class="number">0</span> ? y + m : y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="普通数转montgomery-reduction">3. 普通数转Montgomery
+Reduction</h4>
+<p>我们要计算<span class="math inline">\(x\rightarrow xR=x\cdot
+2^{32}\)</span>，但是如果直接用取模就失去了意义。。。</p>
+<p>方法是快速计算<span class="math inline">\(x\cdot
+R^2\)</span>，然后reduce一次</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">u32 R2=-<span class="built_in">u64</span>(m)%m;</span><br><span class="line"><span class="function">u32 <span class="title">intToMont</span><span class="params">(i32 x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*R2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span class="math display">\[ \ \]</span></p>
+<h4 id="montomery运算">4. Montomery运算</h4>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">u32 <span class="title">Add</span><span class="params">(u32 x,u32 y)</span> </span>&#123;</span><br><span class="line">    x+=y-m;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">i32</span>(x&lt;<span class="number">0</span>)?x+m:x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">u32 <span class="title">Dec</span><span class="params">(u32 x,u32 y)</span></span>&#123;</span><br><span class="line">    x-=y;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">i32</span>(x&lt;<span class="number">0</span>)?x+m:x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">u32 <span class="title">Mul</span><span class="params">(u32 x,u32 y)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span class="math display">\[ \ \]</span></p>
+<h4 id="montomery-reduction转普通数">5. Montomery Reduction转普通数</h4>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">i32 <span class="title">get</span><span class="params">(u32 x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">reduce</span>(x);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>封装之后，得到板子一号，这个是动态模数的。。。</p>
+<p>实现上可能的误区：</p>
+<p>为什么不用 -inv? 避免加法，原因是加法取模要和 m 比较</p>
+<p>同样的，下面的 i32(y)&lt;0 语句可以被替换为 y&gt;=m
+(负数溢出)，看似减少一次类型转换，但是实际上0作为常量比较快得多</p>
+<p>加法运算时也是类似的原因，x&gt;=m 比较实在太慢，因此强制减去一个
+m，然后和 0 比</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> u32=<span class="type">uint32_t</span>;</span><br><span class="line"><span class="keyword">using</span> i32=<span class="type">int32_t</span>;</span><br><span class="line"><span class="keyword">using</span> u64=<span class="type">uint64_t</span>;</span><br><span class="line"><span class="keyword">using</span> i64=<span class="type">int64_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> u32 m,inv,r2,P;</span><br><span class="line"><span class="function">u32 <span class="title">getinv</span><span class="params">()</span></span>&#123;</span><br><span class="line">    u32 inv=m;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">4</span>;++i) inv*=<span class="number">2</span>-inv*m;</span><br><span class="line">    <span class="keyword">return</span> inv;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Mont</span>&#123;</span><br><span class="line"><span class="keyword">private</span> :</span><br><span class="line">    u32 x;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">    <span class="function"><span class="type">static</span> u32 <span class="title">reduce</span><span class="params">(u64 x)</span></span>&#123; </span><br><span class="line">        u32 y=<span class="built_in">u32</span>(x&gt;&gt;<span class="number">32</span>)-<span class="built_in">u32</span>((<span class="built_in">u64</span>(<span class="built_in">u32</span>(x)*inv)*m)&gt;&gt;<span class="number">32</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">i32</span>(y)&lt;<span class="number">0</span>?y+m:y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Mont</span>()&#123; ; &#125;</span><br><span class="line">    <span class="built_in">Mont</span>(i32 x):<span class="built_in">x</span>(<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*r2)) &#123; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> += (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x+=rhs.x-m,<span class="built_in">is32</span>(x)&lt;<span class="number">0</span>&amp;&amp;(x+=m),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> -= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x-=rhs.x,<span class="built_in">i32</span>(x)&lt;<span class="number">0</span>&amp;&amp;(x+=m),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> *= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x=<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*rhs.x),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> + (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x+=y; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> - (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x-=y; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> * (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x*=y; &#125;</span><br><span class="line">    <span class="function">i32 <span class="title">get</span><span class="params">()</span></span>&#123; <span class="keyword">return</span> <span class="built_in">reduce</span>(x); &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Init</span><span class="params">(<span class="type">int</span> m)</span> </span>&#123; </span><br><span class="line">    ::m=m;</span><br><span class="line">    inv=-<span class="built_in">getinv</span>();</span><br><span class="line">    r2=-<span class="built_in">u64</span>(m)%m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>动态模数的方法，计算 <span class="math inline">\(5\cdot 10^7!\mod
+998244353\)</span> 在 duck.ac 上评测结果，时间单位是微秒<span
+class="math inline">\(\mu s\)</span>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Naive Mod     : 213689172  Time: 518352</span><br><span class="line">My Montgomery : 213689172  Time: 192195</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<p><br></p>
+<p>这个是我自己写的静态模数的，因为模数是静态的，所以不需要一定和0比较大小</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="type">uint32_t</span> m&gt; <span class="keyword">struct</span> <span class="title class_">Mont</span>&#123;</span><br><span class="line"><span class="keyword">private</span> :</span><br><span class="line">    <span class="keyword">using</span> u32=<span class="type">uint32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> i32=<span class="type">int32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> u64=<span class="type">uint64_t</span>;</span><br><span class="line">    <span class="keyword">using</span> i64=<span class="type">int64_t</span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">getinv</span><span class="params">()</span></span>&#123;</span><br><span class="line">        u32 inv=m;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">4</span>;++i) inv*=<span class="number">2</span>-inv*m;</span><br><span class="line">        <span class="keyword">return</span> inv;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">constexpr</span> u32 inv=-<span class="built_in">getinv</span>(),r2=-<span class="built_in">u64</span>(m)%m;</span><br><span class="line">    u32 x;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">reduce</span><span class="params">(u64 x)</span></span>&#123; </span><br><span class="line">        u32 y=(x+<span class="built_in">u64</span>(<span class="built_in">u32</span>(x)*inv)*m)&gt;&gt;<span class="number">32</span>;</span><br><span class="line">        <span class="keyword">return</span> y&gt;=m?y-m:y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Mont</span>()&#123; ; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">Mont</span><span class="params">(i32 x)</span>:x(reduce(u64(x)*r2)) &#123;</span> &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont&amp; <span class="keyword">operator</span> += (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x+=rhs.x-m,x&gt;=m&amp;&amp;(x+=m),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont&amp; <span class="keyword">operator</span> -= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x-=rhs.x,x&gt;=m&amp;&amp;(x+=m),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont&amp; <span class="keyword">operator</span> *= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x=<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*rhs.x),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont <span class="keyword">operator</span> + (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x+=y; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont <span class="keyword">operator</span> - (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x-=y; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont <span class="keyword">operator</span> * (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x*=y; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> i32 <span class="title">get</span><span class="params">()</span></span>&#123; <span class="keyword">return</span> <span class="built_in">reduce</span>(x); &#125;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这个是摘自 <a target="_blank" rel="noopener" href="https://loj.ac/s/864511">LOJ多项式乘法
+hly1204的提交记录</a></p>
+<p>个人解读：实际上每次存储的是 <span class="math inline">\(x \mod
+2m\)</span> 的值，避免了reduce时的加减取模。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// from https://min-25.hatenablog.com/entry/2017/08/20/171214</span></span><br><span class="line"><span class="keyword">template</span> &lt;std::<span class="type">uint32_t</span> P&gt; <span class="keyword">struct</span> <span class="title class_">MontgomeryModInt32</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">using</span> i32 = std::<span class="type">int32_t</span>;</span><br><span class="line">  <span class="keyword">using</span> u32 = std::<span class="type">uint32_t</span>;</span><br><span class="line">  <span class="keyword">using</span> i64 = std::<span class="type">int64_t</span>;</span><br><span class="line">  <span class="keyword">using</span> u64 = std::<span class="type">uint64_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  u32 v;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">get_r</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    u32 iv = P;</span><br><span class="line">    <span class="keyword">for</span> (u32 i = <span class="number">0</span>; i != <span class="number">4</span>; ++i) iv *= <span class="number">2</span> - P * iv;</span><br><span class="line">    <span class="keyword">return</span> iv;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="type">static</span> <span class="keyword">constexpr</span> u32 r = -<span class="built_in">get_r</span>(), r2 = -<span class="built_in">u64</span>(P) % P;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">static_assert</span>((P &amp; <span class="number">1</span>) == <span class="number">1</span>);</span><br><span class="line">  <span class="built_in">static_assert</span>(r * P == <span class="number">-1</span>);</span><br><span class="line">  <span class="built_in">static_assert</span>(P &lt; (<span class="number">1</span> &lt;&lt; <span class="number">30</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">pow_mod</span><span class="params">(u32 x, u64 y)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ((y %= P - <span class="number">1</span>) &lt; <span class="number">0</span>) y += P - <span class="number">1</span>;</span><br><span class="line">    u32 res = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (; y != <span class="number">0</span>; y &gt;&gt;= <span class="number">1</span>, x = <span class="built_in">u64</span>(x) * x % P)</span><br><span class="line">      <span class="keyword">if</span> (y &amp; <span class="number">1</span>) res = <span class="built_in">u64</span>(res) * x % P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">get_pr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    u32 tmp[<span class="number">32</span>] = &#123;&#125;, cnt = <span class="number">0</span>;</span><br><span class="line">    <span class="type">const</span> u64 phi = P - <span class="number">1</span>;</span><br><span class="line">    u64 m = phi;</span><br><span class="line">    <span class="keyword">for</span> (u64 i = <span class="number">2</span>; i * i &lt;= m; ++i) &#123;</span><br><span class="line">      <span class="keyword">if</span> (m % i == <span class="number">0</span>) &#123;</span><br><span class="line">        tmp[cnt++] = i;</span><br><span class="line">        <span class="keyword">while</span> (m % i == <span class="number">0</span>) m /= i;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (m &gt; <span class="number">1</span>) tmp[cnt++] = m;</span><br><span class="line">    <span class="keyword">for</span> (u64 res = <span class="number">2</span>; res &lt;= phi; ++res) &#123;</span><br><span class="line">      <span class="type">bool</span> flag = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">for</span> (u32 i = <span class="number">0</span>; i != cnt &amp;&amp; flag; ++i) flag &amp;= <span class="built_in">pow_mod</span>(res, phi / tmp[i]) != <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">if</span> (flag) <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">MontgomeryModInt32</span>() = <span class="keyword">default</span>;</span><br><span class="line">  ~<span class="built_in">MontgomeryModInt32</span>() = <span class="keyword">default</span>;</span><br><span class="line">  <span class="function"><span class="keyword">constexpr</span> <span class="title">MontgomeryModInt32</span><span class="params">(u32 v)</span> : v(reduce(u64(v) * r2)) &#123;</span>&#125;</span><br><span class="line">  <span class="function"><span class="keyword">constexpr</span> <span class="title">MontgomeryModInt32</span><span class="params">(<span class="type">const</span> MontgomeryModInt32 &amp;rhs)</span> : v(rhs.v) &#123;</span>&#125;</span><br><span class="line">  <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">reduce</span><span class="params">(u64 x)</span> </span>&#123; <span class="keyword">return</span> x + (<span class="built_in">u64</span>(<span class="built_in">u32</span>(x) * r) * P) &gt;&gt; <span class="number">32</span>; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">constexpr</span> u32 <span class="title">get</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">    u32 res = <span class="built_in">reduce</span>(v);</span><br><span class="line">    <span class="keyword">return</span> res - (P &amp; -(res &gt;= P));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="keyword">constexpr</span> <span class="keyword">operator</span> <span class="title">u32</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">get</span>(); &#125;</span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="keyword">constexpr</span> <span class="keyword">operator</span> <span class="title">i32</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">i32</span>(<span class="built_in">get</span>()); &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 &amp;<span class="keyword">operator</span>=(<span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> v = rhs.v, *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 <span class="keyword">operator</span>-() <span class="type">const</span> &#123;</span><br><span class="line">    MontgomeryModInt32 res;</span><br><span class="line">    <span class="keyword">return</span> res.v = (P &lt;&lt; <span class="number">1</span> &amp; -(v != <span class="number">0</span>)) - v, res;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">constexpr</span> MontgomeryModInt32 <span class="title">inv</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">pow</span>(<span class="number">-1</span>); &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 &amp;<span class="keyword">operator</span>+=(<span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> v += rhs.v - (P &lt;&lt; <span class="number">1</span>), v += P &lt;&lt; <span class="number">1</span> &amp; -(<span class="built_in">i32</span>(v) &lt; <span class="number">0</span>), *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 &amp;<span class="keyword">operator</span>-=(<span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> v -= rhs.v, v += P &lt;&lt; <span class="number">1</span> &amp; -(<span class="built_in">i32</span>(v) &lt; <span class="number">0</span>), *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 &amp;<span class="keyword">operator</span>*=(<span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> v = <span class="built_in">reduce</span>(<span class="built_in">u64</span>(v) * rhs.v), *<span class="keyword">this</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">constexpr</span> MontgomeryModInt32 &amp;<span class="keyword">operator</span>/=(<span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>-&gt;<span class="keyword">operator</span>*=(rhs.<span class="built_in">inv</span>());</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> MontgomeryModInt32 <span class="keyword">operator</span>+(<span class="type">const</span> MontgomeryModInt32 &amp;lhs,</span><br><span class="line">                                      <span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">MontgomeryModInt32</span>(lhs) += rhs;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> MontgomeryModInt32 <span class="keyword">operator</span>-(<span class="type">const</span> MontgomeryModInt32 &amp;lhs,</span><br><span class="line">                                      <span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">MontgomeryModInt32</span>(lhs) -= rhs;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> MontgomeryModInt32 <span class="keyword">operator</span>*(<span class="type">const</span> MontgomeryModInt32 &amp;lhs,</span><br><span class="line">                                      <span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">MontgomeryModInt32</span>(lhs) *= rhs;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> MontgomeryModInt32 <span class="keyword">operator</span>/(<span class="type">const</span> MontgomeryModInt32 &amp;lhs,</span><br><span class="line">                                      <span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">MontgomeryModInt32</span>(lhs) /= rhs;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> std::istream &amp;<span class="keyword">operator</span>&gt;&gt;(std::istream &amp;is, MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> is &gt;&gt; rhs.v, rhs.v = <span class="built_in">reduce</span>(<span class="built_in">u64</span>(rhs.v) * r2), is;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">friend</span> std::ostream &amp;<span class="keyword">operator</span>&lt;&lt;(std::ostream &amp;os, <span class="type">const</span> MontgomeryModInt32 &amp;rhs) &#123;</span><br><span class="line">    <span class="keyword">return</span> os &lt;&lt; rhs.<span class="built_in">get</span>();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">constexpr</span> MontgomeryModInt32 <span class="title">pow</span><span class="params">(i64 y)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ((y %= P - <span class="number">1</span>) &lt; <span class="number">0</span>) y += P - <span class="number">1</span>; <span class="comment">// phi(P) = P - 1, assume P is a prime number</span></span><br><span class="line">    <span class="function">MontgomeryModInt32 <span class="title">res</span><span class="params">(<span class="number">1</span>)</span>, <span class="title">x</span><span class="params">(*<span class="keyword">this</span>)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (; y != <span class="number">0</span>; y &gt;&gt;= <span class="number">1</span>, x *= x)</span><br><span class="line">      <span class="keyword">if</span> (y &amp; <span class="number">1</span>) res *= x;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这个是计算 <span class="math inline">\(5\cdot 10^7!\mod
+998244353\)</span> 在 duck.ac 上的测试结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Naive Mod      : 213689172  Time: 180649</span><br><span class="line">My Montgomery  : 213689172  Time: 178217</span><br><span class="line">His Montgomery : 213689172  Time: 152847</span><br></pre></td></tr></table></figure>
+<p>这个是计算 <span class="math inline">\(7\cdot 10^7!\mod
+998244353\)</span> 在 duck.ac 上的测试结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Naive Mod      : 939830261  Time: 252908</span><br><span class="line">My Montgomery  : 939830261  Time: 249476</span><br><span class="line">His Montgomery : 939830261  Time: 213986</span><br></pre></td></tr></table></figure>
+<p>还可以看Min25博客里下面的ModInt64板本</p>
+<p><a
+target="_blank" rel="noopener" href="https://min-25.hatenablog.com/entry/2017/08/20/171214">传送门</a></p>
+<p>下面自己实现的<span class="math inline">\(\mod 2m\)</span>
+版本，差不多也是最终版本了，跑起来和hly1204差不多</p>
+<p>静态版本</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="type">uint32_t</span> m&gt; <span class="keyword">struct</span> <span class="title class_">Mont2</span>&#123;</span><br><span class="line"><span class="keyword">private</span> :</span><br><span class="line">    <span class="keyword">using</span> u32=<span class="type">uint32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> i32=<span class="type">int32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> u64=<span class="type">uint64_t</span>;</span><br><span class="line">    <span class="keyword">using</span> i64=<span class="type">int64_t</span>;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">constexpr</span> u32 m2=m&lt;&lt;<span class="number">1</span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">getinv</span><span class="params">()</span></span>&#123;</span><br><span class="line">        u32 inv=m;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">4</span>;++i) inv*=<span class="number">2</span>-inv*m;</span><br><span class="line">        <span class="keyword">return</span> inv;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">constexpr</span> u32 inv=-<span class="built_in">getinv</span>(),r2=-<span class="built_in">u64</span>(m)%m;</span><br><span class="line">    u32 x;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="keyword">constexpr</span> u32 <span class="title">reduce</span><span class="params">(u64 x)</span></span>&#123; </span><br><span class="line">        <span class="keyword">return</span> (x+<span class="built_in">u64</span>(<span class="built_in">u32</span>(x)*inv)*m)&gt;&gt;<span class="number">32</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Mont2</span>()&#123; ; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">Mont2</span><span class="params">(i32 x)</span>:x(reduce(u64(x)*r2)) &#123;</span> &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont2&amp; <span class="keyword">operator</span> += (<span class="type">const</span> Mont2 &amp;rhs) &#123; <span class="keyword">return</span> x+=rhs.x-m2,x&gt;=m2&amp;&amp;(x+=m2),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont2&amp; <span class="keyword">operator</span> -= (<span class="type">const</span> Mont2 &amp;rhs) &#123; <span class="keyword">return</span> x-=rhs.x,x&gt;=m2&amp;&amp;(x+=m2),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> Mont2&amp; <span class="keyword">operator</span> *= (<span class="type">const</span> Mont2 &amp;rhs) &#123; <span class="keyword">return</span> x=<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*rhs.x),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont2 <span class="keyword">operator</span> + (Mont2 x,<span class="type">const</span> Mont2 &amp;y) &#123; <span class="keyword">return</span> x+=y; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont2 <span class="keyword">operator</span> - (Mont2 x,<span class="type">const</span> Mont2 &amp;y) &#123; <span class="keyword">return</span> x-=y; &#125;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="keyword">friend</span> Mont2 <span class="keyword">operator</span> * (Mont2 x,<span class="type">const</span> Mont2 &amp;y) &#123; <span class="keyword">return</span> x*=y; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> i32 <span class="title">get</span><span class="params">()</span></span>&#123; </span><br><span class="line">        u32 res=<span class="built_in">reduce</span>(x); </span><br><span class="line">        <span class="keyword">return</span> res&gt;=m?res-m:res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; ;</span><br></pre></td></tr></table></figure>
+<p>板子各有优劣.jpg</p>
+<p>另外这是 Int_To_Montgomery 加法的速度，<span
+class="math inline">\(7\cdot 10^7\)</span> 次加法与类型转换。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Naive :        : 305907824 80074</span><br><span class="line">My Montgomery  : 305907824 109479</span><br><span class="line">My Montgomery2 : 305907824 99896</span><br><span class="line">His Montgomery : 305907824 117449</span><br></pre></td></tr></table></figure>
+<p>动态版本</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> u32=<span class="type">uint32_t</span>;</span><br><span class="line"><span class="keyword">using</span> i32=<span class="type">int32_t</span>;</span><br><span class="line"><span class="keyword">using</span> u64=<span class="type">uint64_t</span>;</span><br><span class="line"><span class="keyword">using</span> i64=<span class="type">int64_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> u32 m,m2,inv,r2,P;</span><br><span class="line"><span class="function">u32 <span class="title">getinv</span><span class="params">()</span></span>&#123;</span><br><span class="line">    u32 inv=m;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">4</span>;++i) inv*=<span class="number">2</span>-inv*m;</span><br><span class="line">    <span class="keyword">return</span> inv;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Mont</span>&#123;</span><br><span class="line"><span class="keyword">private</span> :</span><br><span class="line">    u32 x;</span><br><span class="line"><span class="keyword">public</span> :</span><br><span class="line">    <span class="function"><span class="type">static</span> u32 <span class="title">reduce</span><span class="params">(u64 x)</span></span>&#123; </span><br><span class="line">        u32 y=(x+<span class="built_in">u64</span>(<span class="built_in">u32</span>(x)*inv)*m)&gt;&gt;<span class="number">32</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">i32</span>(y)&lt;<span class="number">0</span>?y+m:y;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Mont</span>()&#123; ; &#125;</span><br><span class="line">    <span class="built_in">Mont</span>(i32 x):<span class="built_in">x</span>(<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*r2)) &#123; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> += (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x+=rhs.x-m2,<span class="built_in">i32</span>(x)&lt;<span class="number">0</span>&amp;&amp;(x+=m2),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> -= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x-=rhs.x,<span class="built_in">i32</span>(x)&lt;<span class="number">0</span>&amp;&amp;(x+=m2),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    Mont&amp; <span class="keyword">operator</span> *= (<span class="type">const</span> Mont &amp;rhs) &#123; <span class="keyword">return</span> x=<span class="built_in">reduce</span>(<span class="built_in">u64</span>(x)*rhs.x),*<span class="keyword">this</span>; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> + (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x+=y; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> - (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x-=y; &#125;</span><br><span class="line">    <span class="keyword">friend</span> Mont <span class="keyword">operator</span> * (Mont x,<span class="type">const</span> Mont &amp;y) &#123; <span class="keyword">return</span> x*=y; &#125;</span><br><span class="line">    <span class="function">i32 <span class="title">get</span><span class="params">()</span></span>&#123; </span><br><span class="line">        u32 res=<span class="built_in">reduce</span>(x);</span><br><span class="line">        <span class="keyword">return</span> res&gt;=m?res-m:res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Init</span><span class="params">(<span class="type">int</span> m)</span> </span>&#123; </span><br><span class="line">    ::m=m,m2=m*<span class="number">2</span>;</span><br><span class="line">    inv=-<span class="built_in">getinv</span>();</span><br><span class="line">    r2=-<span class="built_in">u64</span>(m)%m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个动态模板计算 <span class="math inline">\(5\cdot 10^7!\mod
+998244353\)</span>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Naive Mod      : 213689172 494061 (稍微修改了一下暴力的细节。。)</span><br><span class="line">My Montgomery2 : 213689172 152849</span><br></pre></td></tr></table></figure>
+<p>不得不说 duck.ac 真的很 nb。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E5%A4%8D%E5%90%88%E8%BF%90%E7%AE%97+%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E5%8F%8D%E6%BC%94/" rel="prev" title="">
+                  <i class="fa fa-angle-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E5%85%B3%E4%BA%8E%E7%89%A9%E5%93%81%E5%A4%A7%E5%B0%8F%E8%BE%83%E5%B0%8F%E7%9A%8401%E8%83%8C%E5%8C%85/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

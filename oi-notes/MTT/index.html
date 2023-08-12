@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="title: &#39;任意模数NTT(MTT)&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; 任意模数NTT(MTT) 模板题传送门 问题的简单描述为，求解两个值域为 \(\leq 10^9\) 的多项式卷积对于 \(P\leq 10^9\) 取模的结果。  问题不能直接用NTT&#x2F;FFT求解，因为均超过了值域范围（double值域承受">
+<meta property="og:type" content="article">
+<meta property="og:title" content="orangejuice&#39;s blog">
+<meta property="og:url" content="https://compilationfail.github.io/oi-notes/MTT/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="title: &#39;任意模数NTT(MTT)&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; 任意模数NTT(MTT) 模板题传送门 问题的简单描述为，求解两个值域为 \(\leq 10^9\) 的多项式卷积对于 \(P\leq 10^9\) 取模的结果。  问题不能直接用NTT&#x2F;FFT求解，因为均超过了值域范围（double值域承受">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-12T04:32:40.511Z">
+<meta property="article:modified_time" content="2023-08-12T04:32:40.511Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-notes/MTT/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-notes/MTT/","path":"oi-notes/MTT/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%BB%E6%84%8F%E6%A8%A1%E6%95%B0nttmtt"><span class="nav-number">1.</span> <span class="nav-text">任意模数NTT(MTT)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#solution13%E6%A8%A1%E6%95%B0ntt"><span class="nav-number">1.0.1.</span> <span class="nav-text">Solution1：3模数NTT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#solution2%E6%8B%86%E7%B3%BB%E6%95%B0fft"><span class="nav-number">1.0.2.</span> <span class="nav-text">Solution2：拆系数FFT</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">229</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/MTT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><hr />
+<p>title: '任意模数NTT(MTT)' date: 'Sat Aug 12 11:05:23 2023 categories:
+- oi-notes'</p>
+<h1 id="任意模数nttmtt">任意模数NTT(MTT)</h1>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4245">模板题传送门</a></p>
+<p>问题的简单描述为，求解两个值域为 <span class="math inline">\(\leq
+10^9\)</span> 的多项式卷积对于 <span class="math inline">\(P\leq
+10^9\)</span> 取模的结果。</p>
+<p><br></p>
+<p>问题不能直接用NTT/FFT求解，因为均超过了值域范围（double值域承受不了）。</p>
+<p><br></p>
+<h3 id="solution13模数ntt">Solution1：3模数NTT</h3>
+<p>取几个互质的模数分别做一次，然后用中国剩余定理合并。</p>
+<p>由于值域大，通常需要多次 NTT，且中国剩余定理合并常数也不小。</p>
+<p>实际代码实现也复杂，因此笔者认为不可取。</p>
+<p><br></p>
+<h3 id="solution2拆系数fft">Solution2：拆系数FFT</h3>
+<p>设 <span class="math inline">\(f(x)=\sum a_ix^i\)</span>。</p>
+<p>核心：将系数 <span class="math inline">\(a_i\)</span> 分解成 <span
+class="math inline">\(a_i=A_i\cdot S+C_i,b_i=B_i\cdot
+S+D_i\)</span>。</p>
+<p>(其中 <span class="math inline">\(S\ge \sqrt{P}\)</span> 是一个常数，
+<span class="math inline">\(0 \leq A_i,B_i,C_i,D_i&lt;S\)</span> )。</p>
+<p>目的是转化后使系数值域变小，double 精度可以承受。</p>
+<p>则最后的答案转化为求解 <span
+class="math inline">\(A_iB_jS^2+(C_iB_j+A_iD_j)S+C_iD_j\)</span>。</p>
+<p>即求解 <span
+class="math inline">\(A_iB_j,C_iB_j,A_iD_j,C_iD_j\)</span>
+，此时值域已经大大缩小。</p>
+<p>如果直接求解，可以看出要求解4次卷积，需要进行 <span
+class="math inline">\(12\)</span> 次<strong>FFT</strong>，不可接受。</p>
+<p>利用复数的一些性质，有些东西我们可以一起算。</p>
+<p>构造：</p>
+<ol type="1">
+<li><p><span class="math inline">\(f(x)=\sum
+(A_i,C_i)x^i\)</span>，</p></li>
+<li><p><span
+class="math inline">\(g(x)=\sum(B_i,D_i)x^i\)</span>，</p></li>
+<li><p><span class="math inline">\(f(x)g(x)=\sum \sum (A_iB_j-C_iD_j,
+A_iD_j+C_iB_j)x^{i+j}\)</span>。</p></li>
+</ol>
+<p>此时已经得到大部分值了，再构造：</p>
+<ol type="1">
+<li><p><span class="math inline">\(h(x)=\sum B_ix^i\)</span>，</p></li>
+<li><p><span class="math inline">\(f(x)h(x)=\sum \sum
+(A_iB_j,C_iB_j)x^{i+j}\)</span>。</p></li>
+</ol>
+<p>取一部分即可。</p>
+<p>最终一共有 5 次 FFT。</p>
+<p>Tips:</p>
+<p>1.这里的负数取整一定要注意，因为 C++ 默认是向 0
+取整，而不是向下取整。</p>
+<p>2.实际运行表明，这样写用 double 很难保证精度，应该要用 long
+double</p>
+<p>附:</p>
+<p>4次FFT做MTT，但是具体证明比较反人类，而代码非常好看且好写，所以建议直接背板子</p>
+<p>Tips:
+只要使用了上面提到的最适合FFT的板子，就可以用double，甚至可以开O2</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> MTT&#123;</span><br><span class="line">	<span class="type">const</span> <span class="type">double</span> PI=<span class="built_in">acos</span>((<span class="type">double</span>)<span class="number">-1</span>);</span><br><span class="line">	<span class="type">int</span> rev[N];</span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">Cp</span>&#123;</span><br><span class="line">		<span class="type">double</span> x,y;</span><br><span class="line">		<span class="built_in">Cp</span>()&#123; ; &#125;</span><br><span class="line">		<span class="built_in">Cp</span>(<span class="type">double</span> _x,<span class="type">double</span> _y): <span class="built_in">x</span>(_x),<span class="built_in">y</span>(_y)&#123; &#125; </span><br><span class="line">		<span class="keyword">inline</span> Cp <span class="keyword">operator</span> + (<span class="type">const</span> Cp &amp;t) <span class="type">const</span> &#123; <span class="keyword">return</span> (Cp)&#123;x+t.x,y+t.y&#125;; &#125;</span><br><span class="line">		<span class="keyword">inline</span> Cp <span class="keyword">operator</span> - (<span class="type">const</span> Cp &amp;t) <span class="type">const</span> &#123; <span class="keyword">return</span> (Cp)&#123;x-t.x,y-t.y&#125;; &#125;</span><br><span class="line">		<span class="keyword">inline</span> Cp <span class="keyword">operator</span> * (<span class="type">const</span> Cp &amp;t) <span class="type">const</span> &#123; <span class="keyword">return</span> (Cp)&#123;x*t.x-y*t.y,x*t.y+y*t.x&#125;; &#125;</span><br><span class="line">	&#125;A[N],B[N],C[N],w[N/<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="meta">#<span class="keyword">define</span> E(x) ll(x+0.5)%P</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">FFT</span><span class="params">(<span class="type">int</span> n,Cp *a,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(rev[i]&lt;i) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">		w[<span class="number">0</span>]=<span class="built_in">Cp</span>(<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">for</span>(reg <span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">			Cp t=<span class="built_in">Cp</span>(<span class="built_in">cos</span>(PI/i),f*<span class="built_in">sin</span>(PI/i));</span><br><span class="line">			<span class="keyword">for</span>(reg <span class="type">int</span> j=i<span class="number">-2</span>;j&gt;=<span class="number">0</span>;j-=<span class="number">2</span>) w[j+<span class="number">1</span>]=t*(w[j]=w[j&gt;&gt;<span class="number">1</span>]);</span><br><span class="line">            <span class="comment">// 上面提到的最优板子</span></span><br><span class="line">			<span class="keyword">for</span>(reg <span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=<span class="number">2</span>*i) &#123;</span><br><span class="line">				<span class="keyword">for</span>(reg <span class="type">int</span> j=l;j&lt;l+i;j++) &#123;</span><br><span class="line">					Cp t=a[j+i]*w[j-l];</span><br><span class="line">					a[j+i]=a[j]-t;</span><br><span class="line">					a[j]=a[j]+t;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(f==<span class="number">-1</span>) <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i].x/=n,a[i].y/=n;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Multiply</span><span class="params">(<span class="type">int</span> n,<span class="type">int</span> m,<span class="type">int</span> *a,<span class="type">int</span> *b,<span class="type">int</span> *res,<span class="type">int</span> P)</span></span>&#123;</span><br><span class="line">		<span class="comment">// [0,n-1]*[0,m-1]-&gt;[0,n+m-2]</span></span><br><span class="line">		<span class="type">int</span> S=(<span class="number">1</span>&lt;&lt;<span class="number">15</span>)<span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">		<span class="type">int</span> R=<span class="number">1</span>,cc=<span class="number">-1</span>;</span><br><span class="line">		<span class="keyword">while</span>(R&lt;=n+m<span class="number">-1</span>) R&lt;&lt;=<span class="number">1</span>,cc++;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,R) rev[i]=(rev[i&gt;&gt;<span class="number">1</span>]&gt;&gt;<span class="number">1</span>)|((i&amp;<span class="number">1</span>)&lt;&lt;cc);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) A[i]=<span class="built_in">Cp</span>((a[i]&amp;S),(a[i]&gt;&gt;<span class="number">15</span>));</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) B[i]=<span class="built_in">Cp</span>((b[i]&amp;S),(b[i]&gt;&gt;<span class="number">15</span>));</span><br><span class="line">		<span class="built_in">rep</span>(i,n,R<span class="number">-1</span>) A[i]=<span class="built_in">Cp</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line">		<span class="built_in">rep</span>(i,m,R<span class="number">-1</span>) B[i]=<span class="built_in">Cp</span>(<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">		<span class="built_in">FFT</span>(R,A,<span class="number">1</span>),<span class="built_in">FFT</span>(R,B,<span class="number">1</span>);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,R<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="type">int</span> j=(R-i)%R;</span><br><span class="line">			C[i]=<span class="built_in">Cp</span>((A[i].x+A[j].x)/<span class="number">2</span>,(A[i].y-A[j].y)/<span class="number">2</span>)*B[i];</span><br><span class="line">			B[i]=<span class="built_in">Cp</span>((A[i].y+A[j].y)/<span class="number">2</span>,(A[j].x-A[i].x)/<span class="number">2</span>)*B[i];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">FFT</span>(R,C,<span class="number">-1</span>),<span class="built_in">FFT</span>(R,B,<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n+m<span class="number">-2</span>) &#123;</span><br><span class="line">			ll a=<span class="built_in">E</span>(C[i].x),b=<span class="built_in">E</span>(C[i].y),c=<span class="built_in">E</span>(B[i].x),d=<span class="built_in">E</span>(B[i].y);</span><br><span class="line">			res[i]=(a+((b+c)&lt;&lt;<span class="number">15</span>)+(d&lt;&lt;<span class="number">30</span>))%P;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">#<span class="keyword">undef</span> E</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E6%9C%80%E5%B0%8F%E5%89%B2%E6%A0%91/" rel="prev" title="">
+                  <i class="fa fa-angle-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E6%8E%B7%E9%AA%B0%E5%AD%90+%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E7%AC%94%E8%AE%B0/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

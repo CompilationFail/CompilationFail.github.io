@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="title: &#39;FFT&amp;NTT（以及扩展）&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; FFT&amp;NTT（以及扩展） 预备知识：用于NTT NTT&#x2F;FFT其实本质相同，用途是快速求解 多项式乘积 前言 FT: 傅里叶变换: 这是一个工程上的概念，可以简述为：一个周期性的信号波段可以用 若干个正弦曲线 的带权和表示">
+<meta property="og:type" content="article">
+<meta property="og:title" content="orangejuice&#39;s blog">
+<meta property="og:url" content="https://compilationfail.github.io/oi-notes/NTT/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="title: &#39;FFT&amp;NTT（以及扩展）&#39; date: &#39;Sat Aug 12 11:05:23 2023 categories: - oi-notes&#39; FFT&amp;NTT（以及扩展） 预备知识：用于NTT NTT&#x2F;FFT其实本质相同，用途是快速求解 多项式乘积 前言 FT: 傅里叶变换: 这是一个工程上的概念，可以简述为：一个周期性的信号波段可以用 若干个正弦曲线 的带权和表示">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-12T04:32:40.517Z">
+<meta property="article:modified_time" content="2023-08-12T04:32:40.517Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-notes/NTT/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-notes/NTT/","path":"oi-notes/NTT/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#fftntt%E4%BB%A5%E5%8F%8A%E6%89%A9%E5%B1%95"><span class="nav-number">1.</span> <span class="nav-text">FFT&amp;NTT（以及扩展）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.0.1.</span> <span class="nav-text">前言</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%88%E5%8F%8A%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-number">1.1.</span> <span class="nav-text">谈及核心思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fft%E7%9A%84%E5%8D%95%E4%BD%8D%E6%A0%B9"><span class="nav-number">1.2.</span> <span class="nav-text">FFT的单位根</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ntt"><span class="nav-number">1.3.</span> <span class="nav-text">NTT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%A1%B9%E5%BC%8F%E8%BD%AC%E7%82%B9%E5%80%BC%E5%BC%8F"><span class="nav-number">1.4.</span> <span class="nav-text">多项式转点值式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%82%B9%E5%80%BC%E5%BC%8F%E8%BD%AC%E5%A4%9A%E9%A1%B9%E5%BC%8F"><span class="nav-number">1.5.</span> <span class="nav-text">点值式转多项式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tips"><span class="nav-number">1.6.</span> <span class="nav-text">Tips:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">1.7.</span> <span class="nav-text">代码实现与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%9D%B4%E8%9D%B6%E4%BC%98%E5%8C%96"><span class="nav-number">1.7.1.</span> <span class="nav-text">蝴蝶优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%82%B9%E5%80%BC%E5%BC%8F%E8%BD%AC%E5%A4%9A%E9%A1%B9%E5%BC%8F%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">1.7.2.</span> <span class="nav-text">关于点值式转多项式的优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E5%8A%A0%E5%87%8F%E8%BF%90%E7%AE%97%E5%8F%96%E6%A8%A1%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">1.7.3.</span> <span class="nav-text">对于加减运算取模的优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E7%B3%BB%E6%95%B0%E9%A2%84%E5%A4%84%E7%90%86%E4%BC%98%E5%8C%96%E4%BB%A5ntt%E4%B8%BA%E4%BE%8B"><span class="nav-number">1.7.4.</span> <span class="nav-text">关于系数预处理优化（以NTT为例）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8B%93%E5%B1%95"><span class="nav-number">2.</span> <span class="nav-text">拓展</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%B2%BBntt"><span class="nav-number">2.1.</span> <span class="nav-text">1. 分治+NTT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cdqntt"><span class="nav-number">2.2.</span> <span class="nav-text">2. CDQ+NTT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mtt%E4%BB%BB%E6%84%8F%E6%A8%A1%E6%95%B0ntt"><span class="nav-number">2.3.</span> <span class="nav-text">3. MTT(任意模数NTT)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#n-%E5%85%83%E7%82%B9%E5%80%BC%E5%BC%8F"><span class="nav-number">2.4.</span> <span class="nav-text">4.\(n\) 元点值式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A4%9A%E5%BA%94%E7%94%A8%E5%92%8C%E4%BC%98%E5%8C%96%E5%8F%82%E8%A7%81%E6%AF%9B%E5%95%B82016%E8%AE%BA%E6%96%87"><span class="nav-number">2.5.</span> <span class="nav-text">更多应用和优化参见毛啸2016论文</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">229</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/NTT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><hr />
+<p>title: 'FFT&amp;NTT（以及扩展）' date: 'Sat Aug 12 11:05:23 2023
+categories: - oi-notes'</p>
+<h1 id="fftntt以及扩展">FFT&amp;NTT（以及扩展）</h1>
+<p>预备知识：<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13092822.html">用于NTT</a></p>
+<p>NTT/FFT其实本质相同，用途是快速求解 <strong>多项式乘积</strong></p>
+<h3 id="前言">前言</h3>
+<p>FT: 傅里叶变换:</p>
+<p>这是一个工程上的概念，可以简述为：一个周期性的信号波段可以用
+若干个<strong>正弦曲线</strong> 的带权和表示</p>
+<p>DFT: 离散傅里叶变换，这是傅里叶变换在离散情况下的变种</p>
+<p>FFT: 快速傅里叶变换</p>
+<p>NTT: 快速数论变换</p>
+<span id="more"></span>
+<h2 id="谈及核心思想">谈及核心思想</h2>
+<ol type="1">
+<li><strong>单位根</strong>:</li>
+</ol>
+<p>构造 <span class="math inline">\(\omega_n\)</span> 为 <span
+class="math inline">\(n\)</span> 阶单位根(不知道 <span
+class="math inline">\(\omega_n\)</span> 的值域)，满足性质 <span
+class="math inline">\(\omega_n^n=\omega_n^0=1\)</span>，即在幂次上呈现
+<span class="math inline">\(n\)</span> 元循环。</p>
+<p>对于 <span class="math inline">\(2|n\)</span> , <span
+class="math inline">\(\omega _n^{\frac{n}{2}}=-1\)</span>，</p>
+<p>显然 <span class="math inline">\(\omega_n\)</span>
+满足一个非常简单的性质：<strong>折半引理</strong> <span
+class="math inline">\(\begin{aligned} \forall 2|i\and 2|n ,
+\omega_n^i=\omega_{\frac{n}{2}}^{\frac{i}{2}}\end{aligned}\)</span>。</p>
+<ol start="2" type="1">
+<li><strong>多项式</strong>与<strong>点值式</strong>的转化：</li>
+</ol>
+<p>一个 <span class="math inline">\(n\)</span> 阶多项式一般的表示就是
+<span class="math inline">\(F(x)=\sum_{i=0}^{n-1} a_ix^i\)</span>。</p>
+<p>然而，多项式也可以用 <span class="math inline">\(n\)</span>
+个<strong>互不相关的</strong>点表示，即 <span
+class="math inline">\((x_0,y_0),(x_1,y_1),\cdots,(x_{n-1},y_{n-1})\)</span>，两者可以互相转化。</p>
+<p>对于点形式的多项式，在两个多项式求乘积时，同一个 <span
+class="math inline">\(x_i\)</span> 对应的 <span
+class="math inline">\(y_i\)</span> 可以直接相乘。</p>
+<p>FFT / NTT 做多项式卷积的核心过程是：</p>
+<p>多项式 <span
+class="math inline">\(\stackrel{\text{DFT}}{\Longrightarrow}\)</span>
+点值式 <span class="math display">\[\Longrightarrow\]</span>
+点值式对应相乘 <span
+class="math display">\[\stackrel{\text{IDFT}}{\Longrightarrow}\]</span>
+多项式。</p>
+<p>而用单位根来构造快速的多项式与点值式的转化，即 <span
+class="math inline">\(\text{DFT}/\text{IDFT}\)</span>。</p>
+<ol start="3" type="1">
+<li><strong>分治思想</strong></li>
+</ol>
+<p>用于降低多项式与点值式转换的复杂度。</p>
+<p><br></p>
+<h2 id="fft的单位根">FFT的单位根</h2>
+<p><span class="math inline">\((x,y)\)</span> 指复数 <span
+class="math inline">\(i=\sqrt{-1},(x,y)=x+yi\)</span>。</p>
+<p>基本运算 <span class="math inline">\((x,y)+(a,b)=(x+a,y+b),(x,y)\cdot
+(a,b)=(ax-by,ay+bx)\)</span>。</p>
+<p>FFT的单位根是: <span class="math inline">\(\omega_n\)</span> = <span
+class="math inline">\((cos(\frac{2\pi}{n}),sin(\frac{2\pi}{n}))\)</span>。</p>
+<p>而 <span class="math inline">\(\omega _n^i=(cos(\frac{2\pi}{n}\cdot
+i),sin(\frac{2\pi}{n}\cdot i))\)</span>
+(展开发现就是三角函数求和公式)。</p>
+<p>显然满足单位根的性质。</p>
+<p>（实际上可以发现，这个说是点值其实就是信号序列的三角函数表示）。</p>
+<p><br></p>
+<h2 id="ntt">NTT</h2>
+<p>相信您已经了解了原根的一些性质， <span
+class="math inline">\(\text{NTT}\)</span> 的单位根常用原根构造。</p>
+<p><span class="math inline">\(\text{NTT}\)</span>
+的单位根实际有较大的局限性，对于质数 <span
+class="math inline">\(P\)</span> 只能构造出 <span
+class="math inline">\(n|P-1,\omega_n=g^{\frac{P-1}{n}}\)</span>。</p>
+<p>计算在模意义下就能满足单位根的性质。</p>
+<p>通常我们 <span class="math inline">\(P\)</span> 取 <span
+class="math inline">\(998244353\)</span> ， <span
+class="math inline">\(2^{23}|(P-1)\)</span> ，它的一个原根是 <span
+class="math inline">\(3\)</span>。</p>
+<p>实际上，为了满足下面分治需要，构造的模数通常满足 <span
+class="math inline">\(P-1=s\cdot 2^t\)</span> 的 <span
+class="math inline">\(t\)</span> 较大，这类模数我们常称作 <span
+class="math inline">\(\text{NTT}\)</span> 模数。</p>
+<p><br></p>
+<h2 id="多项式转点值式">多项式转点值式</h2>
+<p>接下来我们考虑如何将多项式转化为点值式。</p>
+<p>对于点值式，我们构造的点横坐标为 <span
+class="math inline">\(x_i=\omega_n^i\)</span>。</p>
+<p>具体目标是对于函数 <span class="math inline">\(F(x)\)</span> ，求出在
+<span class="math inline">\(x_0,x_1,\cdots ,x_{n-1}\)</span>
+上的函数值。</p>
+<p>即求出 <span
+class="math inline">\(F(x_i)=a_0\omega_n^0+a_1\omega_n^{i}+a_2\omega_n^{2i}+\cdots\)</span>。</p>
+<p>接下来就是核心的<strong>分治思想</strong>，注意，这里的分治是子问题<strong>严格等大</strong>的。</p>
+<p>对于当前问题，分成两部分子问题求解(实际是可以分成多部分的，但是这个是特殊情况暂时不予讨论)，即求解。</p>
+<p>令 <span class="math inline">\(m=\frac{n}{2}\)</span>。</p>
+<p><span class="math inline">\(\displaystyle
+2|i,G(x_i)=a_0\omega_{m}^0+a_2\omega_{m}^{\frac{i}{2}}+a_4\omega_{m}^{\frac{i}{2}\cdot
+2}+\cdots\)</span>。</p>
+<p><span class="math inline">\(\displaystyle
+2|i,H(x_i)=a_1\omega_{m}^0+a_3\omega_{m}^{\frac{i}{2}}+a_5\omega_{m}^{\frac{i}{2}\cdot
+2}+\cdots\)</span>。</p>
+<p>更简洁的描述为。</p>
+<p><span
+class="math inline">\(i&lt;m,G(x_i&#39;)=a_0\omega_{m}^0+a_2\omega_{m}^{i}+a_4\omega_{m}^{2i}+\cdots\)</span></p>
+<p><span
+class="math inline">\(i&lt;m,H(x_i&#39;)=a_1\omega_{m}^0+a_3\omega_{m}^{i}+a_5\omega_{m}^{2i}+\cdots\)</span></p>
+<p>由于 <span class="math inline">\(G(x&#39;_i),H(x&#39;_i)\)</span>
+计算的是 <span class="math inline">\([0,m-1]\)</span> 项，而求 <span
+class="math inline">\(F(x_i)\)</span> 时用到的是 <span
+class="math inline">\(0,2,4,\cdots\)</span> 项，实际需要访问 <span
+class="math inline">\(G(x^2_i),H(x^2_i)\)</span></p>
+<p>和 <span class="math inline">\(F(x_i)\)</span>
+的式子比较，我们得到合并的式子为：</p>
+<p><span class="math display">\[
+F(x_i)=G(x^2_i)+x_i H(x^2_i)
+\]</span> 带入折半引理，实际等价于：</p>
+<p><span class="math display">\[
+F(x_i)=G(x&#39;_i)+x_i H(x&#39;_i)
+\]</span> 注意 <span class="math inline">\(x_i=x&#39;_{i\mod
+m}\)</span>。</p>
+<p>为了保证复杂度，尽量使得每次分治的子问题都分为两部分，这样的复杂度为
+<span class="math inline">\(O(n\log n)\)</span>。</p>
+<p>附：实际上，分为 <span class="math inline">\(d\)</span>
+个子问题时，每次合并的复杂度为 <span class="math inline">\(O(n\cdot
+d)\)</span> ，因此复杂度为 <span class="math inline">\(nd \log_d
+n\)</span>。</p>
+<p>保证每次分治为两个严格等大的子问题，可以从一开始就把 <span
+class="math inline">\(n\)</span> 扩充为 <span
+class="math inline">\(2\)</span> 的幂次：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> N=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(N&lt;=n+m) N&lt;&lt;=<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>附: <span class="math inline">\(d\)</span> 个子问题时，设子问题答案为
+<span class="math inline">\(G_j(x_i)\)</span> ，则合并的式子为：</p>
+<p><span class="math display">\[
+\begin{aligned}
+F(x_i)=\sum_{j=0}^{d-1}x_i^jG_j(x_i^d)=\sum_{i=0}^{d-1}x_i^jG_j(x&#39;_{i\mod
+\frac{n}{d}})\end{aligned}
+\]</span></p>
+<h2 id="点值式转多项式">点值式转多项式</h2>
+<p>核心性质：单位根反演 <span
+class="math inline">\(\sum_{j=0}^{n-1}\omega_n^{ij}=
+\left\{\begin{aligned} \frac{\omega_n^{in}-1}{\omega_n^i-1}=0 &amp;&amp;
+i\ne 0\\ n &amp;&amp; i=0\end{aligned} \right.\)</span>。</p>
+<p>设点值式对应 <span class="math inline">\(y_i\)</span> 的序列为 <span
+class="math inline">\(b_i\)</span>，则 <span
+class="math inline">\(n\cdot a_i=\sum_{j=0}^{n-1}\omega_n^{-ij}
+b_j\)</span>。</p>
+<p>证明如下：</p>
+<p><span class="math inline">\(\begin{aligned}
+\sum_{j=0}^{n-1}\omega_n^{-ij}b_j=\sum_{j=0}^{n-1}
+\omega_n^{-ij}(\sum_{k=0}^{n-1}a_k\omega_n^{jk})\end{aligned}\)</span></p>
+<p><span class="math inline">\(\begin{aligned}
+\sum_{j=0}^{n-1}\omega_n^{-ij}b_j=
+\sum_{k=0}^{n-1}a_k\sum_{j=0}^{n-1}\omega_n^{j(k-i)}
+\end{aligned}\)</span></p>
+<p>由上面的式子，发现只有 <span class="math inline">\(k-i=0\)</span>
+时右边的求和式有值，故上式成立。</p>
+<p>因此点值式转多项式直接把系数改为 <span
+class="math inline">\(\omega_n^{-i}\)</span> 即可。</p>
+<p><br></p>
+<p><br></p>
+<h2 id="tips">Tips:</h2>
+<ol type="1">
+<li>由于单位根的循环特性，溢出会直接溢出到本来的式子里</li>
+</ol>
+<p>因此，如果乘法过后的多项式产生了超过 <span
+class="math inline">\(&gt;n\)</span> 的项 <span
+class="math inline">\(x^i\)</span> ，会溢出到 <span
+class="math inline">\(x^{i\mod n}\)</span>。</p>
+<ol start="2" type="1">
+<li>点值式并不是不满足除法，只是除法得到的多项式并不一定是一个 <span
+class="math inline">\(n\)</span>
+元以内的多项式，除了恰好整除的情况，得到的通常是一个无穷级数的式子，如
+<span class="math inline">\(\begin{aligned}
+\frac{1}{1-x}=\frac{1-x^{\infty}}{1-x}=\sum_{i=0}^{\infty}x^i\end{aligned}\)</span>。</li>
+</ol>
+<p>真正要求除法，通常是求前 <span class="math inline">\(n\)</span>
+项的结果，即需要用到<strong>多项式乘法逆</strong>。</p>
+<p><br></p>
+<h2 id="代码实现与优化">代码实现与优化</h2>
+<p><a target="_blank" rel="noopener" href="http://uoj.ac/problem/34">模板题传送门</a></p>
+<p>然后我们得到一份优美的代码 （FFT）。</p>
+<p>（ <code>Complex</code> 是 C++ 库自带的复数，<code>M_PI</code> 是 C++
+自带 <span class="math inline">\(\pi\)</span> 常量）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">FFT</span><span class="params">(<span class="type">int</span> n,Complex *a,<span class="type">int</span> f)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(n==<span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line">	Complex tmp[N];</span><br><span class="line">	<span class="type">int</span> m=n/<span class="number">2</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) tmp[i]=a[i&lt;&lt;<span class="number">1</span>],tmp[i+m]=a[i&lt;&lt;<span class="number">1</span>|<span class="number">1</span>]; <span class="comment">// 按照奇偶分类</span></span><br><span class="line">	<span class="built_in">memcpy</span>(a,tmp,<span class="built_in">sizeof</span>(Complex) * n);</span><br><span class="line">	<span class="built_in">FFT</span>(m,a,f),<span class="built_in">FFT</span>(m,a+m,f); <span class="comment">// 分两半，算g(x),h(x)</span></span><br><span class="line">	<span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span>,<span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>; <span class="comment">// w=x^1,e=x^i</span></span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) &#123;</span><br><span class="line">		tmp[i]=a[i]+e*a[i+m]; <span class="comment">// f(x_i)=g(x_i)+e*h(x_i)</span></span><br><span class="line">		e=e*w; </span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,m,n<span class="number">-1</span>) &#123;</span><br><span class="line">		tmp[i]=a[i-m]+e*a[i];</span><br><span class="line">		e=e*w;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">memcpy</span>(a,tmp,<span class="built_in">sizeof</span>(T)*n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于 <span class="math inline">\((\omega_n)^{\frac{n}{2}}=-1\)</span>
+，所以还可以简化为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span>,<span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">0</span>,m<span class="number">-1</span>) &#123;</span><br><span class="line">	tmp[i]=a[i]+e*a[i+m];</span><br><span class="line">	tmp[i+m]=a[i]-e*a[i+m];</span><br><span class="line">	e=e*w;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于用了 double，最后输出要取整。</p>
+<h3 id="蝴蝶优化">蝴蝶优化</h3>
+<p>我们加一点优化，取代递归的分治过程。</p>
+<p>可以看到，分治时我们按照 <span class="math inline">\(i \mod
+2\)</span> 分成两组，然后继续分。</p>
+<p>这个过程中，实际上我们就是将 <span class="math inline">\(i\)</span>
+的二进制位前后翻转。</p>
+<p>所以我们可以暴力处理出 <span class="math inline">\(i\)</span>
+分治底层的位置。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) &#123;</span><br><span class="line">	<span class="type">int</span> x=i,s=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;(j&lt;&lt;c)&lt;=n;++j) &#123;</span><br><span class="line">		s=(s&lt;&lt;<span class="number">1</span>)|(x&amp;<span class="number">1</span>);</span><br><span class="line">		x&gt;&gt;=<span class="number">1</span>;</span><br><span class="line">	&#125; <span class="comment">// s就是最终位置</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然也是有 <span class="math inline">\(O(n)\)</span> 处理方法的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> N=<span class="number">1</span>,c=<span class="number">-1</span>;</span><br><span class="line"><span class="keyword">while</span>(N&lt;=n+m) N&lt;&lt;=<span class="number">1</span>,c++;</span><br><span class="line"><span class="built_in">rep</span>(i,<span class="number">1</span>,N<span class="number">-1</span>) rev[i]=(rev[i&gt;&gt;<span class="number">1</span>]&gt;&gt;<span class="number">1</span>)|((i&amp;<span class="number">1</span>)&lt;&lt;c);</span><br></pre></td></tr></table></figure>
+<p>（建议自己模拟一下）。</p>
+<p>有了这个翻转数组，我们可以直接从分治底层开始解决整个问题，每次合并操作完全相同。</p>
+<p>每次分治问题的大小，依次合并每一个子问题区间即可。</p>
+<p>为了在一个数组上完成操作，还需要注意合并顺序。</p>
+<p>代码解释 <span class="math inline">\(i\)</span> ：分治子问题大小为
+<span class="math inline">\(2i\)</span> ， <span
+class="math inline">\(l\)</span> :合并区间的左端点为 <span
+class="math inline">\(l\)</span> ，右端点为 <span
+class="math inline">\(l+2i\)</span> ， <span
+class="math inline">\(j\)</span> 枚举合并位置。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">FFT</span><span class="params">(<span class="type">int</span> n,Complex *a)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">Complex <span class="title">w</span><span class="params">(cos(<span class="number">2</span>*M_PI/n),f*sin(<span class="number">2</span>*M_PI/n))</span></span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="function">Complex <span class="title">e</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>)</span></span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j=l;j&lt;l+i;++j,e=e*w) &#123;</span><br><span class="line">                Complex t=a[j+m]*e;   <span class="comment">// a&#x27;[j]=a[j]+e*a[j+m]</span></span><br><span class="line">                                      <span class="comment">// a&#x27;[j+i]=a[j]-e*a[j+m]</span></span><br><span class="line">                a[j+m]=a[j]-t;</span><br><span class="line">                a[j]=a[j]+t;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>事实上我们还有更快的写法，就是将 <span
+class="math inline">\(\omega_n^i\)</span> 预处理出来。</p>
+<p>（注意这个 <span class="math inline">\(\text{FFT}\)</span>
+的预处理很考验double精度，不能每次都直接累乘上去，隔几个就要重新调用依次三角函数）。</p>
+<p>当然如果自己写复数会更快。</p>
+<p><br></p>
+<h3 id="关于点值式转多项式的优化">关于点值式转多项式的优化</h3>
+<p>由于每次求得点值是 <span
+class="math inline">\(\omega_n^{-i}=\omega_n^{n-i}\)</span>。</p>
+<p>所以可以直接用 多项式转点值式的函数， 最后把 <span
+class="math inline">\([1,n-1]\)</span> 这一段翻转，每个数除掉 <span
+class="math inline">\(n\)</span> 即可。</p>
+<p><br></p>
+<h3 id="对于加减运算取模的优化">对于加减运算取模的优化</h3>
+<p>三目运算：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a+=b,a=a&gt;=P?a-P:a;</span><br><span class="line">a-=b,a=a&lt;<span class="number">0</span>?a+P:a;</span><br></pre></td></tr></table></figure>
+<p>逻辑运算优化（原理是逻辑预算会在第一个确定表达式值的位置停下）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a+=b,((a&gt;=P)&amp;&amp;(a-=P));</span><br><span class="line">a-=b,((a&lt;<span class="number">0</span>)&amp;&amp;(a+=P));</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h3
+id="关于系数预处理优化以ntt为例">关于系数预处理优化（以NTT为例）</h3>
+<p>带入上面已经提到的优化，无预处理系数的 <span
+class="math inline">\(\text{NTT}\)</span> 大概是这样的：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">NTT</span><span class="params">(<span class="type">int</span> n,<span class="type">int</span> *a,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="type">int</span> e=<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j=l;j&lt;l+i;++j,e=<span class="number">1ll</span>*e*w%P) &#123;</span><br><span class="line">                <span class="type">int</span> t=<span class="number">1ll</span>*a[j+i]*e%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="type">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一种简单的预处理是，每次对于每个分治大小，预处理依次系数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> a[N],e[N];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">NTT</span><span class="params">(<span class="type">int</span> n,<span class="type">int</span> *a,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    e[<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;i;++j) e[j]=<span class="number">1ll</span>*e[j<span class="number">-1</span>]*w%P;</span><br><span class="line">        <span class="comment">//for(int j=i-2;j&gt;=0;j-=2) e[j+1]=1ll*w*(e[j]=e[j&gt;&gt;1])%P;</span></span><br><span class="line">        <span class="comment">//这个版本是沿用上一次预处理的结果，实际(只有)用这种预处理方法可以极大程度上加强FFT的精度</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="type">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="type">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另一种是在一开始就把所有的系数用一个数组存下来，具体过程可以描述为：</p>
+<p>对于每个分治长度 <span class="math inline">\(n\)</span>
+，我们只需要访问 <span
+class="math inline">\(\omega_n^{0},\omega_n^{1},\cdots,\omega_n^{\frac{n}{2}-1}\)</span>。</p>
+<p>那么对于分治长度 <span class="math inline">\(n\)</span> ，我们在
+<span class="math inline">\(w\)</span> 数组的第 <span
+class="math inline">\(\frac{n}{2}\)</span> ~ <span
+class="math inline">\(n-1\)</span> 项依次存储这些值。</p>
+<p>优化:我们只需要对于最大的分治长度处理，剩下的部分发现可以直接用折半引理访问得到。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1</span>&lt;&lt;<span class="number">21</span>;</span><br><span class="line"><span class="type">int</span> a[N],w[N];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Init</span><span class="params">()</span></span>&#123;</span><br><span class="line">    w[N&gt;&gt;<span class="number">1</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="type">int</span> t=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/N);</span><br><span class="line">    <span class="built_in">rep</span>(i,(N&gt;&gt;<span class="number">1</span>)+<span class="number">1</span>,N<span class="number">-1</span>) w[i]=<span class="number">1ll</span>*w[i<span class="number">-1</span>]*t%P;</span><br><span class="line">    <span class="built_in">drep</span>(i,(N&gt;&gt;<span class="number">1</span>)<span class="number">-1</span>,<span class="number">1</span>) w[i]=w[i&lt;&lt;<span class="number">1</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">NTT</span><span class="params">(<span class="type">int</span> n,<span class="type">int</span> *a,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> *e=w+i;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="type">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="type">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>三份代码在 duck.ac 上的评测结果表明，不预处理系数将近慢一倍。</p>
+<p>单组数据来看，预处理系数会慢一点；多组来看，预处理系数会快。实际差距不大，都可以使用。</p>
+<p>但是在某些层面来说，下面这份板子才是最好的（适用NTT,FFT且精度较高），不需要预处理。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">qpow</span><span class="params">(ll x,ll k=P<span class="number">-2</span>)</span></span>&#123;</span><br><span class="line">    ll res=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(;k;k&gt;&gt;=<span class="number">1</span>,x=x*x%P) <span class="keyword">if</span>(k&amp;<span class="number">1</span>) res=res*x%P;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> a[N],e[N];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">NTT</span><span class="params">(<span class="type">int</span> n,<span class="type">int</span> *a,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">    <span class="built_in">rep</span>(i,<span class="number">1</span>,n<span class="number">-1</span>) <span class="keyword">if</span>(i&lt;rev[i]) <span class="built_in">swap</span>(a[i],a[rev[i]]);</span><br><span class="line">    e[<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i&lt;&lt;=<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="type">int</span> w=<span class="built_in">qpow</span>(<span class="number">3</span>,(P<span class="number">-1</span>)/i/<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=i<span class="number">-2</span>;j&gt;=<span class="number">0</span>;j-=<span class="number">2</span>) e[j+<span class="number">1</span>]=<span class="number">1ll</span>*w*(e[j]=e[j&gt;&gt;<span class="number">1</span>])%P;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">0</span>;l&lt;n;l+=i*<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> j=l;j&lt;l+i;++j) &#123;</span><br><span class="line">                <span class="type">int</span> t=<span class="number">1ll</span>*a[j+i]*e[j-l]%P;</span><br><span class="line">                a[j+i]=a[j]-t,((a[j+i]&lt;<span class="number">0</span>)&amp;&amp;(a[j+i]+=P));</span><br><span class="line">                a[j]+=t,((a[j]&gt;=P)&amp;&amp;(a[j]-=P));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(f==<span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">reverse</span>(a+<span class="number">1</span>,a+n);</span><br><span class="line">        <span class="type">int</span> Inv=<span class="built_in">qpow</span>(n);</span><br><span class="line">        <span class="built_in">rep</span>(i,<span class="number">0</span>,n<span class="number">-1</span>) a[i]=<span class="number">1ll</span>*a[i]*Inv%P;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h1 id="拓展">拓展</h1>
+<h2 id="分治ntt">1. 分治+NTT</h2>
+<p>常用于处理多个<strong>计数背包</strong>的快速合并
+（实际<strong>无权值01背包</strong>也是可以的）。</p>
+<p>我们可以用 NTT <span class="math inline">\(n\log n\)</span>
+合并两个大小为 <span class="math inline">\(n\)</span> 的背包。</p>
+<p>分治时，每次合并两个分治子问题，总共的时间就是 <span
+class="math inline">\(\sum size\log n\)</span>。</p>
+<p>每个背包的 <span class="math inline">\(size\)</span> 会被计算 <span
+class="math inline">\(\log n\)</span> 次，所以总共复杂度是 <span
+class="math inline">\(n \log ^2 n\)</span>。</p>
+<p><br></p>
+<h2 id="cdqntt">2. CDQ+NTT</h2>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4721">模板题传送门</a></p>
+<p>对于形如 <span
+class="math inline">\(dp_i=\sum_{j=0}^{i-1}dp_jg_{i-j}\)</span> 的 <span
+class="math inline">\(dp\)</span> 转移（就是dp转移与差值有关）。</p>
+<p>由于求 <span class="math inline">\(dp_i\)</span> 时，需要保证 <span
+class="math inline">\(dp_0,dp_1,\cdots,dp_{i-1}\)</span>
+才能卷积，这个限制，我们可以用<strong>CDQ分治</strong>解决。</p>
+<p>对于当前分治区间 <span class="math inline">\([L,R]\)</span>。</p>
+<p>依次考虑 <span class="math inline">\([L,mid]\)</span> 内部转移，
+<span class="math inline">\([L,mid]\)</span> 向 <span
+class="math inline">\([mid+1,R]\)</span> 的转移(用FFT/NTT解决)， <span
+class="math inline">\([mid+1,R]\)</span> 内部转移。</p>
+<p>算法流程：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Solve</span><span class="params">(l,r)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(l==r) <span class="keyword">return</span>;</span><br><span class="line">    mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">    <span class="built_in">Solve</span>(l,mid);</span><br><span class="line">    (l,mid)-&gt;(mid+<span class="number">1</span>,r);</span><br><span class="line">    <span class="built_in">Solve</span>(mid+<span class="number">1</span>,r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="mtt任意模数ntt">3. <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13498834.html">MTT(任意模数NTT)</a></h2>
+<p><br></p>
+<h2 id="n-元点值式">4.<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13498798.html"><span
+class="math inline">\(n\)</span> 元点值式</a></h2>
+<p><br></p>
+<p>练习建议：</p>
+<ol type="1">
+<li><p><a
+target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1919">高精度乘法</a></p></li>
+<li><p>简单应用：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=4609">HDU-4609</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12092699.html">题解</a></p></li>
+<li><p>卷积构造模板： <a
+target="_blank" rel="noopener" href="https://www.lydsy.com/JudgeOnline/problem.php?id=3527">BZOJ-3527</a>
+<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12092699.html">题解</a></p></li>
+<li><p>拓展卷积构造：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5885">HDU-5885</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12097980.html">题解</a></p></li>
+<li><p>构造卷积的应用：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=6061">HDU-6061</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12098078.html">题解</a></p></li>
+<li><p><span class="math inline">\(CDQ\)</span> 分治+ <span
+class="math inline">\(FFT\)</span> ：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5730">HDU-5730</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101353.html">题解</a></p></li>
+<li><p><span class="math inline">\(CDQ\)</span> +NTT/降次前缀和优化
+<span class="math inline">\(dp\)</span> ：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5322">HDU-5332</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101410.html">题解</a></p></li>
+</ol>
+<p>8.容斥+ <span class="math inline">\(MTT\)</span> ：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=6088">HDU-6088</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12101456.html">题解</a></p>
+<p>9.图上 <span class="math inline">\(dp\)</span> ：</p>
+<p>联通图个数：BZOJ-3456 <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12103345.html">题解</a></p>
+<p>带环联通图个数：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5552">HDU-5552</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12103411.html">题解</a></p>
+<p>森林数量和带限制森林数量：<a
+target="_blank" rel="noopener" href="http://acm.hdu.edu.cn/showproblem.php?pid=5279">HDU - 5279</a> <a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12106476.html">题解</a></p>
+<p>10.点分治+FFT：<a
+target="_blank" rel="noopener" href="https://www.codechef.com/problems/PRIMEDST">CodeChef-PRIMEDST</a>
+<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/12120855.html">题解</a></p>
+<p><br></p>
+<p><br></p>
+<p><br></p>
+<h2
+id="更多应用和优化参见毛啸2016论文">更多应用和优化参见毛啸2016论文</h2>
+<p>（如：两次FFT做卷积，4次FFT做MTT。。。）。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E7%9F%A9%E9%98%B5%E8%A1%8C%E5%88%97%E5%BC%8F/" rel="prev" title="">
+                  <i class="fa fa-angle-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-notes/%E6%8C%87%E5%AE%9A%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%8D%95%E4%BD%8D%E6%A0%B9%E7%82%B9%E5%80%BC%E5%BC%8F%E6%B1%82%E8%A7%A3/" rel="next" title="">
+                   <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
