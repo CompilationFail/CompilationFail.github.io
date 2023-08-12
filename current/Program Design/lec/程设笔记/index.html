@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon16.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="程设笔记 主讲内容：近似算法 &#x2F; 随机算法，中间会插入 oop 部分。 ## Intro 有关近似的概念 相对误差的近似： \(\alpha\) 近似：\(output \leq \alpha \cdot ans\) 的算法 \((1+\varepsilon)\) 近似：\(output \leq (1+\varepsilon) \cdot ans\) 的算法，算法的复杂度为 \(O(f(\fra">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程设笔记">
+<meta property="og:url" content="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="程设笔记 主讲内容：近似算法 &#x2F; 随机算法，中间会插入 oop 部分。 ## Intro 有关近似的概念 相对误差的近似： \(\alpha\) 近似：\(output \leq \alpha \cdot ans\) 的算法 \((1+\varepsilon)\) 近似：\(output \leq (1+\varepsilon) \cdot ans\) 的算法，算法的复杂度为 \(O(f(\fra">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/assets/image-20230521183002529.png">
+<meta property="og:image" content="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/assets/image-20230521201956844.png">
+<meta property="og:image" content="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/assets/image-20230521202418530.png">
+<meta property="article:published_time" content="2023-04-07T12:13:33.000Z">
+<meta property="article:modified_time" content="2023-08-12T06:44:14.757Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/assets/image-20230521183002529.png">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/","path":"current/Program Design/lec/程设笔记/","title":"程设笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>程设笔记 | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">程设笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%85%B3%E8%BF%91%E4%BC%BC%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.0.1.</span> <span class="nav-text">有关近似的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%85%B3%E9%9A%8F%E6%9C%BA%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.0.2.</span> <span class="nav-text">有关随机的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%A2%86%E5%9F%9F"><span class="nav-number">1.0.3.</span> <span class="nav-text">常见领域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80"><span class="nav-number">1.0.4.</span> <span class="nav-text">分析：数学基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%9F%BA%E7%A1%80"><span class="nav-number">1.0.5.</span> <span class="nav-text">代码基础</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E5%8F%91%E7%94%9F%E5%99%A8"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">随机发生器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E5%88%86%E5%B8%83"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">随机分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hash-%E5%87%BD%E6%95%B0"><span class="nav-number">1.0.5.3.</span> <span class="nav-text">hash 函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">经典算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E5%89%B2%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.1.</span> <span class="nav-text">最大割问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95%E6%A0%A1%E9%AA%8C"><span class="nav-number">1.1.2.</span> <span class="nav-text">矩阵乘法校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E4%BC%B0%E8%AE%A1%E7%A7%AF%E5%88%86"><span class="nav-number">1.1.3.</span> <span class="nav-text">蒙特卡洛估计积分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E5%9B%BE%E8%BF%91%E4%BC%BC-tsp"><span class="nav-number">1.1.4.</span> <span class="nav-text">*平面图近似 TSP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E5%BF%AB%E6%8E%92"><span class="nav-number">1.1.5.</span> <span class="nav-text">分布式快排</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E5%9B%BE%E7%9A%84-balanced-separator"><span class="nav-number">1.1.6.</span> <span class="nav-text">*平面图的 Balanced Separator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-number">1.1.7.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E8%BF%91%E4%BC%BC-point-query"><span class="nav-number">1.1.8.</span> <span class="nav-text">数据流近似 Point Query</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E8%BF%91%E4%BC%BC-heavy-hitter"><span class="nav-number">1.1.9.</span> <span class="nav-text">数据流近似 Heavy Hitter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E7%B2%BE%E7%A1%AE-majority"><span class="nav-number">1.1.10.</span> <span class="nav-text">数据流精确 Majority</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bloom-filter"><span class="nav-number">1.1.11.</span> <span class="nav-text">*Bloom Filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E7%9A%84-jaccard-similarity-%E8%BF%91%E4%BC%BC"><span class="nav-number">1.1.12.</span> <span class="nav-text">集合的 Jaccard Similarity
+近似</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E7%9A%84-cosine-similarity-%E8%BF%91%E4%BC%BC"><span class="nav-number">1.1.13.</span> <span class="nav-text">*向量的 Cosine Similarity
+近似</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hamming-%E7%A9%BA%E9%97%B4%E6%9C%80%E8%BF%91%E7%82%B9%E8%BF%91%E4%BC%BC%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.14.</span> <span class="nav-text">Hamming 空间最近点近似算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AC%A7%E6%B0%8F%E8%B7%9D%E7%A6%BB%E7%9B%B4%E5%BE%84%E8%BF%91%E4%BC%BC"><span class="nav-number">1.1.15.</span> <span class="nav-text">欧氏距离直径近似</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AC%A7%E6%B0%8F%E7%A9%BA%E9%97%B4%E6%9C%80%E5%B0%8F%E5%8C%85%E5%9B%B4%E7%90%83%E8%BF%91%E4%BC%BC"><span class="nav-number">1.1.16.</span> <span class="nav-text">欧氏空间最小包围球近似</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E5%88%86%E6%A0%91"><span class="nav-number">1.1.17.</span> <span class="nav-text">四分树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E5%88%86%E6%A0%91%E8%BF%91%E4%BC%BC%E6%9C%80%E8%BF%91%E9%82%BB%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.1.18.</span> <span class="nav-text">四分树近似最近邻查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AC%A7%E6%B0%8F%E7%A9%BA%E9%97%B4-wspd-well-separated-pair-decomposition"><span class="nav-number">1.1.19.</span> <span class="nav-text">欧氏空间 WSPD
+(Well-separated pair decomposition)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tree-embedding"><span class="nav-number">1.1.20.</span> <span class="nav-text">Tree Embedding</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#johnson-linderstrauss-%E9%99%8D%E7%BB%B4%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.</span> <span class="nav-text">Johnson-Linderstrauss
+降维问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#k-%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98-2-%E8%BF%91%E4%BC%BC-gonzalez-%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">k 聚类问题 2-近似： Gonzalez
+算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jl-%E9%97%AE%E9%A2%98%E7%9A%84%E4%B8%8B%E7%95%8C%E5%88%86%E6%9E%90"><span class="nav-number">1.2.2.</span> <span class="nav-text">JL 问题的下界分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jl-%E6%9E%84%E9%80%A0%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.3.</span> <span class="nav-text">JL 构造算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8-linear-regression"><span class="nav-number">1.2.4.</span> <span class="nav-text">应用： Linear Regression</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%A6%BB%E6%95%A3%E5%8C%96-epsilon-net"><span class="nav-number">1.2.5.</span> <span class="nav-text">应用：离散化 \(\epsilon-\)net</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pca-principle-components-analysis%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90-%E9%99%8D%E7%BB%B4"><span class="nav-number">1.3.</span> <span class="nav-text">PCA (Principle
+Components Analysis，主成分分析) 降维</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">预处理：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%A2%E5%BC%8F%E5%8C%96"><span class="nav-number">1.3.1.</span> <span class="nav-text">形式化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3"><span class="nav-number">1.3.2.</span> <span class="nav-text">求解：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3singular-value-decomposition"><span class="nav-number">1.3.3.</span> <span class="nav-text">奇异值分解（Singular
+Value Decomposition）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cur-%E9%99%8D%E7%BB%B4"><span class="nav-number">1.3.4.</span> <span class="nav-text">CUR 降维</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E7%BC%A9%E6%84%9F%E7%9F%A5-compressive-sensing"><span class="nav-number">1.4.</span> <span class="nav-text">压缩感知 Compressive Sensing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E7%82%B9%E8%A6%86%E7%9B%96-2-%E8%BF%91%E4%BC%BC"><span class="nav-number">1.5.</span> <span class="nav-text">最小点覆盖 2 近似</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">数据流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sparse-recovery"><span class="nav-number">2.1.</span> <span class="nav-text">Sparse Recovery</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E8%BF%91%E4%BC%BC%E7%9B%B4%E5%BE%84"><span class="nav-number">2.2.</span> <span class="nav-text">平面近似直径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ell_0-%E9%87%87%E6%A0%B7"><span class="nav-number">2.3.</span> <span class="nav-text">\(\ell_0\)
+采样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E5%9B%BE%E8%BF%9E%E9%80%9A%E5%88%86%E9%87%8F"><span class="nav-number">2.4.</span> <span class="nav-text">数据流图连通分量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%A7%E6%95%B0%E6%8D%AE%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">大数据算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mapreduce-%E6%A1%86%E6%9E%B6"><span class="nav-number">3.1.</span> <span class="nav-text">MapReduce 框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mpc-%E6%A1%86%E6%9E%B6"><span class="nav-number">3.2.</span> <span class="nav-text">MPC 框架</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">261</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="程设笔记 | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          程设笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-04-07 20:13:33" itemprop="dateCreated datePublished" datetime="2023-04-07T20:13:33+08:00">2023-04-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-08-12 14:44:14" itemprop="dateModified" datetime="2023-08-12T14:44:14+08:00">2023-08-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">课程笔记</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="程设笔记">程设笔记</h1>
+<p>主讲内容：近似算法 / 随机算法，中间会插入 oop 部分。 ## Intro</p>
+<h3 id="有关近似的概念">有关近似的概念</h3>
+<p>相对误差的近似：</p>
+<p><span class="math inline">\(\alpha\)</span> 近似：<span
+class="math inline">\(output \leq \alpha \cdot ans\)</span> 的算法</p>
+<p><span class="math inline">\((1+\varepsilon)\)</span> 近似：<span
+class="math inline">\(output \leq (1+\varepsilon) \cdot ans\)</span>
+的算法，算法的复杂度为 <span
+class="math inline">\(O(f(\frac{1}{\varepsilon}))\)</span>，这里通常
+<span class="math inline">\(\varepsilon \in [0.01,0.3]\)</span></p>
+<span id="more"></span>
+<h3 id="有关随机的概念">有关随机的概念</h3>
+<p>随机有两种：</p>
+<ol type="1">
+<li>蒙特卡洛式：性能较高，但是有一定出错率。</li>
+<li>拉斯维加斯式：正确性有保证，随机性与效率有关。</li>
+</ol>
+<h3 id="常见领域">常见领域</h3>
+<ol type="1">
+<li>工程领域的近似场景</li>
+<li>高并发场景</li>
+<li>大数据处理</li>
+<li>数据流的 时 / 空 亚线性算法</li>
+<li>数据科学：如与 AI 有关的聚类 / 回归</li>
+</ol>
+<h3 id="分析数学基础">分析：数学基础</h3>
+<p><strong>Markov 不等式</strong> :</p>
+<p>若随机变量 <span class="math inline">\(X \ge 0\)</span>，则 <span
+class="math display">\[
+\Pr[X \ge a] \leq \dfrac{\mathbb{E}[X]}{a}
+\]</span> 用于最优化问题的概率分析。</p>
+<p><strong>Chernoff Bound</strong>:</p>
+<p>若 <span class="math inline">\(X_1 \sim X_n \in [0,1]\)</span>
+为独立随机变量，<span class="math inline">\(X=\sum X_i\)</span>，则
+<span class="math display">\[
+\forall t\in[0,1],\Pr[|X-\mu|\ge t\mu]\leq 2\exp(-t^2\mu/3)
+\]</span> <strong>Hoeffding</strong> 不等式：</p>
+<p>设独立随机变量 <span class="math inline">\(X_1\sim
+X_n\in[a,b]\)</span>，<span class="math inline">\(X = \sum
+X_i\)</span>，则： <span class="math display">\[
+\Pr[X-\mathbb{E}[X]\ge t] \leq 2\exp(-\frac{2t^2}{n(b-a)^2})
+\]</span></p>
+<h3 id="代码基础">代码基础</h3>
+<h4 id="随机发生器">随机发生器</h4>
+<ol type="1">
+<li>系统真随机，如
+<code>/dev/urandom</code>，算法中不推荐，在生成密钥时可能可用</li>
+<li><code>minstd_rand</code>，一个折中的选择</li>
+<li>Mersenne Twister: <code>std::mt19937()</code> from
+<code>&lt;random&gt;</code>，快</li>
+<li>Lagged Fibonacci:
+<code>std::ranlux24, ranlux48</code>，有很好的随机性</li>
+</ol>
+<h4 id="随机分布">随机分布</h4>
+<ol type="1">
+<li>整数均匀：<code>uniform_int_distribution &lt;int&gt; (l, r)</code></li>
+<li>实数均匀：<code>uniform_real_distribution &lt;&gt; (l, r)</code></li>
+<li>离散分布：<code>std::discrete_distribution &lt;&gt; d(&#123;1.5, 1.5, 1.5, 3.0&#125;)</code></li>
+<li>bernoulli
+分布：<code>std::bernoulli_distribution d(0.25)</code></li>
+</ol>
+<h4 id="hash-函数">hash 函数</h4>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> mix(h) (&#123;					\</span></span><br><span class="line"><span class="meta">			(h) ^= (h) &gt;&gt; 23;		\</span></span><br><span class="line"><span class="meta">			(h) *= 0x2127599bf4325c37ULL;	\</span></span><br><span class="line"><span class="meta">			(h) ^= (h) &gt;&gt; 47; &#125;)</span></span><br><span class="line"><span class="function">u64 <span class="title">fasthash64</span><span class="params">(u64 v)</span> </span>&#123;</span><br><span class="line">	<span class="type">const</span> <span class="type">uint64_t</span> m = <span class="number">0x880355f21e6d1965</span>ULL;</span><br><span class="line">	u64 h = seed;</span><br><span class="line">	h ^= <span class="built_in">mix</span>(v);</span><br><span class="line">	h *= m;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">mix</span>(h);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="经典算法">经典算法</h2>
+<h3 id="最大割问题">最大割问题</h3>
+<p><strong>描述</strong>：</p>
+<p><span class="math inline">\(\mathtt{input}: G = (V,E)\)</span></p>
+<p><span class="math inline">\(\mathtt{output}: \arg \max\{\text{cut}(S)
+= \sum_{u\in S, v\in V\backslash S} w(u,v) \mid S \subseteq
+V\}\)</span></p>
+<p>这里，<span class="math inline">\(w(u,v) =
+1\)</span>，即割为一个边集。</p>
+<p><strong>近似算法</strong>：<span class="math inline">\(T\)</span>
+轮，随机生成一个 <span class="math inline">\(S\)</span>: 考虑每一个点
+<span class="math inline">\(u \in V\)</span>，有 <span
+class="math inline">\(50\%\)</span> 的概率放入 <span
+class="math inline">\(S\)</span> 中</p>
+<p><strong>分析</strong>：</p>
+<ol type="1">
+<li><p>一个弱的期望分析：<span
+class="math inline">\(\mathbb{E}[\text{cut}(S)] = \sum \Pr[(u,v) \in
+\text{cut}(S)] \ge 0.5|E|\)</span>，这里 <span
+class="math inline">\(E\)</span> 为最优解。</p></li>
+<li><p>达到 <span class="math inline">\(0.5-\epsilon\)</span>
+近似的概率：</p>
+<p>由 Markov 不等式，<span class="math inline">\(\Pr[\text{cut}(S) &lt;
+(0.5 -\epsilon) E] \leq \frac{0.5\mathbb{E}[\text{cut}(S)]}{(0.5 -
+\epsilon)E}\)</span></p>
+<p><span class="math inline">\(T\)</span> 取 <span
+class="math inline">\(\frac{\log (1/\delta)}{\epsilon}\)</span>，<span
+class="math inline">\(\delta\)</span> 为失败概率。</p></li>
+<li><p>复杂度为 <span class="math inline">\(O(Tm)\)</span>。</p></li>
+</ol>
+<h3 id="矩阵乘法校验">矩阵乘法校验</h3>
+<p><strong>描述：</strong></p>
+<p><span class="math inline">\(\mathtt{input}: A \in M_{n \times
+m}(\mathbb{R}),B \in M_{m\times k}(\mathbb{R}),C\in M_{n\times
+k}(\mathbb{R})\)</span></p>
+<p><span class="math inline">\(\mathtt{output}: [A \cdot B =
+C]\)</span></p>
+<p><strong>近似算法</strong>：<span class="math inline">\(T\)</span>
+轮，每次随机一个向量 <span class="math inline">\(x\)</span>，比较 <span
+class="math inline">\(ABx = Cx\)</span>，<span
+class="math inline">\(T\)</span> 轮都相同认为相等。</p>
+<p><strong>分析</strong>：</p>
+<ol type="1">
+<li>如果 <span class="math inline">\(x_i\in
+\{0,1\}\)</span>，一轮出错的概率 <span class="math inline">\(\leq
+0.5\)</span>。</li>
+<li>复杂度为 <span class="math inline">\(O(T(nm + mk +
+nk))\)</span>。</li>
+</ol>
+<h3 id="蒙特卡洛估计积分">蒙特卡洛估计积分</h3>
+<p><strong>描述：</strong></p>
+<p><span class="math inline">\(\mathtt{input}: f:[0,1] \to
+[0,1]\)</span>。</p>
+<p><span class="math inline">\(\mathtt{output}: M:=\int_0^1 f(x)\
+\mathrm{d}x\)</span>，要求 <span class="math inline">\(|\hat M - M| \leq
+\epsilon\)</span>。</p>
+<p><strong>近似算法</strong>： 多次随机选点 <span
+class="math inline">\(x_i\)</span>，输出 <span
+class="math inline">\(f(x_i)\)</span> 的平均值。</p>
+<ol type="1">
+<li><span class="math inline">\(\displaystyle \mathbb{E}[f(X)] =
+\int_0^1 f(x)\ \mathrm{d}x\)</span></li>
+<li>由 Hoeffding 不等式可以确定 <span class="math inline">\(T=
+O(\epsilon^{-2} \log (1/\delta))\)</span></li>
+</ol>
+<h3 id="平面图近似-tsp">*平面图近似 TSP</h3>
+<p>思想：存在一个结构简单的平面结构 <span
+class="math inline">\(\text{STSP}\)</span> 是 <span
+class="math inline">\((1+\epsilon)\)</span> 近似的，通过 dp 找到这样的
+<span class="math inline">\(\text{STSP}\)</span>。</p>
+<p>详询：<strong>Arora, 1998</strong></p>
+<h3 id="分布式快排">分布式快排</h3>
+<p>假设每台机器存储 <span class="math inline">\(s=O(\sqrt n)\)</span>
+的数据。</p>
+<p>快排过程：</p>
+<ol type="1">
+<li>一号机器生成 <span class="math inline">\(\sqrt n\)</span> 个随机
+pivot （即键值），广播给所有机器。</li>
+<li>每一台机器对于自己的数据进行分类，然后分发给其他机器。</li>
+<li>每台机器收到数据后，进行本地排序。</li>
+</ol>
+<h3 id="平面图的-balanced-separator">*平面图的 Balanced Separator</h3>
+<p>Mikkel Thorup, JACM 04</p>
+<p>用 <span class="math inline">\(O(\sqrt n)\)</span> 条水平 /
+竖直的线将平面图分割，是的任意两点间的最短路仅跨过 <span
+class="math inline">\(O(1)\)</span> 个 Separator。</p>
+<h3 id="负载均衡">负载均衡</h3>
+<p>将 <span class="math inline">\(n\)</span> 个文件分配个 <span
+class="math inline">\(m\)</span> 台服务器，需要支持 <span
+class="math inline">\(m\leftarrow m + 1\)</span>。</p>
+<ol type="1">
+<li><p>若 <span class="math inline">\(m\)</span> 不变，采用随机
+hash：</p>
+<p>理想随机 hash: <span class="math inline">\(h: [n] \to [m]\)</span>,
+s.t <span class="math inline">\(\Pr[h(i)=h(j)] = 1 \leq
+m\)</span>。</p></li>
+<li><p>若 <span class="math inline">\(m\)</span> 改变，采用 Consistent
+Hashing:</p>
+<p>将文件和服务器都 hash 映射到 <span
+class="math inline">\([M]\)</span>，并且将 <span
+class="math inline">\([M]\)</span> 看成一个 <span
+class="math inline">\(M\)</span> 元环（<span
+class="math inline">\(M\)</span> 足够大）。</p>
+<p>文件分配：文件 <span class="math inline">\(file\)</span> 找到 <span
+class="math inline">\(h(file)\)</span> 在环上最近的后继 <span
+class="math inline">\(h(server)\)</span>，交给 <span
+class="math inline">\(server\)</span>。</p>
+<p>新增服务器：新增服务器之后需要移动 <span
+class="math inline">\(O(n/m)\)</span> 个文件。</p>
+<p>用数据结构维护即可。</p></li>
+</ol>
+<h3 id="数据流近似-point-query">数据流近似 Point Query</h3>
+<p>描述：先给定数据流 <span class="math inline">\(a_1,a_2,\cdots,a_N\in
+[n]\)</span>，随后查询某个数出现的次数 <span
+class="math inline">\(C\)</span>，要求空间较小。</p>
+<p><strong>近似算法 Count-min</strong>：</p>
+<p>算法目标：概率求出 <span class="math inline">\(\hat C\)</span>, s.t.
+<span class="math inline">\(C\leq \hat C \leq C+\epsilon \cdot
+N\)</span>，使用 <span class="math inline">\(O(\text{poly}\log n
+/\epsilon)\)</span> 的时空。</p>
+<p>大致算法：采用一个随机 hash: <span class="math inline">\(h : [n] \to
+[m]\)</span>，用 <span class="math inline">\(m\)</span>
+个桶存下来。存储多个这样的随机 hash 和桶，取最小值。</p>
+<p><strong>概率分析</strong>：</p>
+<p><span class="math inline">\(\begin{aligned}\mathbb{E}[C(h(x)] &amp;=
+\mathbb{E}[C_x+\sum_{y \ne x} [h(y)=h(x)]\cdot C_y] \\&amp;= C_x +
+\sum_{y\ne x} \Pr[h(y)=h(x)]\cdot C_y\\ &amp;\leq C_x + N / m
+\end{aligned}\)</span></p>
+<p>再利用 Markov 不等式：</p>
+<p><span class="math inline">\(\Pr[C(h(x)) -C_x &gt; \epsilon \cdot N]
+\leq \dfrac{\mathbb{E}[C(h(x))-C_x]}{\epsilon \cdot
+N}=\dfrac{N/m}{\epsilon \cdot N}\leq \dfrac{1}{\epsilon \cdot
+m}\)</span></p>
+<p>取 <span class="math inline">\(m=2/\epsilon\)</span>，得到一个 <span
+class="math inline">\(50\%\)</span> 概率的算法 <span
+class="math inline">\(1+\epsilon\)</span> 近似算法。</p>
+<p>由于需要存多个桶，最终时空复杂度为 <span
+class="math inline">\(O(Tm)=O(\log(1/\delta)\cdot
+(2/\epsilon))\)</span></p>
+<h3 id="数据流近似-heavy-hitter">数据流近似 Heavy Hitter</h3>
+<p><strong>k-Heavy Hitter</strong>：</p>
+<p>输出数据流中出现次数超过 <span class="math inline">\(N/k\)</span>
+的元素。</p>
+<p>要求：</p>
+<ol type="1">
+<li>空间较小。</li>
+<li>出现 <span class="math inline">\(N/k\)</span> 的元素必须找出。</li>
+<li>所有被找出的元素出现次数 <span class="math inline">\(\ge
+N/k-\epsilon N\)</span>。</li>
+<li><span class="math inline">\(N\)</span> 在接收数据流时未知</li>
+</ol>
+<p>算法：使用 count-min 维护次数，此外，再维护一个表存储出现次数超过当前
+<span class="math inline">\(N/k\)</span> 的元素，在插入时修改。</p>
+<h3 id="数据流精确-majority">数据流精确 Majority</h3>
+<p>Majority: 出现次数超过一半的元素。</p>
+<p>算法1：若 <span class="math inline">\(x\)</span> 出现超过一半，则
+<span class="math inline">\(x\)</span> 的每一个 <span
+class="math inline">\(0/1\)</span> 位都出现超过一半，支持加 / 删。</p>
+<p>算法2：</p>
+<ol type="1">
+<li>初始化 count = 0, current = NULL</li>
+<li>一次考虑 <span class="math inline">\(a_i\)</span></li>
+<li>若 counter = 0，设置 current = <span
+class="math inline">\(a_i\)</span></li>
+<li>若 current = <span class="math inline">\(a_i\)</span>, counter
+加，否则减。</li>
+</ol>
+<p>以上两个算法值只能在确定 Majority 存在的情况下使用。</p>
+<h3 id="bloom-filter">*Bloom Filter</h3>
+<p>描述：</p>
+<p>维护集合 <span class="math inline">\(S\)</span>，支持插入，删除，值域
+<span class="math inline">\(S\)</span> 可能为字符串</p>
+<p>询问一个元素是否在集合中，要求漏过一个元素的概率 <span
+class="math inline">\(\leq \delta\)</span>。</p>
+<p>算法：</p>
+<p>维护 <span class="math inline">\(m\)</span> 个桶，<span
+class="math inline">\(T\)</span> 个随机 hash 函数 <span
+class="math inline">\(h^i:S\to [m]\)</span>。</p>
+<p>桶维护 <span class="math inline">\(h^j(a_i)\)</span>
+的次数，插入删除时修改 <span class="math inline">\(T\)</span>
+个位置。</p>
+<p>查询：所有 <span class="math inline">\(h^{i}(x)\)</span> 的位置都
+<span class="math inline">\(&gt;0\)</span> 就返回 Yes。</p>
+<p>分析：</p>
+<ol type="1">
+<li>考虑其余 <span class="math inline">\(n\)</span> 个数冲突覆盖掉所有
+<span class="math inline">\(h^i(x)\)</span> 的概率，即 <span
+class="math inline">\((1-(1-1/m)^{Tn})^T \approx
+(1-\exp(-nT/m))^T\)</span></li>
+<li>若 <span class="math inline">\(m,n\)</span> 固定，则取 <span
+class="math inline">\(T = \frac{m}{n}\ln 2\)</span></li>
+<li>若要求失败概率 <span class="math inline">\(\delta\)</span>，则 <span
+class="math inline">\(m = \frac{n\ln \delta^{-1}}{\ln ^2 2}, T=
+\log_2(\delta^{-1})\)</span></li>
+</ol>
+<p>空间是线性的，若没有删除操作，可以将桶换成 bitset。</p>
+<h3 id="集合的-jaccard-similarity-近似">集合的 Jaccard Similarity
+近似</h3>
+<p><span class="math inline">\(J(A,B) = \dfrac{|A\cap B|}{|A\cup
+B|}\)</span></p>
+<p>描述：给定多个集合 <span class="math inline">\(S_i\)</span>，多个查询
+<span class="math inline">\(J(S_{p_i},S_{q_i})\)</span>。</p>
+<p><strong>算法 MinHash</strong>：</p>
+<p>取 hash 函数 <span class="math inline">\(h:[n] \to [0,1]\)</span>
+或者一个足够大的整数域。</p>
+<p>Claim：<span class="math inline">\(\Pr[\min\{h(A_i)\} =
+\min\{h(B_i)\}]=J(A,B)\)</span></p>
+<p>Proof：</p>
+<p><span class="math inline">\(\min\{h(A),h(B)\}\)</span> 一定是集合
+<span class="math inline">\(A\cup B\)</span> 中随机选出的一个，</p>
+<p>仅当恰好选到 <span class="math inline">\(A\cap B\)</span> 时，<span
+class="math inline">\(\min\{h(A_i)\}=\min\{h(B_i)\}\)</span></p>
+<p>取 <span class="math inline">\(T\)</span> 个 hash
+函数，求出概率即可。</p>
+<p>由 Chernoff bound，<span class="math inline">\(T=O(\log n)\)</span>
+时，失败概率为 <span class="math inline">\(1/\text{poly}(n)\)</span></p>
+<h3 id="向量的-cosine-similarity-近似">*向量的 Cosine Similarity
+近似</h3>
+<p><span class="math inline">\(x,y \in \mathbb{R}^d, \sigma(x,y) =
+\dfrac{x \cdot y}{\|x\|_2\cdot \|y\|_2} = \cos \lang
+x,y\rang\)</span></p>
+<p>算法：</p>
+<p>生成一个随机向量 <span class="math inline">\(w\)</span>（这里需要在
+<span class="math inline">\(d\)</span>
+位单位球的表面随机选择一个点，生成方式为生成 <span
+class="math inline">\(d\)</span> 个正态变量，随后放到球面，<a
+target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">wiki</a>）。</p>
+<p>使用 hash 函数 <span class="math inline">\(h(x)=[w \cdot x\ge
+0]\)</span></p>
+<p>Claim：<span class="math inline">\(\Pr[h(x) \ne h(y)] =
+\sigma(x,y)\)</span></p>
+<p>注：使用该 hash 函数后，<span class="math inline">\(T\)</span>
+个输出结果组成了一个 <span class="math inline">\(T\)</span>
+位二进制数。</p>
+<h3 id="hamming-空间最近点近似算法">Hamming 空间最近点近似算法</h3>
+<p>Hamming 空间：<span class="math inline">\(\mathbb{H}^d\)</span>，即
+<span class="math inline">\(d\)</span> 位二进制数，<span
+class="math inline">\(dis(x,y)=\text{popcount}(x\oplus y)\)</span>。</p>
+<p>描述：给定一组点和若干最近点查询，要求 <span
+class="math inline">\((1+\epsilon)\)</span> 近似。</p>
+<p>算法：<span class="math inline">\(T\)</span> 次，用随机排列 <span
+class="math inline">\(\sigma_i\)</span> 映射二进制位，对于映射完的数
+<span class="math inline">\(a_i\)</span> 取字典序最近的 <span
+class="math inline">\(c\)</span> 个更新答案。</p>
+<p>复杂度：<span class="math inline">\(O(T n(\log n+c))\)</span>。</p>
+<p>参数选择：<span
+class="math inline">\(T=O(n^{1/(1+\epsilon)})\)</span>。</p>
+<h3 id="欧氏距离直径近似">欧氏距离直径近似</h3>
+<p><strong>描述</strong>：<span class="math inline">\(P_i\in \Delta^d,
+\Delta=[2^{32}]\)</span> 或 <span
+class="math inline">\([0,10^9]\)</span>，求 <span
+class="math inline">\(\max\{\text{dist}(P_i,P_j)\}\)</span></p>
+<p><strong>算法</strong>：</p>
+<ol type="1">
+<li>求一个 <span class="math inline">\(2-\)</span>近似直径 <span
+class="math inline">\(T (\frac{1}{2}\text{diam}\leq T \leq
+\text{diam})\)</span>。</li>
+<li>以 <span class="math inline">\(\ell=\dfrac{\epsilon \cdot
+T}{\sqrt{d}}\)</span>
+的方格划分空间，将每个点放到最近的立方体顶点上。</li>
+<li>暴力枚举不同的点求距离</li>
+</ol>
+<p><strong>分析</strong>：</p>
+<ol type="1">
+<li><p>误差分析：以长 <span class="math inline">\(\ell\)</span>
+的方格划分，每个点移动的距离不超过 <span
+class="math inline">\(\frac{1}{2}\sqrt{d} \ell\)</span>，</p>
+<p>故求出直径的偏差不超过 <span class="math inline">\(2\sqrt{d}\ell =
+\epsilon T \leq \epsilon \cdot \text{diam}\)</span></p></li>
+<li><p>复杂度分析：直径 <span class="math inline">\(\text{diam}\leq
+2T\)</span>，故按照 <span class="math inline">\(\ell\)</span>
+划分时，每一维坐标的的差距不超过 <span
+class="math inline">\(\frac{2T}{\ell}=2\sqrt{d}/\epsilon\)</span>，</p>
+<p>总划分后点数上界为 <span
+class="math inline">\(O((2\sqrt{d}/\epsilon)^d)=O(\epsilon^{-O(d)})\)</span></p>
+<p>总复杂度为 <span
+class="math inline">\(O(n+\epsilon^{-O(d)})\)</span></p></li>
+</ol>
+<p>注：直接划分到方格的左下角，虽然每个点都移动了 <span
+class="math inline">\(\sqrt{d}\ell\)</span>，但是总体偏差依然正确（可以在移动之后给
+<span class="math inline">\(x,y\)</span> 都加上 <span
+class="math inline">\(\frac{1}{2}\ell\)</span> 移动到方格中心）</p>
+<h3 id="欧氏空间最小包围球近似">欧氏空间最小包围球近似</h3>
+<p><strong>描述</strong>：<span class="math inline">\(P_i\in
+\mathbb{R}^d\)</span>，求 <span class="math inline">\(C\in
+\mathbb{R}^d\)</span>，最小化 <span class="math inline">\(f(P,c) =
+\max\{\text{dist}(P_i,c)\}\)</span></p>
+<p><span class="math inline">\(\epsilon-\)</span>Coreset：找到 <span
+class="math inline">\(S\subseteq P\)</span>，使得 <span
+class="math inline">\(\forall c, f(S,c) \ge (1-\epsilon)f(P,c)\)</span>
+（近似凸包）</p>
+<p><strong>算法</strong>：</p>
+<ol type="1">
+<li><p>用 <span class="math inline">\(O(n)\)</span> 的时间找一个 <span
+class="math inline">\(2\)</span> 近似的值 <span
+class="math inline">\(T\)</span> （<span class="math inline">\(f(P,c)
+\leq T \leq 2f(P,c)\)</span> ）</p></li>
+<li><p>作 <span
+class="math inline">\(\ell=\dfrac{\epsilon}{2\sqrt{d}}\cdot T\)</span>
+的网格，并 round 点集 <span class="math inline">\(P\)</span> 得到新点集
+<span class="math inline">\(P&#39;\)</span></p>
+<p>（也可以找到 <span class="math inline">\(P&#39;\)</span> 在原 <span
+class="math inline">\(P\)</span> 上对应的一组点）</p></li>
+</ol>
+<p><strong>并行算法</strong>：修改 <span
+class="math inline">\(\epsilon\)</span>，做分治合并，每次合并之后再求
+coreset。</p>
+<p><strong>数据流算法</strong>：依次接收每个数据点，维护分治合并路径上的一组点（类似二进制分组）。</p>
+<h3 id="四分树">四分树</h3>
+<p><span class="math inline">\(\mathtt{input}: P_i \in
+\Delta^d\)</span>。</p>
+<p>建树：</p>
+<p><span class="math inline">\(\mathtt{Build}(S, \square)\)</span>:
+当前点集为 <span class="math inline">\(S\)</span>，对应着立方体 <span
+class="math inline">\(\square\)</span>。</p>
+<ol type="1">
+<li>若 <span class="math inline">\(S=\emptyset\)</span>，返回
+NULL。</li>
+<li>新建节点 <span class="math inline">\(u\)</span></li>
+<li>若 $|S|=$1，返回 <span class="math inline">\(u\)</span>。</li>
+<li>将 <span class="math inline">\(\square\)</span>
+的每一维按中点划分，划分为 <span class="math inline">\(2^d\)</span>
+个矩形 <span class="math inline">\(\square_i\)</span>。</li>
+<li><span class="math inline">\(u.son_i=\mathtt{Build}(S\cap \square_i,
+\square_i)\)</span></li>
+</ol>
+<p>树有 <span class="math inline">\(\log \Delta\)</span>
+层，朴素的实现有 <span class="math inline">\(O(n\log \Delta)\)</span>
+个节点。</p>
+<p>若对于树做路径压缩， 则共有 <span class="math inline">\(O(n)\)</span>
+个节点，可以用动态数组存储 <span
+class="math inline">\(u.son\)</span>。</p>
+<h3 id="四分树近似最近邻查询">四分树近似最近邻查询</h3>
+<p><strong>描述</strong>：给定点集 <span class="math inline">\(P_i\in
+\Delta^d\)</span> 和查询 <span class="math inline">\(Q_i\)</span>，输出
+<span class="math inline">\((1+\epsilon)\)</span> 近似的最近点。</p>
+<p><strong>算法</strong>：</p>
+<p>建立四分树，为每个四分树节点选择一个点集的代表点 <span
+class="math inline">\(\text{rep}_u\)</span>（任意一个点即可）。</p>
+<p>维护一个全局的答案 <span class="math inline">\(ans\)</span>
+和对应的点编号。</p>
+<p><span class="math inline">\(\mathtt{Query}(u, \square,
+q)\)</span>:</p>
+<ol type="1">
+<li><p>用 <span class="math inline">\(\text{rep}_u\)</span> 和 <span
+class="math inline">\(\text{rep}_{u.son_i}\)</span> 更新答案</p></li>
+<li><p>剪枝：考虑 <span class="math inline">\(v=u.son_i\)</span>，</p>
+<p>若 <span class="math inline">\(ans \leq (1+\epsilon)
+(\text{dist}(q,\text{rep}_v)-\text{diam}(\square_v))\)</span>，则调用
+<span class="math inline">\(\mathtt{Query}(v, \square_v,q)\)</span></p>
+<p>这里 <span
+class="math inline">\(\text{dist}(q,\text{rep}_v)-\text{diam}(\square_v)\)</span>
+是 <span class="math inline">\(\min\{\text{dist}(q,S_v)\}\)</span>
+的放缩。</p></li>
+</ol>
+<p><strong>分析</strong>：</p>
+<ol type="1">
+<li><p>剪枝是基于 <span class="math inline">\((1+\epsilon)\)</span>
+近似的</p></li>
+<li><p>复杂度分析：给出一个剪枝的界：</p>
+<p>算法运行至 <span class="math inline">\(\text{diam}(\square)\leq
+\dfrac{\epsilon}{2}\cdot r^{*}\)</span> 时，有：</p>
+<p><span class="math inline">\(\begin{aligned} (1+\epsilon) \cdot
+(\text{dist}(q,rep_u)-\text{diam}(\square_u)) &amp;\ge (1+\epsilon)
+(r-\text{diam}(\square_u)) \\ &amp; \ge
+(1+\epsilon)(1-\frac{\epsilon}{2})r \\ &amp; \ge
+r\end{aligned}\)</span></p>
+<p>故这样的点会被剪枝。</p>
+<p>故复杂度的上界为 <span class="math inline">\(O(\epsilon^{O(-d)} \log
+\Delta)\)</span>。</p></li>
+</ol>
+<h3 id="欧氏空间-wspd-well-separated-pair-decomposition">欧氏空间 WSPD
+(Well-separated pair decomposition)</h3>
+<p>描述：<span class="math inline">\(\epsilon-\)</span>WSPD，对于点集
+<span class="math inline">\(P\)</span>，要求找到若干对点集：<span
+class="math inline">\(\{(A_i,B_i)\}_{i=1}^s\)</span>，使得：</p>
+<ol type="1">
+<li><p><span
+class="math inline">\(\max\{\text{diam}(A_i),\text{diam}(B_i)\} \leq
+\epsilon \cdot \text{dist}(A_i,B_i)\)</span>,</p>
+<p>where <span class="math inline">\(\displaystyle
+\text{dist}(A,B)=\min_{u\in A,v\in
+B}\{\text{dist}(u,v)\}\)</span></p></li>
+<li><p><span class="math inline">\(\displaystyle \bigcup_i A_i \times
+B_i = P \times P\)</span></p></li>
+</ol>
+<p><strong>算法</strong>：</p>
+<p>建立四分树，定义 <span
+class="math inline">\(\delta(u)=\left\{\begin{aligned}
+\text{diam}(\square_u) &amp;&amp; |\square_u \cap P|\ge 2 \\ 0
+&amp;&amp; \text{otherwise}\end{aligned}\right.\)</span></p>
+<p><span class="math inline">\(\mathtt{WSPD}(u,v)\)</span>:</p>
+<ol type="1">
+<li>若 <span class="math inline">\(u=v\)</span> 且 <span
+class="math inline">\(\delta_u=0\)</span>，返回 <span
+class="math inline">\(\emptyset\)</span>。（边界）</li>
+<li>若 <span class="math inline">\(\delta_u &lt; \delta_v\)</span>，交换
+<span class="math inline">\(u,v\)</span>。</li>
+<li>若 <span class="math inline">\(\delta_u \leq \epsilon \cdot
+\text{dist}(\square_u,\square_v)\)</span>，则返回 <span
+class="math inline">\((u,v)\)</span>。这里 <span
+class="math inline">\(\text{dist}\)</span> 直接求两个矩形的距离。</li>
+<li><span class="math inline">\(\mathtt{WSPD}(u.son_i,v)\)</span>。</li>
+</ol>
+<p><strong>分析</strong>：</p>
+<p>输出大小与算法复杂度均为 <span
+class="math inline">\(O(n\epsilon^{O(-d)}\log \Delta)\)</span>。</p>
+<p><strong>应用</strong>：</p>
+<ol type="1">
+<li><p>最近点对：取 <span class="math inline">\(\epsilon =
+1\)</span>，空间中的最近点对一定出现在一对 <span
+class="math inline">\((A_i,B_i)\)</span> 中，且 <span
+class="math inline">\(|A_i|=|B_i|=1\)</span>。</p></li>
+<li><p><span class="math inline">\((1+\epsilon)\)</span> 近似直径：构造
+<span class="math inline">\(\epsilon
+/2\)</span>-WSPD，在每个点集任取一个代表点 <span
+class="math inline">\(\text{rep}(A)\)</span>，答案为 <span
+class="math inline">\(\max\{\text{dist}(\text{rep}(A_i),\text{rep}(B_i))\}\)</span></p></li>
+<li><p><span class="math inline">\((1+\epsilon)\)</span> Spanner:
+求完全图 <span class="math inline">\(P\times P\)</span> 的一个子图 <span
+class="math inline">\(H\)</span>，使得 <span
+class="math inline">\(\text{dist}(x,y) \leq \text{dist}_H(x,y)\leq
+(1+\epsilon)\text{dist}(x,y)\)</span>：</p>
+<p>算法：求 <span class="math inline">\(\epsilon/4\)</span>-WSPD，在每个
+<span class="math inline">\(A_i,B_i\)</span> 中选择一个代表点连边。</p>
+<p>可以用于求 MST</p></li>
+</ol>
+<h3 id="tree-embedding">Tree Embedding</h3>
+<p><strong>描述</strong>：将点集 <span class="math inline">\(P\)</span>
+从 <span class="math inline">\(\mathbb{R}^d\)</span> 映射到一颗树 <span
+class="math inline">\(T\)</span> 上，尽量最小化 <span
+class="math inline">\(\text{Distortion}=\max\{\dfrac{\text{dist}_T(x,y)}{\text{dist}(x,y)}\}\)</span>。</p>
+<p><strong>算法</strong>：</p>
+<ol type="1">
+<li>在 <span class="math inline">\(2\Delta\)</span> 上构造四分树</li>
+<li>随机一个 <span class="math inline">\([-\Delta,0]^d\)</span> 上的向量
+<span class="math inline">\(v\)</span>，将整棵树平移 <span
+class="math inline">\(v\)</span>。</li>
+<li>将数据点放在四分树的叶子上，其余点每个点向儿子连接 <span
+class="math inline">\(\sqrt{d} \cdot \Delta\cdot
+2^{\text{-dep}}\)</span> 的边。</li>
+</ol>
+<p><span class="math inline">\(\text{dist}(x,y) \leq
+\text{dist}_T(x,y),\mathbb{E}[\text{dist}_T(x,y)] \leq O(dh) \cdot
+\text{dist}(x,y)\)</span>，<span class="math inline">\(h\)</span>
+为四分树的高度。</p>
+<p>劣势：近似比大 <span class="math inline">\(O(dh)\)</span></p>
+<p>优势：</p>
+<ol type="1">
+<li>因为每对点期望距离都能保持，因此广泛适用于目标函数是点距离和的问题</li>
+<li>树上算法性能较好，可解决问题多，有树算法就有欧氏空间近似算法</li>
+<li>没有 <span
+class="math inline">\(2^d\)</span>，对于高维也相对适用</li>
+</ol>
+<h2 id="johnson-linderstrauss-降维问题">Johnson-Linderstrauss
+降维问题</h2>
+<p><strong>描述</strong>：</p>
+<p>给定 <span class="math inline">\(n\)</span> 个 <span
+class="math inline">\(\mathbb{R}^d\)</span> 中的点，将它们映射到 <span
+class="math inline">\(\mathbb{R}^m\)</span> 上，</p>
+<p>并且 <span class="math inline">\(\|f(P_1)-f(P_2)\|_2\in (1\pm
+\epsilon)\cdot \|P_1-P_2\|_2\)</span>（距离 <span
+class="math inline">\(\epsilon\)</span> 近似）。</p>
+<p>这里 <span class="math inline">\(m=O(\epsilon^{-2}\log
+n)\)</span>。</p>
+<p>应用引入：</p>
+<h3 id="k-聚类问题-2-近似-gonzalez-算法">k 聚类问题 2-近似： Gonzalez
+算法</h3>
+<p><strong>描述</strong>：找到点集 <span class="math inline">\(C
+\subseteq P\)</span>，<span class="math inline">\(\displaystyle
+\text{minimize}: \min_{c\in C}\max_{p\in P}
+\text{dist}(p,c)\)</span></p>
+<p><strong>流程</strong>：</p>
+<ol type="1">
+<li>任选一个点 <span class="math inline">\(c_1\)</span>，初始化 <span
+class="math inline">\(C=\{c_1\}\)</span></li>
+<li><span class="math inline">\(k-1\)</span> 轮，不断找出距离 <span
+class="math inline">\(C\)</span> 最远的点 <span
+class="math inline">\(p\)</span>，放入 <span
+class="math inline">\(C\)</span> 中。</li>
+</ol>
+<p>复杂度为 <span class="math inline">\(O(nkd)\)</span>，如果使用 JL
+方法优化，则可以降低到 <span class="math inline">\(O(nk\log
+n)\)</span>。</p>
+<h3 id="jl-问题的下界分析">JL 问题的下界分析</h3>
+<p><span class="math inline">\(m=O(\log n)\)</span> 是一个紧的下界。</p>
+<p>一个构造证明：</p>
+<p><span class="math inline">\(d=n\)</span> 时，分别取 <span
+class="math inline">\(p_i=e_i\)</span>（仅第 <span
+class="math inline">\(i\)</span> 维为 <span
+class="math inline">\(1\)</span>）。</p>
+<p>则降维后，在每个点 <span class="math inline">\(p&#39;_i\)</span>
+的半径 <span class="math inline">\(\sqrt 2 \cdot (1-\epsilon)\)</span>
+范围内不能存在点，且所有点必须在 <span class="math inline">\(\sqrt n (1
++ \epsilon)\)</span> 的球内。</p>
+<p>则用体积估计可以得到 <span class="math inline">\(n\cdot V_m(\sqrt
+2(1-\epsilon)) \leq V_m(\sqrt n(1+\epsilon))\)</span></p>
+<p><span class="math inline">\(V_m(r) = O(r^m)\)</span>，故 <span
+class="math inline">\(m=O(\log n)\)</span>。</p>
+<h3 id="jl-构造算法">JL 构造算法</h3>
+<p>原问题的一个强化版为 <span
+class="math inline">\(\text{dist}(f(p_1),f(p_2))^2\in (1\pm
+\epsilon)\cdot \text{dist}(p_1,p_2)^2\)</span></p>
+<p>构造思路：</p>
+<p>对于一对点 <span class="math inline">\(x,y\)</span>，考虑 <span
+class="math inline">\(v=x-y\)</span>，</p>
+<p>我们希望找一个随机映射 <span class="math inline">\(g_i:
+\mathbb{R}^d\to \mathbb{R}\)</span>，使得 <span
+class="math inline">\(E[g(v)^2]=|v|^2\)</span></p>
+<p>独立生成若干个这样的随机映射后组合 <span
+class="math inline">\(f(p)=\frac{1}{\sqrt
+m}(g_1(p),g_2(p),\cdots,g_m(p))\)</span>。</p>
+<p><span class="math inline">\(g_i\)</span> 的构造：</p>
+<p>生成一个 <span class="math inline">\(\mathbb{R}^d\)</span> 的随机向量
+<span class="math inline">\(w\)</span>，<span
+class="math inline">\(w\)</span> 的每一位采样自 <span
+class="math inline">\(\mathscr{N}(0,1)\)</span>。</p>
+<p>取 <span class="math inline">\(g(v)=v\cdot w\)</span></p>
+<p><span class="math inline">\(\mathbb{E}(g(v)) = \mathbb{E}(v\cdot w) =
+|v| \cdot \mathbb{E}(\mathscr{N}(0,1))\)</span></p>
+<p><span class="math inline">\(\mathbb{E}(g(v)^2) = \mathbb{E}(\sum
+(v_iw_i)^2) = |v|^2 E(\mathscr{N}(0,1)^2)=|v|^2\)</span></p>
+<p>误差估计：<span class="math inline">\(\Pr[f(v)^2] \in (1+\epsilon)
+|v|^2 \ge 1-\exp(-O(\epsilon^2m))\)</span></p>
+<p>对于 <span class="math inline">\(n^2\)</span> 对点，用 uion bound
+得到一个松的估计为：误差概率 <span
+class="math inline">\(\exp(-O(\epsilon^2m))\cdot O(n^2)\leq
+\delta\)</span>, <span class="math inline">\(\delta\)</span>
+为失败概率。</p>
+<p>解得 <span class="math inline">\(m=O(\epsilon^{-2}\log
+(\frac{n}{\delta}))\)</span></p>
+<p>该算法实际上仅有参数 <span
+class="math inline">\(m\)</span>，构造的映射不依赖输入数据（Data
+Oblivious）。</p>
+<h3 id="应用-linear-regression">应用： Linear Regression</h3>
+<p>输入 <span class="math inline">\((p_i,v_i)(i=1,2,\cdots,n), p_i\in
+\mathbb{R}^d,v_i \in \mathbb{R}\)</span></p>
+<p>在实际场景中，<span class="math inline">\(d \ll n\)</span>。</p>
+<p>找到一个 <span class="math inline">\((w,w_0)\)</span>，最小化 <span
+class="math inline">\(\displaystyle \sum_{i} ((x\cdot
+w)+w_0-y)^2\)</span></p>
+<p>写成归一形式即：<span class="math inline">\(\arg\min
+\|Xw-y\|^2\)</span>，最优的 <span
+class="math inline">\(w^*=(X^TX)^{-1}X^T y\)</span></p>
+<p>思路：将 JL 写成 <span class="math inline">\(A\in \mathbb{R}_{m\times
+n}\)</span>, 问题就变成了 <span class="math inline">\(AWw-Ay\)</span>
+（不是对 <span class="math inline">\(d\)</span> 降维，而是对 <span
+class="math inline">\(n\)</span> 降维！）。</p>
+<p>问题：不能直接降维，因为降维的正确性分析依赖于涉及的不同向量数量
+<span class="math inline">\(n\)</span>，这个 <span
+class="math inline">\(n\)</span> 会囊括回归过程中的所有中间 <span
+class="math inline">\(Xw\)</span>。</p>
+<p>（实际上取 <span class="math inline">\(m= O(d)\)</span> 即可）。</p>
+<p>新的问题：计算 <span class="math inline">\(AW\)</span> 需要 <span
+class="math inline">\(O(nd^2)\)</span> 的时间，即便只需要计算一次。</p>
+<p>优化：用稀疏矩阵代替 <span class="math inline">\(S\)</span> 代替
+<span class="math inline">\(A\)</span>。</p>
+<p><span class="math inline">\(S\in \mathbb{R}^{m\times
+n}\)</span>，每一列随机选择一个位置赋予 <span class="math inline">\(\pm
+1\)</span>，取 <span class="math inline">\(A = \sqrt{\frac{n}{m}}
+S\)</span>。</p>
+<p>这样计算 <span class="math inline">\(AX\)</span> 的复杂度降到了 <span
+class="math inline">\(X\)</span> 的非零位置个数。</p>
+<h3 id="应用离散化-epsilon-net">应用：离散化 <span
+class="math inline">\(\epsilon-\)</span>net</h3>
+<p><span class="math inline">\(d\)</span> 维单位球面 <span
+class="math inline">\(\mathcal{S}_{\mathscr{U}}\)</span>
+上的一个离散子集 <span
+class="math inline">\(N_{\epsilon}\)</span>，使得：</p>
+<ol type="1">
+<li>(covering)：任何球面上的点都能找到距离 <span
+class="math inline">\(\epsilon\)</span> 内的代表。</li>
+<li>(packing)： <span class="math inline">\(N_{\epsilon}\)</span>
+中任意两个点距离 <span
+class="math inline">\(&gt;\epsilon\)</span>。</li>
+</ol>
+<p>用一个 trivial 的构造容易说明存在这样的离散集，且其大小为 <span
+class="math inline">\(O(\epsilon^{-d})\)</span></p>
+<h2 id="pca-principle-components-analysis主成分分析-降维">PCA (Principle
+Components Analysis，主成分分析) 降维</h2>
+<p>和 JL 的区别：</p>
+<ol type="1">
+<li>PCA 不针对欧式距离</li>
+<li>PCA 通过数据直接的关系来降维，而 JL 不依赖数据</li>
+<li>PCA 降维的基通常都有实际意义</li>
+</ol>
+<p>目标描述：</p>
+<p>输入 <span class="math inline">\(x_i\in \mathbb{R}^d\)</span>，找到
+<span class="math inline">\(m\)</span> 个基 <span
+class="math inline">\(v_i \in \mathbb{R}^d\)</span>，使得 <span
+class="math inline">\(x_i \approx \sum_j a_{i,j} v_j\)</span></p>
+<p>即用较少的基近似线性表示所有的向量。</p>
+<h4 id="预处理">预处理：</h4>
+<ol type="1">
+<li>去均值：记 <span class="math inline">\(\overline{x} =
+\text{average}\{x_i\}, x_i \leftarrow x_i -
+\overline{x}\)</span>，将中心移动到原点。</li>
+<li>归一化：<span class="math inline">\(x_{i,j} =
+\dfrac{x_{i,j}}{\sqrt{\sum_{k}
+x_{k,j}^2}}\)</span>，尽量让每一个维度的长接近，否则目标函数上会出现维度间的主次。</li>
+</ol>
+<h3 id="形式化">形式化</h3>
+<p><span class="math inline">\(m=1\)</span> 时，问题等价于找一条直线
+<span class="math inline">\(\ell: k \cdot v_1\)</span>。</p>
+<p>目标为： <span class="math display">\[
+\arg \min_{v} \frac{1}{n} \sum (\text{dist}(v,x_i))^2
+\]</span></p>
+<p><span class="math inline">\(\text{dist}^2(v,x_i)=x_i^2-(x_i \cdot
+v)^2\)</span>，所以等价于最大化 <span class="math inline">\((x_i\cdot
+v)^2\)</span>。</p>
+<p><img src="./assets/image-20230521183002529.png" alt="image-20230521183002529" style="zoom:50%;" /></p>
+<p>扩展到任意 <span class="math inline">\(m\)</span>
+的情况，目标同样可以写作最大化投影： <span class="math display">\[
+\arg \max_{m-\dim \text{subspace} s} \frac{1}{n} \sum_i (\text{length of
+} x_i\text{&#39;s injection on }s)
+\]</span> <span class="math inline">\(m-\)</span> 维的子空间可以用 <span
+class="math inline">\(m\)</span> 个
+orthonormal（正交标准基）的向量表示。</p>
+<p>用 <span class="math inline">\(\text{span}(v_i) = \{\sum \lambda_i
+v_i\mid \forall \lambda_i\}\)</span> 来表示平面，则投影长度为 <span
+class="math inline">\(\sum_i (x\cdot v_i)^2\)</span>，投影坐标即为 <span
+class="math inline">\((x\cdot v_i)_{i=1}^m\)</span>。</p>
+<h3 id="求解">求解：</h3>
+<p><span class="math inline">\(m=1\)</span> 时，目标重写为 <span
+class="math inline">\(\sum (x_i\cdot v)^2 =
+\|Xv\|_2^2=v^TX^TXv\)</span>，设 <span
+class="math inline">\(A=X^TX\)</span>，</p>
+<p>则相当于最大化一个二次型 <span
+class="math inline">\(v^TAv\)</span>，而实二次型的标准型为对角矩阵。</p>
+<p>做正交对角化，设 <span class="math inline">\(A=Q\cdot
+\text{diag}\{\lambda_i\}\cdot Q^T\)</span>，对于对角矩阵求出最优的 <span
+class="math inline">\(Q^Tv\)</span> 即可。</p>
+<p>若 <span class="math inline">\(|\lambda_1|\ge
+|\lambda_2|\cdots\)</span>，则最优的 <span
+class="math inline">\(Q^Tv\)</span> 显然为 <span
+class="math inline">\(e_1\)</span>，则 <span
+class="math inline">\(v=Q\cdot e_1\)</span>，即 <span
+class="math inline">\(Q\)</span> 的第一列。</p>
+<p>一般的 <span class="math inline">\(m\)</span>：改为前 <span
+class="math inline">\(m\)</span> 列即可。</p>
+<p>容易发现，其实求出的就是 <span
+class="math inline">\(\lambda_i\)</span> 对应的一个特征向量。</p>
+<p>直接用线性代数方法求解不太实用。</p>
+<p>近似求最大特征向量（即 <span
+class="math inline">\(m=1\)</span>）<strong>Power
+Iteration</strong>：</p>
+<ol type="1">
+<li>任取一个向量 <span class="math inline">\(u_0\)</span>。</li>
+<li>枚举 <span class="math inline">\(i\)</span>，求出 <span
+class="math inline">\(u_i=A^iu_0\)</span>。</li>
+<li>当 <span class="math inline">\(\dfrac{u_i}{\|u_i\|}\)</span>
+接近不变时停止，并返回这个值作为结果。</li>
+</ol>
+<p>原理：不断乘 <span class="math inline">\(A\)</span>
+的过程中，会在最大特征向量的方向上被不断拉长。</p>
+<p>从右边开始计算 <span class="math inline">\(Au=X^TXu\)</span>
+的复杂度为 <span class="math inline">\(X\)</span>
+的非零元个数，所以复杂度近似 <span
+class="math inline">\(O(\text{nnz}(X))\)</span>。</p>
+<p>迭代次数估计： <span class="math display">\[
+(u_t \cdot v_1) \ge 1 -
+\left(\frac{\lambda_2}{\lambda_1}\right)^t
+\]</span> 达到 <span class="math inline">\(1-\epsilon\)</span>
+误差需要迭代次数 <span class="math inline">\(t=O(\frac{\log
+(d/\epsilon)}{\log(\lambda_1 / \lambda_2)})\)</span></p>
+<p>计算 <span class="math inline">\(m&gt;1\)</span> ：</p>
+<p>先找到 <span class="math inline">\(v_1\)</span> 之后把 <span
+class="math inline">\(x_i \leftarrow x_i - (x_i \cdot v_1) \cdot
+v_1\)</span> 即可。</p>
+<p>PCA 局限性：只能线性拟合的情况下，拟合力有限，当 <span
+class="math inline">\(m\)</span>
+增大时可能也只有前几个向量比较有意义。</p>
+<h3 id="奇异值分解singular-value-decomposition">奇异值分解（Singular
+Value Decomposition）</h3>
+<p><span class="math inline">\(\text{rank}\)</span> 为 <span
+class="math inline">\(k\)</span> 的矩阵 <span
+class="math inline">\(A\)</span> 可以分解为 <span
+class="math inline">\(n\times k, k\times n\)</span>
+的两个矩阵的乘积。</p>
+<p><span class="math inline">\(A=USV^T\)</span>，其中 <span
+class="math inline">\(U,V^T\)</span> 为正交矩阵的前 <span
+class="math inline">\(k\)</span> 列/前 <span
+class="math inline">\(k\)</span> 行， <span
+class="math inline">\(S\)</span> 为奇异值矩阵（对角线为奇异值）。</p>
+<p>或者写作 <span class="math inline">\(A = \sum_{i=1}^n s_i \cdot
+u_iv_i^T\)</span>。</p>
+<p>SVD low-rank 近似：仅保留 <span class="math inline">\(k\)</span>
+个，令 <span class="math inline">\(A_k=\sum_{i=1}^k s_i\cdot
+u_iv_i^T\)</span>，可以用极少的元素存储 <span
+class="math inline">\(A\)</span> 的信息。</p>
+<p>用 SVD 做 PCA:</p>
+<p>设 <span class="math inline">\(X=(USV^T)\)</span>，则 <span
+class="math inline">\(A=X^TX=VS^TU^TUSV^T=VS^TSV^T\)</span>，将 <span
+class="math inline">\(S^TS\)</span> 看作 <span
+class="math inline">\(D\)</span>，用 <span
+class="math inline">\(V\)</span> 就知道前面的 <span
+class="math inline">\(Q\)</span> 了。</p>
+<p>SVD 的缺陷：</p>
+<p>可能将原本的稀疏的矩阵反而变稠密了：</p>
+<p><img src="./assets/image-20230521201956844.png" alt="image-20230521201956844" style="zoom:50%;" /></p>
+<p>SVD 做 <span class="math inline">\(k-\)</span> 聚类问题降维：</p>
+<p>对于坐标矩阵（<span class="math inline">\(n\times d\)</span>）求
+SVD，取 <span class="math inline">\(m=\lceil k/\epsilon\rceil\)</span>
+的 low-rank SVD 近似，得到映射。</p>
+<p>在 <span class="math inline">\(X_m\)</span> 上的聚类是 <span
+class="math inline">\(\epsilon\)</span> 近似的。</p>
+<h3 id="cur-降维">CUR 降维</h3>
+<p>取 <span class="math inline">\(\text{rank}=k\)</span>，将 <span
+class="math inline">\(A\)</span> 写作 <span
+class="math inline">\(A=CUR\)</span>，其中 <span
+class="math inline">\(U\)</span> 是 <span
+class="math inline">\(\text{rank}(k)\)</span> 的矩阵，但是是稠密的。</p>
+<p><span class="math inline">\(C,R\)</span> 分别对应原本 <span
+class="math inline">\(A\)</span> 的一些列/行。</p>
+<p>算法寻找重要的列/行：</p>
+<p><img src="./assets/image-20230521202418530.png" alt="image-20230521202418530" style="zoom:50%;" /></p>
+<p>复杂度为 <span class="math inline">\(O(\text{nnz}(A)\cdot \text{poly}
+\log n+ \text{poly}(k/\epsilon)\)</span></p>
+<h2 id="压缩感知-compressive-sensing">压缩感知 Compressive Sensing</h2>
+<p>近似 <span class="math inline">\(k-\)</span> 稀疏：只有 <span
+class="math inline">\(k\)</span> 个位置的绝对值远大于其它位置。</p>
+<p>算法原理：（实际上是某种程度上 Input Oblivious 的降维）</p>
+<ol type="1">
+<li>生成一组 <span class="math inline">\(a_1,a_2,\cdots,a_m\in
+\mathbb{R}^n\)</span></li>
+<li>对于任意的输入量 <span
+class="math inline">\(z\)</span>，在传输过程中仅传输 <span
+class="math inline">\(b=(z\cdot a_i)\)</span>。</li>
+<li>接收方要能从 <span class="math inline">\(b\)</span> 恢复 <span
+class="math inline">\(z\)</span>。</li>
+</ol>
+<p>记 <span class="math inline">\(A=\begin{pmatrix}a_1^T \\ a_2^T \\
+\vdots \\ a_m^T\end{pmatrix}\)</span>，则 <span
+class="math inline">\(b=Az\)</span>，解 <span
+class="math inline">\(Ax=b\)</span> 为欠定方程。</p>
+<p>在 <span class="math inline">\(z\)</span> 任意取稠密输入时，<span
+class="math inline">\(m=n\)</span> 是可反解的充要条件。</p>
+<p>在 <span class="math inline">\(z\)</span> 为 <span
+class="math inline">\(k-\)</span>稀疏（即至多 <span
+class="math inline">\(k\)</span> 个非零，<span class="math inline">\(k
+\ll n\)</span></p>
+<p><strong>压缩感知定理</strong>：</p>
+<p>设 <span class="math inline">\(A\in \mathbb{R}^{m\times
+n}\)</span>，其中 <span class="math inline">\(m=O(k\log
+(n/k))\)</span>，<span class="math inline">\(A_{i,j} =
+\mathcal{N}(0,1)\)</span>。</p>
+<p>则有大概率可以从 <span class="math inline">\(b=Az\)</span> 中恢复
+<span class="math inline">\(z\)</span>（<span
+class="math inline">\(z\)</span> 为任意 近似<span
+class="math inline">\(k-\)</span>稀疏向量）。</p>
+<p><strong>恢复 <span class="math inline">\(z\)</span></strong>：</p>
+<p><span class="math inline">\(z\)</span>
+不唯一，恢复的方式则是找到非零位置数目最小的一个 <span
+class="math inline">\(z\)</span>。</p>
+<p>理想目标记做</p>
+<p><span class="math display">\[
+\arg \min_{Ax=b}\{|\text{supp}(x)|\}
+\]</span> 这里 <span class="math inline">\(\text{supp}(x)\)</span>
+表示非零坐标数目，也称作 <span
+class="math inline">\(\ell_0\)</span>-范数。</p>
+<p>由于 <span class="math inline">\(\ell_0\)</span>-最小化问题是
+NPH，可以退一步通过 <span class="math inline">\(\ell_1\)</span>
+来近似，即最小化 <span class="math inline">\(\sum |x_i|\)</span>。</p>
+<p>实际目标为：</p>
+<p><span class="math display">\[
+\arg \min_{Ax=b}\{\sum |x_i|\}
+\]</span> 可以用一个线性规划来解决： <span class="math display">\[
+\begin{aligned}
+\min&amp;&amp;&amp; \sum y_i
+\\
+s.t. &amp;&amp;&amp; Ax=b
+\\
+&amp;&amp;&amp; y_i -x_i \ge 0
+\\
+  &amp;&amp;&amp; y _i + x_i\ge 0
+\end{aligned}
+\]</span> LP 问题的 Poly 解法：Ellipsoid Method，常用解法：Simplex</p>
+<p>稍微修改条件就可以处理数据有噪声的情形。</p>
+<p>完整算法：</p>
+<ol type="1">
+<li>给定 <span class="math inline">\(k,n\)</span>。</li>
+<li>取 <span class="math inline">\(m =O(k\log
+(n/k))\)</span>，随机生成矩阵 <span class="math inline">\(A \in
+\mathbb{R}^{m\times n}, A_{i,j} =\mathcal{N}(0,1)\)</span>。</li>
+<li>计算 <span class="math inline">\(b= A z\)</span>。</li>
+<li>LP 反解 <span class="math inline">\(x\)</span>。</li>
+</ol>
+<h2 id="最小点覆盖-2-近似">最小点覆盖 2 近似</h2>
+<p>转化为： <span class="math display">\[
+\begin{aligned}
+\min&amp;&amp;&amp; \sum x_i
+\\
+s.t. &amp;&amp;&amp; x_{u_i}+x_{v_i} \ge 1
+\\ &amp;&amp;&amp; x_i \ge 0
+\end{aligned}
+\]</span></p>
+<h1 id="数据流算法">数据流算法</h1>
+<h2 id="sparse-recovery">Sparse Recovery</h2>
+<p>数据流：支持插入删除，要求空间消耗优于直接存储的算法。</p>
+<p>定义：</p>
+<ol type="1">
+<li><p>频数向量 <span
+class="math inline">\(x\)</span>，每一个维度表示一个不同的数据点出现的次数。</p></li>
+<li><p>support: <span class="math inline">\(\text{supp}(x)=\{p \mid x_p
+\ne 0\}\)</span>。</p></li>
+<li><p><span
+class="math inline">\(\|x\|_0=|\text{supp}(x)|\)</span></p></li>
+<li><p><span class="math inline">\(k-\)</span>sparse: <span
+class="math inline">\(\|x\|_0 \leq k\)</span>。</p></li>
+</ol>
+<p>Sparse Recovery 算法：检查数据流是否满足 <span
+class="math inline">\(k-\)</span>sparse，若满足就需要恢复出 <span
+class="math inline">\(\text{supp}(x)\)</span>。</p>
+<p>存在一个 <span class="math inline">\(O(\text{poly}\log n)\)</span>
+更新，<span class="math inline">\(O(k\cdot \text{poly}\log n)\)</span>
+查询，空间为 <span class="math inline">\(O(k\cdot \text{poly} \log
+n)\)</span> 的算法。</p>
+<p><span class="math inline">\(k=1\)</span>:</p>
+<ol type="1">
+<li>维护 <span class="math inline">\(\text{count,
+sum}\)</span>，则结果一定为 <span
+class="math inline">\(v=\text{sum}/\text{count}\)</span>。</li>
+<li>再随机一个常数 <span class="math inline">\(r\)</span>，维护 <span
+class="math inline">\(s=\sum \text{count}_p \cdot r^p \mod
+q\)</span>，其中 <span
+class="math inline">\(q=O(\text{poly}(n))\)</span> 为质数（假设值域也为
+<span class="math inline">\(\text{poly}(n)\)</span> 级别）。</li>
+<li>检验 <span class="math inline">\(v\)</span> 是否为整数，以及 <span
+class="math inline">\(s \xlongequal{?} r^v \cdot \text{count}\)</span>
+即可判定唯一。</li>
+</ol>
+<p>概率分析：</p>
+<p>设 <span class="math inline">\(g(r) = \sum \text{count}_p \cdot r^p -
+\text{count} \cdot r^v\)</span>，则 <span
+class="math inline">\(g(r)\)</span> 是 <span
+class="math inline">\(n\)</span> 次多项式，故错误概率为 <span
+class="math inline">\(n / q\)</span>。</p>
+<p>任意 <span class="math inline">\(k\)</span>：</p>
+<p>考虑一个随机 hash 到 <span
+class="math inline">\([2k]\)</span>，若不超过 <span
+class="math inline">\(k\)</span> 个元素 <span
+class="math inline">\(v_1,\cdots,v_k\)</span>，则 <span
+class="math inline">\(v_i\)</span> 单独一个桶的概率 <span
+class="math inline">\(&gt;0.5\)</span>。</p>
+<p>多取几个 hash，维护 <span class="math inline">\(2k\)</span> 个 <span
+class="math inline">\(k=1\)</span> 的情况即可。</p>
+<p>完整算法：</p>
+<ol type="1">
+<li>取 <span class="math inline">\(T=O(\log k)\)</span> 个独立 hash:
+<span class="math inline">\(h_i: [\Delta] \to [2k]\)</span>。</li>
+<li>对于每一个 <span class="math inline">\(h_t\)</span>， 将 <span
+class="math inline">\(a_i\)</span> 放入 <span
+class="math inline">\(h_t(a_i)\)</span> 个 Sparse 进行维护。</li>
+<li>结束后，恢复所有结果的并集，判断找到的元素数量和出现频次是否满足要求。</li>
+</ol>
+<h2 id="平面近似直径">平面近似直径</h2>
+<p>回顾：近似直径即 round 到 <span class="math inline">\(\ell =
+\varepsilon \cdot T / \sqrt{2}\)</span> 的格点上，其中 <span
+class="math inline">\(T\)</span> 为一个 2-近似直径，方格数量为 <span
+class="math inline">\(O(\epsilon^{-O(d)})\)</span>。</p>
+<p>目标空间复杂度：<span class="math inline">\(O(\varepsilon^{-d} \text{
+poly} \log n)\)</span>。</p>
+<p>思路：猜测一个直径 <span class="math inline">\(D\)</span>。</p>
+<p>具体：</p>
+<ol type="1">
+<li>枚举 <span class="math inline">\(i=0 \sim \log
+\Delta\)</span>。</li>
+<li>维护点集 round 到 <span class="math inline">\(\ell=\epsilon\cdot
+2^{i}\)</span> 时的 <span class="math inline">\(k-\)</span>sparse，其中
+<span class="math inline">\(k\)</span> 为确定的 <span
+class="math inline">\(O(\epsilon^{-O(d)})\)</span> 级的参数。</li>
+<li>找到最小的 <span class="math inline">\(i\)</span> 使得 <span
+class="math inline">\(k-\)</span>sparse 成立，根据 <span
+class="math inline">\(k-\)</span>sparse 确定的点集。</li>
+</ol>
+<p>实际上找到的 <span class="math inline">\(i\)</span> 不一定满足 <span
+class="math inline">\(2^i \ge \text{diam}\)</span>，但是 <span
+class="math inline">\(i\)</span> 越小解越精确，同时又有 <span
+class="math inline">\(k\)</span> 限制保证了精确度的下限。</p>
+<p>需要维护 <span class="math inline">\(\log \Delta\)</span>
+个结构。</p>
+<h2 id="ell_0-采样"><span class="math inline">\(\ell_0\)</span>
+采样</h2>
+<p>Sparse Recover 用于恢复具体的数据，<span
+class="math inline">\(\ell_0\)</span> 采样则返回单个元素 <span
+class="math inline">\(p\)</span>，且 <span
+class="math inline">\(p\)</span> 满足分布： <span
+class="math display">\[
+\forall q \in \text{supp}(x), \Pr[p=q] =\frac{1}{|\text{supp}(x)|}
+\]</span> 思路：</p>
+<p>设 <span
+class="math inline">\(\text{supp}(x)=k\)</span>，将所有元素以 <span
+class="math inline">\(\frac{1}{k}\)</span>
+的概率保留，在保留下来的元素中均匀采样。</p>
+<p>保留下来的元素有常数概率只有一个。</p>
+<p>具体实现：</p>
+<ol type="1">
+<li>维护 <span class="math inline">\(m=O(\log n)\)</span> 个 <span
+class="math inline">\(1-\)</span>sparse Recovery <span
+class="math inline">\(\mathcal{S}_i\)</span>。</li>
+<li>维护随机 hash <span class="math inline">\(h_i:[\Delta]\to
+\{0,1\}\)</span>，且 <span class="math inline">\(\forall p\in
+[\Delta],\Pr[h(p)=1]=2^{-i}\)</span>。</li>
+<li>插入时仅保留 <span class="math inline">\(h_t(a_i)=1\)</span> 的
+<span class="math inline">\(a_i\)</span> 放入 <span
+class="math inline">\(\mathcal{S}_t\)</span>。</li>
+<li>找到一个返回 Yes 的 <span
+class="math inline">\(\mathcal{S}_i\)</span>，返回恢复出来的元素。</li>
+</ol>
+<h2 id="数据流图连通分量">数据流图连通分量</h2>
+<p><span class="math inline">\(n\)</span> 确定，<span
+class="math inline">\(m\)</span> 条边为数据流。</p>
+<p>存在一个 <span class="math inline">\(\tilde{O}(n)=O(\text{poly}\log
+n)\)</span> 空间，单次操作 <span class="math inline">\(\text{poly}\log
+n\)</span> 时间的算法。</p>
+<p>记一个广义频数向量： <span class="math display">\[
+x^u_{(u,v)} = \left\{\begin{aligned} 1 &amp;&amp; (u,v) \in E, u&lt; v
+\\ -1 &amp;&amp; (u,v) \in E, u &gt; v \\ 0
+&amp;&amp;\text{otherwise}\end{aligned} \right.
+\]</span></p>
+<p><span class="math display">\[
+x^{S} = \sum_{u\in S} x^u
+\]</span></p>
+<p>则 <span class="math inline">\(\text{supp}(x^S)\)</span> 仅包含 <span
+class="math inline">\(S\)</span> 与 <span class="math inline">\(V
+\backslash S\)</span> 之间的边。</p>
+<p>注意到 <span class="math inline">\(\ell_0\)</span>
+采样具有可合并性：</p>
+<ol type="1">
+<li>对于每一个点 <span class="math inline">\(v\)</span> 维护 <span
+class="math inline">\(\ell_0\)</span> 采样 <span
+class="math inline">\(\mathscr{L}_v\)</span>。</li>
+<li>插入删除时对于 <span
+class="math inline">\(\mathscr{L}_u,\mathscr{L}_v\)</span> 操作。</li>
+<li>做正常的合并操作，每次可以合并两个点集之后需要同时合并对应的 <span
+class="math inline">\(\ell_0\)</span> 采样。</li>
+</ol>
+<p>此外，还可以做一个数据流近似 Boruvka 算法</p>
+<p>思路是对于每一种边权建立一个 <span
+class="math inline">\(\ell_0\)</span> 采样，但是需要将边权 round
+到最近的 <span class="math inline">\((1+\varepsilon)^w\)</span>。</p>
+<p>这样就只需要 <span class="math inline">\(O(n\cdot
+\log_{1+\varepsilon} \Delta)\)</span> 个采样，做 Boruvka
+的过程中枚举边权。</p>
+<h1 id="大数据算法">大数据算法</h1>
+<p>MPC (Massively Parallel Computing).</p>
+<p>MapReduce, RDD(Resilient Distributed Dataset)</p>
+<h2 id="mapreduce-框架">MapReduce 框架</h2>
+<p>表示一种大数据处理的格式约定。</p>
+<p>数据以 <span class="math inline">\((K,V)\)</span> (key, value)
+二元组形式表示，</p>
+<p>Mapper: <span class="math inline">\(\{(K,V)\}_{i=1}^n \to
+\{(K&#39;,V&#39;)\}_{i=1}^{n\times m}\)</span>。</p>
+<p>Reducer: 输入为一组 <span class="math inline">\(K\)</span>
+相同的二元组 <span
+class="math inline">\((K^*,\{V_i\})\)</span>，输出也为 <span
+class="math inline">\((K^*,\{V_i\})\)</span> 的形式。</p>
+<p>mapper 负责调整数据形式，reducer 负责合并数据。</p>
+<p>如求 <span class="math inline">\(\ell_0\)</span> 范数的操作：</p>
+<ol type="1">
+<li>输入 <span class="math inline">\((i,a_i)\)</span>。</li>
+<li>第一轮：
+<ol type="1">
+<li>Mapper: <span class="math inline">\((i,a_i) \mapsto
+(a_i,1)\)</span>。</li>
+<li>Reducer: <span class="math inline">\((K=a_i, \{1,1,1,1,\cdots\})
+\mapsto (a_i,1)\)</span>，（对于同一个 <span
+class="math inline">\(a_i\)</span> 合并）。</li>
+</ol></li>
+<li>第二轮：
+<ol type="1">
+<li>Mapper: <span class="math inline">\((a_i,1) \mapsto
+(0,1)\)</span>。</li>
+<li>Reducer: <span class="math inline">\((0,\{1,1,1,1\}) \mapsto
+(0,1+1+1+\cdots)\)</span>。</li>
+</ol></li>
+</ol>
+<h2 id="mpc-框架">MPC 框架</h2>
+<p>输入 <span class="math inline">\(n\)</span> 个值 <span
+class="math inline">\(p_i\)</span>。</p>
+<p>每台机器有 <span class="math inline">\(s=o(n) = n^{\alpha}\)</span>
+的存储容量。</p>
+<p>机器个数为 <span class="math inline">\(m = \Omega(n/s)\)</span>。</p>
+<p>每一轮可以完成机器间信息收发，但是每台机器传输量为 <span
+class="math inline">\(o(s)\)</span>。</p>
+<p>优化的主要目标为轮数，其次是每轮的本地效率。</p>
+<p>一个简单的问题：Broadcast。</p>
+<p>一号机存储了一条信息 <span class="math inline">\(t\)</span>，<span
+class="math inline">\(s\ge
+t^{1+\epsilon}\)</span>，要求广播给所有机器。</p>
+<p>根据传输量的限制，不能一轮发送给所有机器，可以呈现多叉树方式传递。</p>
+<p>MPC 排序：</p>
+<p>每轮：一号机随机选择 <span class="math inline">\(\sqrt s\)</span> 个
+Pivot，每台机子本地进行一轮 Pivot，将 <span class="math inline">\(\sqrt
+s\)</span> 个区间的内数的个数返还给一号机。</p>
+<p>每台机器根据汇总的个数，重新分发数据给其他机子。</p>
+<p>复杂度：排序共 <span class="math inline">\(O(\log_s n)\)</span>
+轮，每轮需要汇总信息要 <span class="math inline">\(O(\log_s n)\)</span>
+的时间，总轮数为 <span class="math inline">\(O(\log_s^2n)\)</span>。</p>
+<p>super-linear: <span
+class="math inline">\(s=n^{1+\epsilon}\)</span></p>
+<p>near-linear: <span class="math inline">\(s=\tilde{O}(n)\)</span></p>
+<p>sub-linear: <span class="math inline">\(s=n^{1-\epsilon}\)</span></p>
+<p>super-linear MST:</p>
+<p>先将所有边按照较小顶点的编号排序，然后每台机子本地做对应边集的结果，最后直接全部发送到
+<span class="math inline">\(1\)</span> 号点合并。</p>
+<p>MPC 近似直径</p>
+<p>直径可以合并，但是会累积误差。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/current/Program%20Design/lec/%E7%A8%8B%E8%AE%BE%E7%AC%94%E8%AE%B0%20-%20OOP/" rel="next" title="OOP in C++">
+                  OOP in C++ <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
