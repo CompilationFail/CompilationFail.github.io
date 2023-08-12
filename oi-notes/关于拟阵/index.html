@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="拟阵 大量基础定义警告，参考了 wiki 和2018论文《浅谈拟阵的一些拓展及其应用》，如果想看大段详细证明请移步论文。 拟阵的概念比较抽象，有多种定义方法，结合这些定义方法可以更具体地了解拟阵的基础性质。 前言 很多问题可以转化为拟阵，但是并不是所有问题都可以通过简单的拟阵操作得到答案。 在具体问题中，很多时候有着更优的算法解决拟阵运算无法解决的操作。 但是对于一个奇怪的问题，如果转化为类似拟阵">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拟阵">
+<meta property="og:url" content="https://compilationfail.github.io/oi-notes/%E5%85%B3%E4%BA%8E%E6%8B%9F%E9%98%B5/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="拟阵 大量基础定义警告，参考了 wiki 和2018论文《浅谈拟阵的一些拓展及其应用》，如果想看大段详细证明请移步论文。 拟阵的概念比较抽象，有多种定义方法，结合这些定义方法可以更具体地了解拟阵的基础性质。 前言 很多问题可以转化为拟阵，但是并不是所有问题都可以通过简单的拟阵操作得到答案。 在具体问题中，很多时候有着更优的算法解决拟阵运算无法解决的操作。 但是对于一个奇怪的问题，如果转化为类似拟阵">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-12T04:34:15.326Z">
+<meta property="article:modified_time" content="2023-08-12T04:34:15.326Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-notes/%E5%85%B3%E4%BA%8E%E6%8B%9F%E9%98%B5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-notes/%E5%85%B3%E4%BA%8E%E6%8B%9F%E9%98%B5/","path":"oi-notes/关于拟阵/","title":"拟阵"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>拟阵 | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8B%9F%E9%98%B5"><span class="nav-number">1.</span> <span class="nav-text">拟阵</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.0.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E5%8F%8A%E7%BA%A6%E5%AE%9A"><span class="nav-number">1.0.2.</span> <span class="nav-text">符号及约定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%82%E9%9B%86"><span class="nav-number">1.0.3.</span> <span class="nav-text">幂集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E6%97%8F"><span class="nav-number">1.0.4.</span> <span class="nav-text">集族</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E7%8B%AC%E7%AB%8B%E9%9B%86%E5%AE%9A%E4%B9%89%E6%8B%9F%E9%98%B5%E4%BC%BC%E4%B9%8E%E6%98%AF%E6%9C%80%E7%9B%B4%E8%A7%82%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.0.5.</span> <span class="nav-text">用独立集定义拟阵(似乎是最直观的定义)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E5%9F%BA%E5%BA%95%E5%92%8C%E5%9F%BA%E5%AE%9A%E4%B9%89%E6%8B%9F%E9%98%B5%E4%BC%BC%E4%B9%8E%E6%98%AF%E6%9C%80%E7%AE%80%E6%B4%81%E7%9A%84%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.0.6.</span> <span class="nav-text">用基底和基定义拟阵(似乎是最简洁的描述)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E7%8E%AF%E8%B7%AF%E9%9B%86%E5%AE%9A%E4%B9%89%E6%8B%9F%E9%98%B5"><span class="nav-number">1.0.7.</span> <span class="nav-text">用环路集定义拟阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E8%B7%AF%E5%92%8C%E5%9F%BA%E5%BA%95%E7%9A%84%E4%B8%80%E4%BA%9B%E5%85%B3%E7%B3%BB"><span class="nav-number">1.0.8.</span> <span class="nav-text">环路和基底的一些关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%9F%E9%98%B5%E7%9A%84%E7%A7%A9"><span class="nav-number">1.0.9.</span> <span class="nav-text">拟阵的秩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E7%A7%A9%E5%87%BD%E6%95%B0%E5%AE%9A%E4%B9%89%E6%8B%9F%E9%98%B5"><span class="nav-number">1.0.10.</span> <span class="nav-text">用秩函数定义拟阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">1.0.11.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">一些应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%82%E6%9C%80%E5%A4%A7%E6%9D%83%E5%80%BC%E7%8B%AC%E7%AB%8B%E5%AD%90%E9%9B%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">求最大权值独立子集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%9F%E9%98%B5%E4%BA%A4"><span class="nav-number">1.1.2.</span> <span class="nav-text">拟阵交</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%A6%E6%9D%83%E6%8B%9F%E9%98%B5%E4%BA%A4"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">带权拟阵交</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%9F%E9%98%B5%E4%BA%A4%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">拟阵交的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E5%88%86%E5%9B%BE%E5%8C%B9%E9%85%8D%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">二分图匹配问题</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">256</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E5%85%B3%E4%BA%8E%E6%8B%9F%E9%98%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="拟阵 | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          拟阵
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="拟阵">拟阵</h1>
+<p>大量基础定义警告，参考了 wiki
+和2018论文《浅谈拟阵的一些拓展及其应用》，如果想看大段详细证明请移步论文。</p>
+<p>拟阵的概念比较抽象，有多种定义方法，结合这些定义方法可以更具体地了解拟阵的基础性质。</p>
+<h3 id="前言">前言</h3>
+<p>很多问题可以转化为拟阵，但是并不是所有问题都可以通过简单的拟阵操作得到答案。</p>
+<p>在具体问题中，很多时候有着更优的算法解决拟阵运算无法解决的操作。</p>
+<p>但是对于一个奇怪的问题，如果转化为类似拟阵的操作后，就有很多性质可以拿过来套。在
+OI 中，应用于拟阵的常见算法与二分图上的一些算法相当相似。</p>
+<p>拟阵的应用，更多还是用 <strong>诸多的性质</strong>
+把复杂,抽象问题向更简单的方向转化<del>(便于乱搞)</del>。</p>
+<p>也可以便于简化问题的证明，所以这个东西了解一下也差不多了。</p>
+<p><del>(不会有人丧心病狂到专门出一个拟阵交的题吧)</del>。</p>
+<span id="more"></span>
+<p><br></p>
+<h3 id="符号及约定">符号及约定</h3>
+<p><span class="math inline">\(|S|\)</span> 集合大小。</p>
+<p><span class="math inline">\(S-T\)</span>，删除 <span
+class="math inline">\(S\)</span> 中在 <span
+class="math inline">\(T\)</span> 中的元素。</p>
+<p><span class="math inline">\(a\Rightarrow b\)</span> 若 <span
+class="math inline">\(a\)</span> 则 <span
+class="math inline">\(b\)</span>。</p>
+<p><span class="math inline">\(a\Leftrightarrow b\)</span>，<span
+class="math inline">\(a,b\)</span> 等价。</p>
+<p><span class="math inline">\(a\in b\)</span> 元素 <span
+class="math inline">\(a\)</span> 是集合 <span
+class="math inline">\(b\)</span> 中的一个元素。</p>
+<p><span class="math inline">\(a\sube b\)</span>，集合 <span
+class="math inline">\(a\)</span> 是集合 <span
+class="math inline">\(b\)</span> 的子集。</p>
+<p><span class="math inline">\(\exists\)</span> 存在。</p>
+<p><span class="math inline">\(\forall\)</span> 任意。</p>
+<h3 id="幂集">幂集</h3>
+<p>一个集合 <span class="math inline">\(S\)</span> 的所有 <span
+class="math inline">\(2^{|S|}\)</span> 个子集构成的集合是 <span
+class="math inline">\(S\)</span> 的幂即 <span
+class="math inline">\(P(S)\)</span> 或记作 <span
+class="math inline">\(2^S\)</span>。</p>
+<h3 id="集族">集族</h3>
+<p>给定集合 <span class="math inline">\(S\)</span>
+的<strong>一些子集</strong>构成的类 <span
+class="math inline">\(F\)</span> 叫做 <span
+class="math inline">\(S\)</span>
+的<strong>子集族</strong>（或称<em>S</em> 上的<strong>集合族</strong>）,
+<span class="math inline">\(F \sube 2^S\)</span>。</p>
+<p><br></p>
+<h3
+id="用独立集定义拟阵似乎是最直观的定义">用独立集定义拟阵(似乎是最直观的定义)</h3>
+<p>一个二元组 <span class="math inline">\(M=(E,I)\)</span>，其中 <span
+class="math inline">\(E\)</span> 是<strong>基础集</strong>，<span
+class="math inline">\(I\)</span> 是 <span
+class="math inline">\(E\)</span>
+的<strong>一些子集构成的集族</strong>(即 <span
+class="math inline">\(I\sube 2^S\)</span>
+)，称之为<strong>独立集</strong>，在独立集中的子集称之为独立的。</p>
+<p>拟阵可以用独立集 <span class="math inline">\(I\)</span> 定义，则
+<span class="math inline">\(I\)</span> 需满足性质:</p>
+<ol type="1">
+<li>空集：有 <span class="math inline">\(\emptyset \in
+I\)</span>，所以有 <span class="math inline">\(I\ne
+\emptyset\)</span>。</li>
+<li>遗传性：若 <span class="math inline">\(A\sube B,B\in I\)</span>，则
+$ AI$。</li>
+<li>扩充性：若 <span class="math inline">\(\exists A,B\in
+I,|A|&gt;|B|\)</span>，则 <span class="math inline">\(\exists i\in
+A,(B\cup \{i\}) \in I\)</span>。</li>
+</ol>
+<p>例子：对于 <span class="math inline">\(S=\{1,2,3\}\)</span>，<span
+class="math inline">\(\{\emptyset \},\{\emptyset,\{1\}\}\)</span>
+是合法的独立集，但 <span
+class="math inline">\(\{\emptyset,\{1\},\{2\},\{3\},\{2,3\}\}\)</span>
+不是，因为它不满足扩充性。</p>
+<p><span
+class="math inline">\(\{\{1,2\},\{2,3\},\{1\},\{2\},\{3\},\{\emptyset
+\}\}\)</span> 也是合法的独立集。</p>
+<p>对于 <span class="math inline">\(S=\{1,2,3,4,5\}\)</span>,<span
+class="math inline">\(I=\{\{1,2,3\},\{3,4,5\},\{1,2\},\{2,3\},\{1,3\},\{3,4\},\{3,5\},\{4,5\},\{1\},\{2\},\{3\},\{5\},\{\emptyset\}\}\)</span>
+不是合法的独立集，因为它不满足扩充性（<span
+class="math inline">\(A=\{1,2,3\},B=\{3,4\}\)</span>时）。</p>
+<p><span class="math display">\[ \ \]</span></p>
+<h3
+id="用基底和基定义拟阵似乎是最简洁的描述">用基底和基定义拟阵(似乎是最简洁的描述)</h3>
+<p>基底: <span class="math inline">\(E\)</span> 的一个
+<strong>独立的极大子集</strong>
+称为其的一个基底，独立的极大子集即其加入任意元素得到的子集不独立。</p>
+<p>基: <span class="math inline">\(E\)</span> 的基 <span
+class="math inline">\(B\)</span> 为其所有基底构成的集合。</p>
+<p>拟阵可以用基 <span class="math inline">\(B\)</span> 定义，则 <span
+class="math inline">\(B\)</span> 需满足性质:</p>
+<ol type="1">
+<li>非空：<span class="math inline">\(B\ne \emptyset\)</span>，最小的
+<span class="math inline">\(B=\{\emptyset\}\)</span>。</li>
+<li>交换公理：对于两个基底 <span
+class="math inline">\(a,b\)</span>，若用 <span
+class="math inline">\(b\)</span> 中 <span
+class="math inline">\(a\)</span> 没有的元素换掉一个 <span
+class="math inline">\(a\)</span>
+中原先的元素，得到的集合依然是基底。</li>
+</ol>
+<p>推论：基底等大，即 <span class="math inline">\(\forall a\in B,b\in
+B,|a|=|b|\)</span> （否则就不满足扩充性）。</p>
+<p>例如：若 <span class="math inline">\(\{1,2\},\{1,3\}\)</span>
+是基底，则 <span class="math inline">\(\{2,3\}\)</span>
+也是基底（否则不满足扩充性）。</p>
+<p>可以得到拟阵的等价定义，且 <span class="math inline">\(I=\bigcup
+_{T\in B} 2^T\)</span>。</p>
+<p><br></p>
+<h3 id="用环路集定义拟阵">用环路集定义拟阵</h3>
+<p>环路: <span class="math inline">\(S\)</span>
+的一个子集是环路，则这个子集是一个极小的<strong>非独立集</strong>，即去掉任意一个元素都会称为独立集。</p>
+<p>所有环路构成的集合称为环路集 <span
+class="math inline">\(C\)</span>，如对于 <span
+class="math inline">\(E=\{1,2\},I=\{\emptyset,\{1\}\}\)</span>，环路集为
+<span class="math inline">\(\{\{2\}\}\)</span>。</p>
+<p>拟阵可以用环路集 <span class="math inline">\(C\)</span> 定义，则
+<span class="math inline">\(C\)</span> 需满足性质：</p>
+<ol type="1">
+<li><span class="math inline">\(C\)</span>可以为空(此时<span
+class="math inline">\(I=P(S)\)</span>)，且<span
+class="math inline">\(\emptyset \not \in C\)</span>。</li>
+<li>环路互相之间不是真子集，即<span class="math inline">\(\exists a\in
+C,b\in C,a\sube b\Rightarrow a=b\)</span> (否则不满足遗传性)。</li>
+<li>若<span class="math inline">\(\exists a\in C,b\in C,a\ne
+b\)</span>以及一个元素<span class="math inline">\(i\in a\cap
+b\)</span>，则<span class="math inline">\(a\cup
+b-\{i\}\)</span>不是独立集。</li>
+</ol>
+<p>推论：<span class="math inline">\(A\sube I \Leftrightarrow \nexists
+B\in C,B\sube A\)</span>。</p>
+<p>环路不一定等大。</p>
+<p><br></p>
+<h3 id="环路和基底的一些关系">环路和基底的一些关系</h3>
+<ol type="1">
+<li><p>环路和基底之间不能通过加减一个元素转化。</p></li>
+<li><p>基底加上一个元素得到的非独立集恰好包含一个环路。</p></li>
+</ol>
+<p><br></p>
+<h3 id="拟阵的秩">拟阵的秩</h3>
+<p>拟阵的秩：拟阵的任意一个<strong>基底的元素个数</strong>是其秩 <span
+class="math inline">\(r\)</span>。</p>
+<p>为了同下文的秩函数相对应，也可说 <span
+class="math inline">\(\begin{aligned}r=\max_{R\in
+I}\{|R|\}\end{aligned}\)</span>，即最大的独立集大小。</p>
+<p><br></p>
+<h3 id="用秩函数定义拟阵">用秩函数定义拟阵</h3>
+<p>对于元素集 <span class="math inline">\(S\)</span>，</p>
+<p>若可以定义一个在 <span class="math inline">\(2^S\)</span> 上的秩函数
+<span class="math inline">\(r(T)\)</span>，满足以下性质：</p>
+<ol type="1">
+<li><p>大小有界： <span
+class="math inline">\(r(T)\in[0,|T|]\)</span>。</p></li>
+<li><p>大小传递性：<span class="math inline">\(A\sube B\Rightarrow
+r(A)\le r(B)\)</span>。</p></li>
+<li><p>次模性： <span class="math inline">\(r(A\cup B)+r(A\cap B)\le
+r(A)+r(B)\)</span>。</p></li>
+</ol>
+<p>那么可以用这样的一个秩函数定义一个拟阵 <span
+class="math inline">\(M=(S,r)\)</span>，此时 <span
+class="math inline">\(r(T)\)</span> 为 <span
+class="math inline">\(2^T\)</span>
+中极大的独立集大小，且拟阵的独立集就是 <span
+class="math inline">\(I=\{T|T\sube S,r(T)=|T|\}\)</span>。</p>
+<p><br></p>
+<h3 id="例子">例子</h3>
+<p>均匀拟阵：<span class="math inline">\(U_n^k=(S,I),|S|=n,I=\{T|T\sube
+S,|T|\leq k\}\)</span>。</p>
+<p>图拟阵：</p>
+<p>对于无向图 <span
+class="math inline">\(G=(V,E)\)</span>，它的生成拟阵是 <span
+class="math inline">\(M=(E,\{T|T\sube E,T无环\})\)</span>。</p>
+<p>它的最大独立子集大小为 <span class="math inline">\(G\)</span>
+的最大生成森林边数，每个最大生成森林都是基底。</p>
+<p>匹配拟阵：</p>
+<p>对于无向图 <span
+class="math inline">\(G=(V,E)\)</span>，它的匹配拟阵是 <span
+class="math inline">\(M=(V,\{T|T\sube
+V,存在一个边匹配覆盖T\})\)</span>。</p>
+<p>它的最大的独立子集大小为 <span class="math inline">\(k\)</span>
+最大匹配数，每个最优匹配的方案都是基底。</p>
+<p>异或线性基：</p>
+<p>对于非负整数可重集合 <span class="math inline">\(S\)</span>，拟阵是
+<span class="math inline">\(M=(S,\{T|T\sube
+S,T中的元素任意异或不会得到0\})\)</span>。</p>
+<p>(这是向量空间的线性基问题的一种)</p>
+<p><br></p>
+<p><br></p>
+<hr />
+<p>注意分清楚 <strong>定义需要满足的条件</strong> 和
+<strong>通过条件推导得到的性质</strong> 的区别
+，上面几种拟阵定义是等价的</p>
+<p><br></p>
+<p><br></p>
+<h2 id="一些应用">一些应用</h2>
+<h3 id="求最大权值独立子集">求最大权值独立子集</h3>
+<p>对于拟阵 <span class="math inline">\(M=(S,I)\)</span>，给每个 <span
+class="math inline">\(S\)</span>
+中每个元素一个非负权值，定义一个集合的权值为所有元素权值和，要求最大权值的独立子集。</p>
+<p>这是一个非常简单的问题，直接从大到小能加入就加入即可，设最终选出的集合为
+<span class="math inline">\(P\)</span>。</p>
+<p>证明:</p>
+<ol type="1">
+<li><p><span class="math inline">\(P\in
+B\)</span>，否则可以再加入元素</p></li>
+<li><p>假设存在更优解 <span class="math inline">\(Q\in
+B\)</span>，根据基底交换公理，一定可以用 <span
+class="math inline">\(P\)</span> 中一个权值更大的元素换掉 <span
+class="math inline">\(Q\)</span> 中一个元素，所以 <span
+class="math inline">\(Q\)</span> 不是合法集合。</p></li>
+</ol>
+<p>在连通图拟阵上使用该算法，就是 <span
+class="math inline">\(\text{Kruskal}\)</span> 最小生成数算法。</p>
+<p>在异或线性基上使用该算法，可以求得最大权值线性基。</p>
+<p><br></p>
+<h3 id="拟阵交">拟阵交</h3>
+<p>对于同基础集的拟阵 <span
+class="math inline">\(M_1=(S,I_1),M_2=(S,I_2)\)</span>，它们的交是独立集的交。</p>
+<p>但是它们的交不一定是拟阵。</p>
+<p>求解最大交:最小最大定理：</p>
+<p><span class="math inline">\(\begin{aligned} \max_{A\in (I_1\cup
+I_2)}\{|T|\}=\min_{R\in S}\{r_1(R)+r_2(S-R)\}\end{aligned}\)</span></p>
+<p>这个东西的证明分为两步:</p>
+<ol type="1">
+<li>证明<span class="math inline">\(\max\leq \min\)</span>。</li>
+</ol>
+<p><span class="math inline">\(|T|=|T\cap R|+|T\cap (S-R)|\leq
+r_1(R)+r_2(S-R)\)</span></p>
+<ol start="2" type="1">
+<li>介绍找到两个最值的算法：</li>
+</ol>
+<p>这个算法的中心是，从空集开始扩展 <span
+class="math inline">\(T\)</span>，并且相应找到对应的 <span
+class="math inline">\(R\)</span> 使得 <span
+class="math inline">\(|T|=r_1(R)+r_2(S-R)\)</span>，此时答案已经充分了。</p>
+<p>求解拟阵交的算法基于一个构造的图：</p>
+<p>对于当前的答案 <span
+class="math inline">\(T\)</span>，构造一个<strong>有向二分图</strong>，两侧点集分别为
+<span class="math inline">\(T,S-T\)</span>。</p>
+<p>对于分别在两侧的点 <span class="math inline">\(x,y\)</span>，</p>
+<p>存在 <span class="math inline">\(x\rightarrow y\)</span> 的边: 当
+<span class="math inline">\(T\)</span> 中把 <span
+class="math inline">\(x\)</span> 换成 <span
+class="math inline">\(y\)</span> 之后是 <span
+class="math inline">\(M_1\)</span> 的独立子集。</p>
+<p>存在 <span class="math inline">\(y\rightarrow x\)</span> 的边: 当
+<span class="math inline">\(T\)</span> 中把 <span
+class="math inline">\(y\)</span> 换成 <span
+class="math inline">\(x\)</span> 之后是 <span
+class="math inline">\(M_2\)</span> 的独立子集。</p>
+<p>设对于 <span class="math inline">\(I_1,I_2\)</span>
+可行的增广元素集合为 $X_1,X_2 $ （即加入元素后依然独立的集合）。</p>
+<p>每次的增广过程可以描述为：</p>
+<ol type="1">
+<li>如果 <span class="math inline">\(X_1\cap X_2\ne
+\emptyset\)</span>，直接都加入 <span class="math inline">\(T\)</span>
+。</li>
+<li>构图，找到一条从 <span class="math inline">\(X_1\)</span>
+的点出发，到达 <span class="math inline">\(X_2\)</span>
+的<strong>最短的</strong>路径 <span class="math inline">\(P\)</span>
+(广搜即可)，将 <span class="math inline">\(I\)</span> 变为 <span
+class="math inline">\(I\bigoplus P\)</span>
+（这里原文是对称差，但是异或大家都懂哈）。</li>
+</ol>
+<p>当不存在增广时，找到了最大的 <span
+class="math inline">\(T\)</span>，此时对应合法的 <span
+class="math inline">\(R\)</span> 为 <span class="math inline">\(\{e\in
+S|在图中存在e到达X_2的路径\}\)</span>。</p>
+<p>由于每次增广至少增加一个元素，该算法的复杂度上限为 <span
+class="math inline">\(O(r|S|^2)\)</span>，其中<span
+class="math inline">\(r\)</span> 为拟阵的秩，<span
+class="math inline">\(|S|^2\)</span> 为边数。</p>
+<p><br></p>
+<h4 id="带权拟阵交">带权拟阵交</h4>
+<p>每个元素带权：</p>
+<p>在增广时，图上每个点加上点权（加入为正，删除为负），每次求出点权最短路进行增广即可。</p>
+<p><br></p>
+<h3 id="拟阵交的应用">拟阵交的应用</h3>
+<h4 id="二分图匹配问题">二分图匹配问题</h4>
+<p>二分图匹配匈牙利算法 是 求解拟阵交的问题 的一种特殊情况。</p>
+<p>对于二分图 <span
+class="math inline">\(G=(V_1,V_2,E)\)</span>，构造：</p>
+<p><span class="math inline">\(M_1=(E,I=\{T\sube
+E|T中的边在V_1上没有公共点\})\)</span>，</p>
+<p><span class="math inline">\(M_2=(E,I=\{T\sube
+E|T中的边在V_2上没有公共点\})\)</span>。</p>
+<p>答案就是 <span class="math inline">\(M_1,M_2\)</span>
+交的最大值，匈牙利算法增广的过程是依次考虑 <span
+class="math inline">\(X_1\)</span> 中的元素进行增广。</p>
+<p>（带权的二分图匹配问题，实际也是可以用拟阵解决的，但是好像 <span
+class="math inline">\(\text{KM}\)</span> 还是最棒的）。</p>
+<p><br></p>
+<p>拟阵交还可以解决一些看起来很抽象的 <strong>带有两个限制的</strong>
+(可能带权) 的问题，比如论文里下面的这个例子</p>
+<p>(Colorful Tree):
+对于一个无向图，每条边给定一个颜色和一个权值，求颜色不能重复的最大生成树</p>
+<p>类似这样的问题可以转化为拟阵交问题，但是这个东西的局限性实在太大，也没有人敢动</p>
+<p><br></p>
+<p>update:</p>
+<p><del>有生之年竟然用上了这个东西？</del></p>
+<p>**模拟赛有人搞了一个题:</p>
+<p>对于一个无向图 <span
+class="math inline">\(G=(V,E),E=(u,v,w)\)</span>，其中<span
+class="math inline">\(w\)</span>为每条边的颜色。</p>
+<p>要求选出一个最大的边集，满足：</p>
+<p>1.每种颜色<span class="math inline">\(i\)</span>选出的边不超过<span
+class="math inline">\(c_i\)</span>条，</p>
+<p>2.选出的边不构成简单环。</p>
+<p>然后写了一次不太正规的拟阵交模板。</p>
+<p>令 <span class="math inline">\(M1\)</span> 为个数的拟阵，<span
+class="math inline">\(M2\)</span> 为生成树拟阵。</p>
+<p>解释在代码里。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">int</span> n,m,k;</span><br><span class="line"><span class="type">int</span> A[N],I[N];</span><br><span class="line"><span class="comment">// A为颜色个数的限制</span></span><br><span class="line"><span class="type">int</span> U[N],V[N],W[N],F[N];</span><br><span class="line"><span class="comment">// U,V,W为边</span></span><br><span class="line"><span class="comment">// F 为并查集</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">Find</span><span class="params">(<span class="type">int</span> x)</span></span>&#123; <span class="keyword">return</span> F[x]==x?x:F[x]=<span class="built_in">Find</span>(F[x]); &#125;</span><br><span class="line"><span class="type">int</span> X[N],Y[N],P[N];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理生成树的情况</span></span><br><span class="line">vector &lt;<span class="type">int</span>&gt; G[N];</span><br><span class="line"><span class="type">int</span> fa[N],fe[N],dep[N];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">dfs</span><span class="params">(<span class="type">int</span> u,<span class="type">int</span> f)</span></span>&#123;</span><br><span class="line">	dep[u]=dep[fa[u]=f]+<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i:G[u]) &#123;</span><br><span class="line">		<span class="type">int</span> v=U[i]==u?V[i]:U[i];</span><br><span class="line">		<span class="keyword">if</span>(v==f) <span class="keyword">continue</span>;</span><br><span class="line">		fe[v]=i,<span class="built_in">dfs</span>(v,u);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	n=<span class="built_in">rd</span>(),m=<span class="built_in">rd</span>(),k=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,k) A[i]=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) U[i]=<span class="built_in">rd</span>(),V[i]=<span class="built_in">rd</span>(),W[i]=<span class="built_in">rd</span>();</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) F[i]=i;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>) &#123;</span><br><span class="line">		<span class="type">int</span> f=<span class="number">0</span>;</span><br><span class="line">        <span class="comment">// X, Y分别为 M1,M2的可拓展集合</span></span><br><span class="line">        <span class="comment">// I 记录已经在选边方案里的边</span></span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(!I[i]) &#123;</span><br><span class="line">			X[i]=A[W[i]]&gt;<span class="number">0</span>,Y[i]=<span class="built_in">Find</span>(U[i])!=<span class="built_in">Find</span>(V[i]);</span><br><span class="line">            <span class="comment">// 如果X,Y有交，就直接加入集合</span></span><br><span class="line">			<span class="keyword">if</span>(X[i] &amp;&amp; Y[i]) &#123;</span><br><span class="line">				A[W[i]]--,F[<span class="built_in">Find</span>(U[i])]=<span class="built_in">Find</span>(V[i]);</span><br><span class="line">				I[i]=<span class="number">1</span>,f=i;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> X[i]=Y[i]=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">if</span>(f) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="type">static</span> queue &lt;<span class="type">int</span>&gt; que;</span><br><span class="line">		<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) que.<span class="built_in">pop</span>();</span><br><span class="line">        <span class="comment">// 预处理当前的生成树，便于处理M2的限制</span></span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) G[i].<span class="built_in">clear</span>();</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(I[i]) G[U[i]].<span class="built_in">pb</span>(i),G[V[i]].<span class="built_in">pb</span>(i);</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) dep[i]=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="keyword">if</span>(!dep[i]) <span class="built_in">dfs</span>(i,<span class="number">0</span>);</span><br><span class="line">        <span class="comment">// 从X中的某一个点出发</span></span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(X[i]) que.<span class="built_in">push</span>(i),P[i]=<span class="number">-1</span>;</span><br><span class="line">		<span class="keyword">else</span> P[i]=<span class="number">0</span>;</span><br><span class="line">		f=<span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 广搜找交替 替换路径</span></span><br><span class="line">		<span class="keyword">while</span>(!que.<span class="built_in">empty</span>()) &#123;</span><br><span class="line"></span><br><span class="line">			<span class="type">int</span> u=que.<span class="built_in">front</span>(); que.<span class="built_in">pop</span>();</span><br><span class="line">            <span class="comment">// 找到一条满足X-&gt;Y的交替路径</span></span><br><span class="line">			<span class="keyword">if</span>(Y[u])&#123; f=u; <span class="keyword">break</span>; &#125;</span><br><span class="line">			<span class="keyword">if</span>(I[u]) &#123;</span><br><span class="line">                <span class="comment">// u-&gt;v，交换之后满足M1</span></span><br><span class="line">				<span class="built_in">rep</span>(v,<span class="number">1</span>,m) <span class="keyword">if</span>(!P[v] &amp;&amp; !I[v] &amp;&amp; A[W[v]]+(W[u]==W[v])) P[v]=u,que.<span class="built_in">push</span>(v);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 满足拟阵M2，即交换这条边之后还是生成树，可以从目前生成树上的环上选取能够替换的边</span></span><br><span class="line">				<span class="type">int</span> x=U[u],y=V[u];</span><br><span class="line">				<span class="keyword">if</span>(<span class="built_in">Find</span>(x)!=<span class="built_in">Find</span>(y)) &#123;</span><br><span class="line">					<span class="built_in">rep</span>(v,<span class="number">1</span>,m) <span class="keyword">if</span>(!P[v] &amp;&amp; I[v]) </span><br><span class="line">						P[v]=u,que.<span class="built_in">push</span>(v);</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="keyword">while</span>(x!=y) &#123;</span><br><span class="line">						<span class="keyword">if</span>(dep[x]&lt;dep[y]) <span class="built_in">swap</span>(x,y);</span><br><span class="line">						<span class="type">int</span> i=fe[x];</span><br><span class="line">						<span class="keyword">if</span>(!P[i]) P[i]=u,que.<span class="built_in">push</span>(i);</span><br><span class="line">						x=fa[x];</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(!f) <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">// 放置交替方案</span></span><br><span class="line">		<span class="keyword">while</span>(~f) &#123;</span><br><span class="line">			A[W[f]]+=I[f]?<span class="number">1</span>:<span class="number">-1</span>;</span><br><span class="line">			I[f]^=<span class="number">1</span>,f=P[f];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(I[i]) cnt++;</span><br><span class="line">        <span class="comment">// 重构并查集</span></span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) F[i]=i;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(I[i]) F[<span class="built_in">Find</span>(U[i])]=<span class="built_in">Find</span>(V[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(!I[i]) cnt++;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,cnt);</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,m) <span class="keyword">if</span>(!I[i]) <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>,i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-notes/%5B%E6%B0%B4%5D%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86%E7%A7%AF/" rel="prev" title="[水]整数拆分积">
+                  <i class="fa fa-angle-left"></i> [水]整数拆分积
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-notes/Nimber/" rel="next" title="Nimber系列略学习笔记">
+                  Nimber系列略学习笔记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

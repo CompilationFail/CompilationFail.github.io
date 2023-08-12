@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="「ROI 2019 Day2」模式串查找 (口胡) 设 \(S&#x3D;\sum |w_i|\) 显然我们需要一个树形数据结构来维护题目中添加字符的操作 归纳一下，需要实现的操作就是： 1.添加一个新串 2.在当前串中分裂一段区间 \([L,R]\) 3.将一个串复制 \(k\) 次 将每一个单字符视为一个节点，考虑用一个可持久化的平衡树来维护上述操作，比如可持久化非旋 \(\text{Treap}\)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「ROI 2019 Day2」模式串查找 (口胡)">
+<meta property="og:url" content="https://compilationfail.github.io/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CROI%202019%20Day2%E3%80%8D%E6%A8%A1%E5%BC%8F%E4%B8%B2%E6%9F%A5%E6%89%BE%20/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="「ROI 2019 Day2」模式串查找 (口胡) 设 \(S&#x3D;\sum |w_i|\) 显然我们需要一个树形数据结构来维护题目中添加字符的操作 归纳一下，需要实现的操作就是： 1.添加一个新串 2.在当前串中分裂一段区间 \([L,R]\) 3.将一个串复制 \(k\) 次 将每一个单字符视为一个节点，考虑用一个可持久化的平衡树来维护上述操作，比如可持久化非旋 \(\text{Treap}\)">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-12T04:34:15.285Z">
+<meta property="article:modified_time" content="2023-08-12T04:34:15.285Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CROI%202019%20Day2%E3%80%8D%E6%A8%A1%E5%BC%8F%E4%B8%B2%E6%9F%A5%E6%89%BE%20/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CROI%202019%20Day2%E3%80%8D%E6%A8%A1%E5%BC%8F%E4%B8%B2%E6%9F%A5%E6%89%BE%20/","path":"oi-solutions/ROI - CEOI - CCO - APIO - Baltic OI - USACO/「ROI 2019 Day2」模式串查找 /","title":"「ROI 2019 Day2」模式串查找 (口胡)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>「ROI 2019 Day2」模式串查找 (口胡) | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#roi-2019-day2%E6%A8%A1%E5%BC%8F%E4%B8%B2%E6%9F%A5%E6%89%BE-%E5%8F%A3%E8%83%A1"><span class="nav-number">1.</span> <span class="nav-text">「ROI 2019 Day2」模式串查找
+(口胡)</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">256</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CROI%202019%20Day2%E3%80%8D%E6%A8%A1%E5%BC%8F%E4%B8%B2%E6%9F%A5%E6%89%BE%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="「ROI 2019 Day2」模式串查找 (口胡) | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          「ROI 2019 Day2」模式串查找 (口胡)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="roi-2019-day2模式串查找-口胡">「ROI 2019 Day2」模式串查找
+(口胡)</h1>
+<p>设 <span class="math inline">\(S=\sum |w_i|\)</span></p>
+<p>显然我们需要一个树形数据结构来维护题目中添加字符的操作</p>
+<p>归纳一下，需要实现的操作就是：</p>
+<p>1.添加一个新串</p>
+<p>2.在当前串中分裂一段区间 <span
+class="math inline">\([L,R]\)</span></p>
+<p>3.将一个串复制 <span class="math inline">\(k\)</span> 次</p>
+<p>将每一个单字符视为一个节点，考虑用一个可持久化的平衡树来维护上述操作，比如可持久化非旋
+<span class="math inline">\(\text{Treap}\)</span></p>
+<p>题解中给出的2-3-Tree不知道效果怎么样</p>
+<p>2,3操作增加的数量为 <span class="math inline">\(\log\)</span>
+级别，最终的节点总数为 <span class="math inline">\(O(S+n\log
+S)\)</span></p>
+<p>接下来需要实现的操作是合并两个子串的信息，显然在合并时计算跨过两个节点的串匹配模板串的次数</p>
+<p>容易想到记录后缀匹配的 <span class="math inline">\(kmp\)</span>
+指针，但是这样的指针难以完成合并操作</p>
+<p>为了计算这个，我们需要维护这个串的前缀/后缀 在
+原串上最长的匹配子段</p>
+<p>此时一个节点的信息可以用 <span
+class="math inline">\((l1,r1),(l2,r2),k\)</span> 来表示，其中 <span
+class="math inline">\(k\)</span> 标记了这个串是否整个出现在模板串中</p>
+<p>合并子串 <span class="math inline">\(A,B\)</span> 信息：</p>
+<p>1.求出前缀/后缀匹配，以前缀为例：</p>
+<p>1-1.如果 <span class="math inline">\(A\)</span>
+无法完全匹配，则匹配前缀为 <span class="math inline">\(A\)</span>
+的匹配前缀</p>
+<p>1-2. <span class="math inline">\(A\)</span> 能够完全匹配，设 <span
+class="math inline">\(A\)</span> 在原串对应 <span
+class="math inline">\(L,R\)</span> ， <span
+class="math inline">\(B\)</span> 的最长匹配前缀在模板串匹配起始位置为
+<span class="math inline">\(P\)</span></p>
+<p>我们需要在 <span class="math inline">\([L,R]\)</span> 之后借上 <span
+class="math inline">\(P\)</span> 开始的一段后缀，而 <span
+class="math inline">\([L,R]\)</span>
+出现在模板串中的位置对应着后缀数组上一段 <span
+class="math inline">\(rank\)</span> 区间</p>
+<p>取模板串反向后缀数组，求出与 <span class="math inline">\(R\)</span>
+匹配长度超过 <span class="math inline">\(R-L+1\)</span> 的 <span
+class="math inline">\(rank\)</span> 区间 <span
+class="math inline">\([l,r]\)</span></p>
+<p>则我们需要找到 <span class="math inline">\([l,r]\)</span> 中 <span
+class="math inline">\(sa[i]+1\)</span> 与 <span
+class="math inline">\(P\)</span> 最长的 <span
+class="math inline">\(LCP\)</span> ，显然是一个求临近 <span
+class="math inline">\(rank\)</span> 的问题，可以在线主席树二分解决</p>
+<p>由此得到最长前缀为 <span class="math inline">\(A\)</span>
+串再加上额外匹配得到的部分</p>
+<p><span class="math inline">\(O(\log m)\)</span> 完成</p>
+<p><span class="math display">\[ \ \]</span></p>
+<p>2.求出跨过两个串的完美匹配个数</p>
+<p>容易得到前串后缀对应的 <span
+class="math inline">\(\text{kmp}\)</span> 指针，后串前缀对应反向的 <span
+class="math inline">\(\text{kmp}\)</span> 指针</p>
+<p>实际上就是求出这两个指针不断失配时相加恰好完全匹配的个数</p>
+<p>注意到，实际上这个询问是完全可以<strong>离线</strong>的</p>
+<p>可以通过在线得到的匹配情况，离线得到询问得到询问答案，再从叶子开始重新计算每个节点的答案</p>
+<p>比较暴力的做法是：</p>
+<p>建立两棵 <span class="math inline">\(\text{kmp}\)</span>
+树，在第一棵树上 <span class="math inline">\(\text{dfs}\)</span>
+，加入祖先对应的位置，然后再第二棵树上查询祖先匹配的个数</p>
+<p>可以用 <span class="math inline">\(\text{dfs}\)</span>
+序+差分树状数组维护，复杂度为 <span class="math inline">\(O(\log
+m)\)</span></p>
+<p><span class="math display">\[  \ \]</span></p>
+<p>因此总体复杂度为 <span class="math inline">\(O((S+n\log S)\log
+m)\)</span> <del>实际上常数非常大？</del></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CUSACO%202021%20US%20Open%20Platinum%E3%80%8DUnited%20Cows%20of%20Farmer%20John/" rel="prev" title="「USACO 2021 US Open Platinum」United Cows of Farmer John">
+                  <i class="fa fa-angle-left"></i> 「USACO 2021 US Open Platinum」United Cows of Farmer John
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-solutions/ROI%20-%20CEOI%20-%20CCO%20-%20APIO%20-%20Baltic%20OI%20-%20USACO/%E3%80%8CBalticOI%202020%E3%80%8D%E6%9D%91%E5%BA%84/" rel="next" title="[「BalticOI 2020」村庄 (贪心)](https://loj.ac/p/3336)">
+                  [「BalticOI 2020」村庄 (贪心)](https://loj.ac/p/3336) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

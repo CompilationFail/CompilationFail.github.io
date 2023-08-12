@@ -149,7 +149,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">229</span>
+          <span class="site-state-item-count">256</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -196,6 +196,465 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E6%8C%87%E5%AE%9A%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%8D%95%E4%BD%8D%E6%A0%B9%E7%82%B9%E5%80%BC%E5%BC%8F%E6%B1%82%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/%E6%8C%87%E5%AE%9A%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%8D%95%E4%BD%8D%E6%A0%B9%E7%82%B9%E5%80%BC%E5%BC%8F%E6%B1%82%E8%A7%A3/" class="post-title-link" itemprop="url">多项式指定大小的单位根点值式求解(含Bluestein’s Algorithm)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1
+id="多项式指定大小的单位根点值式求解含bluesteins-algorithm">多项式指定大小的单位根点值式求解(含Bluestein’s
+Algorithm)</h1>
+<p>下面的阐述建立于存在 <span class="math inline">\(n\)</span>
+阶单位根的前提下。</p>
+<p>（如果是NTT，必须满足 <span class="math inline">\(n|(P-1)\)</span>
+，否则单位根可能会变成一个复杂的<strong>多维向量</strong>）。</p>
+<p><span class="math display">\[ \ \]</span></p>
+<h2
+id="用卷积解决多项式与点值式的转化bluesteins-algorithm">用卷积解决多项式与点值式的转化:Bluestein’s
+Algorithm</h2>
+<p>设最终求得的点值式为 <span class="math inline">\(f(x^k)=\sum a_i\cdot
+\omega_n^{i k}\)</span>。</p>
+<p>其中指数为 <span class="math inline">\(ik\)</span> ，有一种简单的转化
+<span class="math inline">\(i\cdot
+k=\cfrac{i^2+k^2-(i-k)^2}{2}\)</span>。</p>
+<p>由于在模意义下， <span class="math inline">\(x^{\frac{i}{2}}\)</span>
+次(二次剩余)是一个非常麻烦的东西，所以考虑一个更优的转化。</p>
+<p><span class="math display">\[
+i\cdot k=C(i+k,2)-C(i,2)-C(k,2)
+\]</span> 这条式子的组合意义是：从集合 <span
+class="math inline">\(i,k\)</span> 分别选一个，等价于从 <span
+class="math inline">\(i+k\)</span> 选两个减去在 <span
+class="math inline">\(i,k\)</span> 内部选两个。</p>
+<p>通过这样的转化，我们可以对于每一个 <span
+class="math inline">\(a_i\)</span> 计算其对于每个 <span
+class="math inline">\(f(x^k)\)</span> 的贡献，</p>
+<p>具体过程是简单的构造卷积，这里省略。</p>
+<p><br></p>
+<h2 id="适用于特殊情况的转化方法">适用于特殊情况的转化方法</h2>
+<p>需要了解的是，多项式卷积的 FFT / NTT 不止适用与于二元分治。</p>
+<p>对于多项式 <span class="math inline">\(F(x)\)</span> 的 <span
+class="math inline">\(d\)</span> 元分治，设分治子问题的答案为 <span
+class="math inline">\(G_j(x&#39;_i),j\in[0,d-1]\)</span>
+，可以得到合并式子：</p>
+<p><span class="math display">\[
+F(x_i)=\sum_{j=0}^{d-1}x_i^jG_j(x_i^d)=\sum_{i=0}^{d-1}x_i^jG_j(x&#39;_{i\mod
+\frac{n}{d}})
+\]</span> 对于 <span class="math inline">\(n\)</span>
+进行质因数分解，得到 <span class="math inline">\(n=\prod p_i\)</span>
+，带入上面的式子，带入 <span class="math inline">\(p_i\)</span>
+元分治强行求解，可以认为最终复杂度为 <span class="math inline">\(O(n\sum
+p_i)=O(n\cdot \max\{p_i\} \log n)\)</span>。</p>
+<p>因此，这种方法使用于 <span class="math inline">\(p_i\)</span>
+较小的情况。</p>
+<p><br></p>
+<h2 id="n-元点值式的用途">n 元点值式的用途</h2>
+<p>DFT 的卷积是溢出的， <span class="math inline">\(x^i\)</span>
+会溢出到 <span class="math inline">\(x^{i\mod n}\)</span>
+，系数之间存在着循环关系。</p>
+<p>我们可以利用 <span class="math inline">\(n\)</span>
+元卷积做到指定大小的循环卷积，可以处理一些特定问题。</p>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P4191">例题:
+[CTSC2010]性能优化</a>（使用 <span class="math inline">\(O(n\log n\log
+C)\)</span> 的快速幂无法通过，尚未尝试Bluestein’s Algorithm）。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E7%B1%BB%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/%E7%B1%BB%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97/" class="post-title-link" itemprop="url">类欧几里得</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="类欧几里得">类欧几里得</h1>
+<p>对于给定的元 <span class="math inline">\(a,b,c,n\)</span>：</p>
+<p>设 <span
+class="math inline">\(f(i)=\lfloor\frac{ai+b}{c}\rfloor\)</span>。</p>
+<p>求：</p>
+<ol type="1">
+<li><span class="math inline">\(F(a,b,c,n)=\sum_0^nf(i)\)</span>，</li>
+<li><span
+class="math inline">\(G(a,b,c,n)=\sum_0^nf(i)^2\)</span>，</li>
+<li><span class="math inline">\(H(a,b,c,n)=\sum_0^ni\cdot
+f(i)\)</span>。</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/oi-notes/%E7%B1%BB%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E7%82%B9%E5%80%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E7%82%B9%E5%80%BC%E5%BC%8F/" class="post-title-link" itemprop="url">多项式与点值式</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="多项式与点值式">多项式与点值式</h1>
+<p>正常 <span class="math inline">\(\text{DFT/IDFT}\)</span>
+是构造一个特殊的点值式，即 <span
+class="math inline">\(x_i=\omega_{n}^i\)</span>。</p>
+<p>如果能通过题目条件构造出来这样的点值，就可以直接 <span
+class="math inline">\(\text{DFT/IDFT}\)</span>。</p>
+<p>那如果不能的话。。。。。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/oi-notes/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E4%B8%8E%E7%82%B9%E5%80%BC%E5%BC%8F/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/NTT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/NTT/" class="post-title-link" itemprop="url">FFT&NTT（以及扩展）</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="fftntt以及扩展">FFT&amp;NTT（以及扩展）</h1>
+<p>预备知识：<a
+target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13092822.html">用于NTT</a></p>
+<p>NTT/FFT其实本质相同，用途是快速求解 <strong>多项式乘积</strong></p>
+<h3 id="前言">前言</h3>
+<p>FT: 傅里叶变换:</p>
+<p>这是一个工程上的概念，可以简述为：一个周期性的信号波段可以用
+若干个<strong>正弦曲线</strong> 的带权和表示</p>
+<p>DFT: 离散傅里叶变换，这是傅里叶变换在离散情况下的变种</p>
+<p>FFT: 快速傅里叶变换</p>
+<p>NTT: 快速数论变换</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/oi-notes/NTT/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/" class="post-title-link" itemprop="url">集合幂级数的 $\ln,\exp$</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="集合幂级数的-lnexp">集合幂级数的 <span
+class="math inline">\(\ln,\exp\)</span></h1>
+<p>起始：求联通子图个数。</p>
+<p>令 <span class="math inline">\(F(x)\)</span>
+为联通的生成子图个数的形式幂级数，可以简单求出 <span
+class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E7%9F%A9%E9%98%B5%E8%A1%8C%E5%88%97%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -214,7 +673,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E7%9F%A9%E9%98%B5%E8%A1%8C%E5%88%97%E5%BC%8F/" class="post-title-link" itemprop="url">Untitled</a>
+          <a href="/oi-notes/%E7%9F%A9%E9%98%B5%E8%A1%8C%E5%88%97%E5%BC%8F/" class="post-title-link" itemprop="url">矩阵行列式</a>
         </h2>
 
         <div class="post-meta-container">
@@ -225,7 +684,7 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
     </span>
 
   
@@ -238,10 +697,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '矩阵行列式' date: 'Sat Aug 12 11:05:23 2023 categories: -
-oi-notes'</p>
-<h1 id="矩阵行列式">矩阵行列式</h1>
+          <h1 id="矩阵行列式">矩阵行列式</h1>
 <p>对于一个 <span class="math inline">\(n\)</span> 行 <span
 class="math inline">\(n\)</span> 列的矩阵 <span
 class="math inline">\(A\)</span>，有矩阵的行列式（常用 <span
@@ -319,7 +775,7 @@ class="math inline">\(O(n^3)\)</span>。</p>
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E7%89%B9%E5%BE%81%E5%A4%9A%E9%A1%B9%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -337,7 +793,7 @@ class="math inline">\(O(n^3)\)</span>。</p>
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/" class="post-title-link" itemprop="url">Untitled</a>
+          <a href="/oi-notes/%E7%89%B9%E5%BE%81%E5%A4%9A%E9%A1%B9%E5%BC%8F/" class="post-title-link" itemprop="url">零化多项式/特征多项式/最小多项式/常系数线性齐次递推</a>
         </h2>
 
         <div class="post-meta-container">
@@ -348,7 +804,7 @@ class="math inline">\(O(n^3)\)</span>。</p>
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
     </span>
 
   
@@ -361,18 +817,28 @@ class="math inline">\(O(n^3)\)</span>。</p>
     
     
     <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '集合幂级数的 <span class="math inline">\(\ln,\exp\)</span>'
-date: 'Sat Aug 12 11:05:23 2023 categories: - oi-notes'</p>
-<h1 id="集合幂级数的-lnexp">集合幂级数的 <span
-class="math inline">\(\ln,\exp\)</span></h1>
-<p>起始：求联通子图个数。</p>
-<p>令 <span class="math inline">\(F(x)\)</span>
-为联通的生成子图个数的形式幂级数，可以简单求出 <span
-class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</p>
+          <h1
+id="零化多项式特征多项式最小多项式常系数线性齐次递推">零化多项式/特征多项式/最小多项式/常系数线性齐次递推</h1>
+<h3 id="约定">约定:</h3>
+<p><span class="math inline">\(I_n\)</span> 是 <span
+class="math inline">\(n\)</span> 阶单位矩阵，即主对角线是 <span
+class="math inline">\(1\)</span> 的 <span
+class="math inline">\(n\)</span> 阶矩阵</p>
+<p>一个矩阵 <span class="math inline">\(A\)</span> 的 <span
+class="math inline">\(|A|\)</span> 是 <span
+class="math inline">\(A\)</span> 的行列式。</p>
+<p>默认 <span class="math inline">\(A\)</span> 是一个 <span
+class="math inline">\(n\times n\)</span> 的矩阵。</p>
+<hr />
+<h3 id="定义">定义</h3>
+<h4 id="零化多项式">零化多项式:</h4>
+<p>对于一个矩阵 <span
+class="math inline">\(A\)</span>，它的一个零化多项式 <span
+class="math inline">\(f(\lambda)\)</span> 是满足 <span
+class="math inline">\(f(A)=0\)</span> 的多项式，定义域包含矩阵。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/oi-notes/%E9%9B%86%E5%90%88%E5%B9%82%E7%BA%A7%E6%95%B0/#more" rel="contents">
+              <a class="btn" href="/oi-notes/%E7%89%B9%E5%BE%81%E5%A4%9A%E9%A1%B9%E5%BC%8F/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -403,7 +869,7 @@ class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/[%E6%B0%B4]%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86%E7%A7%AF/">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E4%BA%8C%E6%AC%A1%E5%89%A9%E4%BD%99/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -421,7 +887,7 @@ class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%5B%E6%B0%B4%5D%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86%E7%A7%AF/" class="post-title-link" itemprop="url">Untitled</a>
+          <a href="/oi-notes/%E4%BA%8C%E6%AC%A1%E5%89%A9%E4%BD%99/" class="post-title-link" itemprop="url">二次剩余 (Quadratic Residue)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -432,7 +898,7 @@ class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
     </span>
 
   
@@ -445,27 +911,120 @@ class="math inline">\(G(x)\)</span> 为生成子图个数的形式幂级数。</
     
     
     <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '[水]整数拆分积' date: 'Sat Aug 12 11:05:23 2023 categories: -
-oi-notes'</p>
-<h1 id="水整数拆分积">[水]整数拆分积</h1>
-<p>问题：对于 <span class="math inline">\(n(n\ge
-3)\)</span>，要求构造拆分 <span class="math inline">\(n=\sum_{i=1}^m
-a_i\)</span>，最大化 <span class="math inline">\(\prod
-a_i\)</span>。</p>
-<p>最优情况下，满足</p>
-<ol type="1">
-<li><p><span class="math inline">\(n\mod 3=0\)</span>，<span
-class="math inline">\(a_i=3\)</span>。</p></li>
-<li><p><span class="math inline">\(n\mod 3=2\)</span>，<span
-class="math inline">\(i&lt;m,a_i=3 ; a_m=2\)</span>。</p></li>
-<li><p><span class="math inline">\(n\mod 3=1\)</span>，<span
-class="math inline">\(i&lt;m,a_i=3 ; a_m=4\)</span> 或 <span
-class="math inline">\(i&lt;m-1,a_i=3 ;a_{m-1}=a_m=2\)</span>。</p></li>
-</ol>
+          <h1 id="二次剩余-quadratic-residue">二次剩余 (Quadratic Residue)</h1>
+<p>只考虑奇质数 <span class="math inline">\(P\)</span> 的情况</p>
+<p>设求 <span class="math inline">\(x^2\equiv a\pmod P\)</span> 的一个
+<span class="math inline">\(x\)</span>。</p>
+<h2 id="判断">判断</h2>
+<p>由费马小定理 <span class="math inline">\(x^{P-1}\equiv 1 \pmod
+P\)</span>，即 <span class="math inline">\(a^\frac{P-1}{2}\equiv 1 \pmod
+P\)</span>。</p>
+<p>不存在二次剩余即 <span class="math inline">\(a^\frac{P-1}{2}\equiv
+-1\pmod P\)</span>。</p>
+<hr />
+<p>(对于所有 <span class="math inline">\(a=0,1\)</span>
+的情况需要特判)。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/oi-notes/%5B%E6%B0%B4%5D%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86%E7%A7%AF/#more" rel="contents">
+              <a class="btn" href="/oi-notes/%E4%BA%8C%E6%AC%A1%E5%89%A9%E4%BD%99/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E6%9D%9C%E6%95%99%E7%AD%9B%E5%B0%8F%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/oi-notes/%E6%9D%9C%E6%95%99%E7%AD%9B%E5%B0%8F%E8%AE%B0/" class="post-title-link" itemprop="url">杜教筛小记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="杜教筛小记">杜教筛小记</h1>
+<p>对于一个函数 <span
+class="math inline">\(F(n)\)</span>，要在较低时间内求前缀和 <span
+class="math inline">\(S_F(n)=\sum_{i=1}^nF(i)\)</span>。</p>
+<p>假设我们能找到一个函数 <span class="math inline">\(G(n)\)</span> 使得
+<span class="math inline">\(G(n),S_{F \oplus G}(n)\)</span>
+能在较短时间内算出。</p>
+<p>其中 <span class="math inline">\(\oplus\)</span>
+表示狄利克雷卷积，<span class="math inline">\((F\oplus
+G)(n)=\sum_{d|n}F(d)G(\frac{n}{d})\)</span></p>
+<p>那么就有</p>
+<p><span class="math display">\[
+\begin{aligned}
+\displaystyle S_{F\oplus G}(n)&amp;=\sum_1^n
+G(i)S_F(\lfloor\frac{n}{i}\rfloor)
+\\
+\displaystyle G(1)F(n)&amp;=S_{F\oplus
+G}(n)-\sum_2^nG(i)S_F(\lfloor\frac{n}{i}\rfloor)
+\end{aligned}
+\]</span></p>
+<p>这个 <span class="math inline">\(\lfloor\frac{n}{i}\rfloor\)</span>
+的个数是 <span class="math inline">\(O(\sqrt n)\)</span>
+的，数论分段求解。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/oi-notes/%E6%9D%9C%E6%95%99%E7%AD%9B%E5%B0%8F%E8%AE%B0/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -514,7 +1073,7 @@ class="math inline">\(i&lt;m-1,a_i=3 ;a_{m-1}=a_m=2\)</span>。</p></li>
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E8%8C%83%E5%BE%B7%E8%92%99%E5%BE%B7%E8%A1%8C%E5%88%97%E5%BC%8F/" class="post-title-link" itemprop="url">Untitled</a>
+          <a href="/oi-notes/%E8%8C%83%E5%BE%B7%E8%92%99%E5%BE%B7%E8%A1%8C%E5%88%97%E5%BC%8F/" class="post-title-link" itemprop="url">Vandermonde Determinant</a>
         </h2>
 
         <div class="post-meta-container">
@@ -525,7 +1084,7 @@ class="math inline">\(i&lt;m-1,a_i=3 ;a_{m-1}=a_m=2\)</span>。</p></li>
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
+      <time title="Created: 2023-08-12 12:34:15" itemprop="dateCreated datePublished" datetime="2023-08-12T12:34:15+08:00">2023-08-12</time>
     </span>
 
   
@@ -538,10 +1097,7 @@ class="math inline">\(i&lt;m-1,a_i=3 ;a_{m-1}=a_m=2\)</span>。</p></li>
     
     
     <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: 'Vandermonde Determinant' date: 'Sat Aug 12 11:05:23 2023
-categories: - oi-notes'</p>
-<h1 id="vandermonde-determinant">Vandermonde Determinant</h1>
+          <h1 id="vandermonde-determinant">Vandermonde Determinant</h1>
 <p><span class="math display">\[
 \begin{aligned}
 &amp;\det\left(\begin{array}{cccc}
@@ -601,666 +1157,8 @@ x_0^{n-2} &amp; x_1^{n-2} &amp; \cdots &amp; x_{n-2}^{n-2}
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/Nimber/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/Nimber/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: 'Nimber系列略学习笔记' date: 'Sat Aug 12 11:05:23 2023
-categories: - oi-notes'</p>
-<h1 id="nimber系列略学习笔记">Nimber系列略学习笔记</h1>
-<h4 id="前言">前言</h4>
-<p><span class="math inline">\(\text{Nim+Number=Nimber}\)</span></p>
-<p>基于我们熟悉的博弈问题 <span
-class="math inline">\(\text{Nim}\)</span> 问题，我们定义了多 <span
-class="math inline">\(\text{Nim}\)</span> 问题的和，即 <span
-class="math inline">\(\text{Nim}\)</span> 和</p>
-<p>我们知道 <span class="math inline">\(\text{Nim}\)</span>
-和就是异或运算，为了构成一个更完整的 <span
-class="math inline">\(\text{Number}\)</span> 域，又引入一种新的运算</p>
-<p>即 <span class="math inline">\(\text{Nim}\)</span> 积</p>
-<p><br></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/oi-notes/Nimber/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E6%95%B0%E8%AE%BA%E7%9F%A5%E8%AF%86%E5%B0%8F%E7%BB%93/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E6%95%B0%E8%AE%BA%E7%9F%A5%E8%AF%86%E5%B0%8F%E7%BB%93/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '数论知识小结 [基础篇]' date: 'Sat Aug 12 11:05:23 2023
-categories: - oi-notes'</p>
-<h1 id="数论知识小结-基础篇">数论知识小结 [基础篇]</h1>
-<p>符号 <span class="math inline">\((a,b)=\gcd(a,b)\)</span>。</p>
-<p>乘除 <span class="math inline">\(a|b\rightarrow b=ka (k\in
-\N^+)\)</span>。</p>
-<p><span class="math inline">\(\sum\)</span> 求和，<span
-class="math inline">\(\prod\)</span> 求积。</p>
-<p>任意 <span class="math inline">\(\forall\)</span>，存在 <span
-class="math inline">\(\exists\)</span>。</p>
-<p>$x$ 向下取整，$x$ 向上取整。</p>
-<p><span class="math inline">\([a,b]\)</span> 区间，通常指整数即 <span
-class="math inline">\([a,b]\cap \Z\)</span>。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/oi-notes/%E6%95%B0%E8%AE%BA%E7%9F%A5%E8%AF%86%E5%B0%8F%E7%BB%93/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E6%9C%80%E5%B0%8F%E6%A0%91%E5%BD%A2%E5%9B%BE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E6%9C%80%E5%B0%8F%E6%A0%91%E5%BD%A2%E5%9B%BE/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '最小树形图 | 最小内向森林' date: 'Sat Aug 12 11:05:23 2023
-categories: - oi-notes'</p>
-<h1 id="最小树形图-最小内向森林">最小树形图 | 最小内向森林</h1>
-<h2 id="最小树形图">最小树形图</h2>
-<p>对于带权有向图 <span class="math inline">\(G=(V,E)\)</span>。</p>
-<p>对于根 <span class="math inline">\(root\)</span> 最小树形图为以 <span
-class="math inline">\(root\)</span> 为根的外向树最小边权和。</p>
-<h3 id="有根树的树形图">有根树的树形图</h3>
-<p>对于确定的 <span class="math inline">\(root\)</span>
-求最小树形图。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/oi-notes/%E6%9C%80%E5%B0%8F%E6%A0%91%E5%BD%A2%E5%9B%BE/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/Stirling%20%E6%95%B0%E5%B0%8F%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/Stirling%20%E6%95%B0%E5%B0%8F%E8%AE%B0/" class="post-title-link" itemprop="url">Stirling数小记</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<h3 id="定义组合意义">定义/组合意义</h3>
-<p>第一类斯特林数：<span class="math inline">\(\begin{bmatrix}n\\
-m\end{bmatrix}\)</span> 表示 <span class="math inline">\(n\)</span>
-个不同元素分为 <span class="math inline">\(m\)</span>
-个圆排列的方案数。</p>
-<p>有标号的第一类斯特林数 <span
-class="math inline">\(s(n,m)=(-1)^{n-m}\begin{bmatrix}n\\
-m\end{bmatrix}\)</span>。</p>
-<p>第二类斯特林数：<span class="math inline">\(\begin{Bmatrix}n\\
-m\end{Bmatrix}\)</span> 表示 <span class="math inline">\(n\)</span>
-个不同元素分为 <span class="math inline">\(m\)</span>
-个集合的方案数。</p>
-<p>注意圆排列和集合都是相互之间无序的。</p>
-<p><br></p>
-<hr />
-<h3 id="递推方法">递推方法</h3>
-<p>第一类斯特林数</p>
-<p><span class="math inline">\(\begin{bmatrix}n\\
-m\end{bmatrix}=\begin{bmatrix}n-1\\
-m-1\end{bmatrix}+(n-1)\begin{bmatrix}n-1\\ m\end{bmatrix}\)</span></p>
-<p>即新建一个圆排列，或者插入前面 <span
-class="math inline">\(n-1\)</span> 个元素中任意一个的后面。</p>
-<p>显然的，有标号的第一类斯特林数递推式就是：</p>
-<p><span class="math inline">\(\begin{bmatrix}n\\
-m\end{bmatrix}=\begin{bmatrix}n-1\\
-m-1\end{bmatrix}-(n-1)\begin{bmatrix}n-1\\ m\end{bmatrix}\)</span></p>
-<p><br></p>
-<p>第二类斯特林数：</p>
-<p><span class="math inline">\(\begin{Bmatrix}n\\
-m\end{Bmatrix}=\begin{Bmatrix}n-1\\
-m-1\end{Bmatrix}+m\begin{Bmatrix}n-1\\ m\end{Bmatrix}\)</span></p>
-<p>即新建一个集合，或者加入前面的 <span class="math inline">\(m\)</span>
-个集合。</p>
-<p><br></p>
-<hr />
-<h3 id="第二类斯特林数的通项公式">第二类斯特林数的通项公式</h3>
-<p><span class="math inline">\(\begin{aligned} \begin{Bmatrix} n \\ m
-\end{Bmatrix}=\frac{1}{m!}\sum_{i=0}^{\infty} (-1)^{m-i}\binom{m}{i} i^n
-\end{aligned}\)</span></p>
-<p>其组合意义是枚举生成了多少个有序的集合，然后容斥，最后除去集合的顺序。</p>
-<p><br></p>
-<hr />
-<h3 id="生成函数表示与行列求解">生成函数表示与行/列求解</h3>
-<p>固定 <span class="math inline">\(n\)</span>，以 <span
-class="math inline">\(m\)</span>
-为形式幂指数，则第一类斯特林数的普通生成函数：</p>
-<p><span
-class="math inline">\(\displaystyle\text{OGF}=\prod_{i=0}^{n-1}(x+i)=x^{\overline{n}}\)</span></p>
-<p>（其意义就是上面的递推公式）</p>
-<p>倍增 + 卷积二项展开求出 <span class="math inline">\(F(x+i)\)</span>
-即可做到 <span class="math inline">\(O(n\log n)\)</span> 求出一行。</p>
-<p><br></p>
-<p>固定 <span class="math inline">\(m\)</span>，以 <span
-class="math inline">\(n\)</span>
-为形式幂指数，则第一类斯特林数的指数型生成函数。</p>
-<p><span class="math inline">\(\begin{aligned}\text{EGF}= &amp;
-\frac{1}{m!}\cdot (\sum_{i=1}^{\infty}\frac{(i-1)!}{i!}x^i)^m\\= &amp;
-\frac{1}{m!}\cdot
-(\sum_{i=1}^{\infty}\frac{x^i}{i})^m\end{aligned}\)</span></p>
-<p>设 <span
-class="math inline">\(F(x)=\sum_{i=1}^{\infty}\frac{x^i}{i}\)</span>。</p>
-<p><span class="math inline">\(\begin{aligned} \because
-F&#39;(x)=&amp;\sum_{i=1}^{\infty}x^{i-1}=\frac{1}{1-x}\end{aligned}\)</span></p>
-<p><span class="math inline">\(\begin{aligned} \therefore F(x)=\int
-\frac{1}{1-x}=-\ln(1-x)\end{aligned}\)</span></p>
-<p><span class="math inline">\(\begin{aligned}\therefore \text{EGF} =
-&amp; \frac{1}{m!}\cdot (-\ln(1-x))^m\\= &amp; \frac{1}{m!}\cdot
-(-1)^m\cdot \ln^m(1-x)\end{aligned}\)</span></p>
-<p>（就是百度百科上的那个，它什么都没讲清楚）</p>
-<p>多项式快速幂即可做到 <span class="math inline">\(O(n\log n-n\log
-^2n)\)</span> 求一列。</p>
-<p><br></p>
-<p>而在上式的推导过程中额外加入 <span
-class="math inline">\((-1)^m\)</span> 的常数，并且把 <span
-class="math inline">\(x^i\)</span> 换成 <span
-class="math inline">\((-x)^i\)</span>
-可以得到有标号第一类斯特林数的指数型生成函数：</p>
-<p><span class="math inline">\(\begin{aligned} \text{EGF} = &amp;
-\frac{1}{m!}\cdot (\sum_{i=1}^{\infty}\frac{(-x)^i}{i})^m\\=&amp;
-\frac{1}{m!}\cdot \ln^m(1+x)\end{aligned}\)</span></p>
-<p><br></p>
-<p>第二类斯特林数的一行可以直接由通项公式做卷积得到。</p>
-<p><br></p>
-<p>固定 <span class="math inline">\(m\)</span>，以 <span
-class="math inline">\(n\)</span>
-为形式幂指数，则第二类斯特林数的指数型生成函数表示为：</p>
-<p><span class="math inline">\(\begin{aligned} \text{EGF}
-&amp;=\frac{1}{m!}({\sum_{i=1}^{\infty} \frac{x^i}{i!}})^m\\
-&amp;=\frac{1}{m!}(e^x-1)^m \\ &amp;=\frac{1}{m!}\sum_{i=0}^m (-1)^{m-1}
-\binom{m}{i}e^{ix}\end{aligned}\)</span></p>
-<p>实际上由这个二项展开的形式也可以发现，它就是上面通项公式的生成函数推导。</p>
-<p>可以求一列，复杂度为 <span class="math inline">\(O(n\log n-n\log
-^2n)\)</span> 常数很大。</p>
-<p><span class="math display">\[ \ \]</span></p>
-<p>虽然没什么意义，但是还是写一下二元形式：</p>
-<p>第一类斯特林数：</p>
-<p><span class="math inline">\(\begin{aligned} \text{EGF}=e^{-\ln
-(1-x)y}\end{aligned}\)</span></p>
-<p>第二类斯特林数：</p>
-<p><span
-class="math inline">\(\begin{aligned}\text{EGF}=e^{\begin{aligned}(e^x-1)y\end{aligned}}\end{aligned}\)</span></p>
-<p>注意元 <span class="math inline">\(x\)</span> 为指数型，<span
-class="math inline">\(y\)</span> 是普通型。</p>
-<p><span class="math display">\[ \ \]</span></p>
-<hr />
-<h3
-id="斯特林数与幂指数上升幂下降幂">斯特林数与幂指数/上升幂/下降幂</h3>
-<p>第一类斯特林数：</p>
-<p>上面已经说过 <span
-class="math inline">\(\begin{aligned}x^{\overline{n}}=\sum_{i=0}^{n}\begin{bmatrix}n\\i\end{bmatrix}x^i\end{aligned}\)</span>。</p>
-<p>同理，用有标号的第一类斯特林数将 <span
-class="math inline">\(x^{\underline{n}}\)</span> 展开的式子是：</p>
-<p><span
-class="math inline">\(\begin{aligned}x^{\underline{n}}=\sum_{i=0}^{n}(-1)^{n-
-i}\begin{bmatrix}n\\i\end{bmatrix}x^i\end{aligned}\)</span></p>
-<p><br></p>
-<p>第二类斯特林数：</p>
-<p>类似通项公式的求解，组合意义将幂指数展开，视 <span
-class="math inline">\(x^n\)</span> 为将 <span
-class="math inline">\(n\)</span> 个元素随意放在 <span
-class="math inline">\(x\)</span> 个位置，则枚举 <span
-class="math inline">\(x\)</span> 个位置中哪些被选择。</p>
-<p><span class="math inline">\(\displaystyle x^n=\sum_{i=0}^n
-\binom{x}{i}i!\begin{Bmatrix}n\\i\end{Bmatrix}\)</span></p>
-<p>把 <span class="math inline">\(\binom{x}{i}i!\)</span>
-写成下降幂的形式，得到优美的式子</p>
-<p><span class="math inline">\(\displaystyle x^n=\sum_{i=0}^n
-\begin{Bmatrix}n\\i\end{Bmatrix}x^{\underline{i}}\)</span></p>
-<p><br></p>
-<p>而实际上由上式二项反演也可以得到通项公式</p>
-<p><span class="math inline">\(\displaystyle \begin{Bmatrix} n \\ m
-\end{Bmatrix}=\frac{1}{m!}\sum_{i=0}^{\infty} (-1)^{m-i}\binom{m}{i}
-i^n\)</span></p>
-<p>关于下降幂多项式的快速转化，可以再借鉴<a
-target="_blank" rel="noopener" href="https://www.cnblogs.com/chasedeath/p/13073206.html">这个</a></p>
-<p><br></p>
-<hr />
-<h3 id="斯特林变换斯特林反演">斯特林变换/斯特林反演</h3>
-<p>对于斯特林变换 <span class="math inline">\(\displaystyle
-a_n=\sum_{i=0}^n\begin{Bmatrix}n\\i\end{Bmatrix}b_i\)</span></p>
-<p>设 <span class="math inline">\(A(x),B(x)\)</span> 为数列 <span
-class="math inline">\(a,b\)</span>
-的指数型生成函数，带入前文推导的式子，则得到上式的生成函数表达就是</p>
-<p><span class="math inline">\(A(x)=B(e^x-1)\)</span>。</p>
-<p>显然得到 <span class="math inline">\(B(x)=A(\ln(x+1))\)</span>，而
-<span class="math inline">\(\ln(x+1)\)</span>
-显然转化为有标号的第一类斯特林数。</p>
-<p>因此得到斯特林反演的表达形式是：</p>
-<p><span
-class="math inline">\(\begin{aligned}b_n=\sum_{i=0}^{n}(-1)^{n-i}\begin{bmatrix}n\\i\end{bmatrix}a_i\end{aligned}\)</span></p>
-<p><del>(不大可能搞类似多项式复合的方法处理这个反演吧，最多可能也就是求一个位置)</del></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E4%B8%89%E5%85%83%E7%8E%AF%20-%20%E5%9B%9B%E5%85%83%E7%8E%AF%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E4%B8%89%E5%85%83%E7%8E%AF%20-%20%E5%9B%9B%E5%85%83%E7%8E%AF%20/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '无向图的 三元环 - 四元环 计数' date: 'Sat Aug 12 11:05:23
-2023 categories: - oi-notes'</p>
-<h1 id="无向图的-三元环---四元环-计数">无向图的 三元环 - 四元环
-计数</h1>
-<p>问题描述：</p>
-<p>给定一个 <span class="math inline">\(n\)</span> 个点 <span
-class="math inline">\(m\)</span> 条边的无向图，统计其中三元环 /
-四元环的个数。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/oi-notes/%E4%B8%89%E5%85%83%E7%8E%AF%20-%20%E5%9B%9B%E5%85%83%E7%8E%AF%20/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-notes/%E5%85%B3%E4%BA%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="orangejuice">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | orangejuice's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/oi-notes/%E5%85%B3%E4%BA%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-08-12 12:32:40" itemprop="dateCreated datePublished" datetime="2023-08-12T12:32:40+08:00">2023-08-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <hr />
-<p>title: '关于生成函数' date: 'Sat Aug 12 11:05:23 2023 categories: -
-oi-notes'</p>
-<h1 id="关于生成函数">关于生成函数</h1>
-<h2 id="基础">基础</h2>
-<h3 id="普通生成函数">普通生成函数</h3>
-<p>对于数列 <span class="math inline">\(a_i\)</span> ，它的普通生成函数(
-<span class="math inline">\(\text{OGF}\)</span> )为 <span
-class="math inline">\(A(x)=\sum a_ix^i\)</span>。</p>
-<p>这个 <span class="math inline">\(x^i\)</span>
-刚开始并没有实际意义，即为形式幂级数，实际这个 <span
-class="math inline">\(i\)</span> 甚至可以不是一个整数，如 <span
-class="math inline">\(\text{FWT}\)</span> 中的指数为集合幂指数。</p>
-<p>普通生成函数常用于解决无序的组合计数问题，如背包问题。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/oi-notes/%E5%85%B3%E4%BA%8E%E7%94%9F%E6%88%90%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
