@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon32.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon16.jpg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"compilationfail.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="「CTSC2016」香山的树 (KMP+dp) 题目大意 对于所有的串，满足：  其是本身的最小循环同构。 其最小循环同构位置唯一。  给定一个这样的串，求其字典序在所有合法串中的 \(\text{rank}\)，以及求 \(\text{rank}&#x3D;k\) 的串。 简要分析 这是一个暴力的做法，有一定优化空间。 约定 \(\Sigma\) 为字符集。 显然是要枚举答案，求出当前字符串在所有答案中的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「CTSC2016」香山的树 (KMP+dp)">
+<meta property="og:url" content="https://compilationfail.github.io/oi-solutions/NOIP,CSP,%E5%90%84%E7%9C%81%E7%9C%81%E9%80%89,NOI,WC,CTSC/%E3%80%8CCTSC2016%E3%80%8D%E9%A6%99%E5%B1%B1%E7%9A%84%E6%A0%91/index.html">
+<meta property="og:site_name" content="orangejuice&#39;s blog">
+<meta property="og:description" content="「CTSC2016」香山的树 (KMP+dp) 题目大意 对于所有的串，满足：  其是本身的最小循环同构。 其最小循环同构位置唯一。  给定一个这样的串，求其字典序在所有合法串中的 \(\text{rank}\)，以及求 \(\text{rank}&#x3D;k\) 的串。 简要分析 这是一个暴力的做法，有一定优化空间。 约定 \(\Sigma\) 为字符集。 显然是要枚举答案，求出当前字符串在所有答案中的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-08-11T16:12:00.000Z">
+<meta property="article:modified_time" content="2023-08-14T11:23:22.789Z">
+<meta property="article:author" content="orangejuice">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://compilationfail.github.io/oi-solutions/NOIP,CSP,%E5%90%84%E7%9C%81%E7%9C%81%E9%80%89,NOI,WC,CTSC/%E3%80%8CCTSC2016%E3%80%8D%E9%A6%99%E5%B1%B1%E7%9A%84%E6%A0%91/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://compilationfail.github.io/oi-solutions/NOIP,CSP,%E5%90%84%E7%9C%81%E7%9C%81%E9%80%89,NOI,WC,CTSC/%E3%80%8CCTSC2016%E3%80%8D%E9%A6%99%E5%B1%B1%E7%9A%84%E6%A0%91/","path":"oi-solutions/NOIP,CSP,各省省选,NOI,WC,CTSC/「CTSC2016」香山的树/","title":"「CTSC2016」香山的树 (KMP+dp)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>「CTSC2016」香山的树 (KMP+dp) | orangejuice's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+  <script type="text/javascript">
+    const bgc = 10;
+    const bgu = "/images/bg";
+    function set_bg(index) {
+      document.cookie["bgid"] = index.toString();
+      url = `/images/bg${index}.jpg`;
+      document.body.style=`background-url:${url}`;
+    }
+    var index = parseInt(document.cookie["bgid"]);
+    if(isNaN(index)) index = -1;
+  </script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">orangejuice's blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">挂了请务必叫我</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ctsc2016%E9%A6%99%E5%B1%B1%E7%9A%84%E6%A0%91-kmpdp"><span class="nav-number">1.</span> <span class="nav-text">「CTSC2016」香山的树 (KMP+dp)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98%E7%9B%AE%E5%A4%A7%E6%84%8F"><span class="nav-number">1.0.1.</span> <span class="nav-text">题目大意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90"><span class="nav-number">1.0.2.</span> <span class="nav-text">简要分析</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="orangejuice"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">orangejuice</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">269</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/ChenJerson" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;ChenJerson" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/3950662532/profile?rightmod=1&wvr=6&mod=personinfo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;3950662532&#x2F;profile?rightmod&#x3D;1&amp;wvr&#x3D;6&amp;mod&#x3D;personinfo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/CompilationFail" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CompilationFail" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://steamcommunity.com/profiles/76561198969516062/" title="Steam → https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561198969516062&#x2F;" rel="noopener me" target="_blank"><i class="fab fa-steam fa-fw"></i>Steam</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.last.fm/user/chasedeath" title="Lastfm → https:&#x2F;&#x2F;www.last.fm&#x2F;user&#x2F;chasedeath" rel="noopener me" target="_blank"><i class="fab fa-lastfm-square fa-fw"></i>Lastfm</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://open.spotify.com/user/mgxnlznf9dli6bm4k3sp0iuwz" title="Spotify → https:&#x2F;&#x2F;open.spotify.com&#x2F;user&#x2F;mgxnlznf9dli6bm4k3sp0iuwz" rel="noopener me" target="_blank"><i class="fab fa-spotify fa-fw"></i>Spotify</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://compilationfail.github.io/oi-solutions/NOIP,CSP,%E5%90%84%E7%9C%81%E7%9C%81%E9%80%89,NOI,WC,CTSC/%E3%80%8CCTSC2016%E3%80%8D%E9%A6%99%E5%B1%B1%E7%9A%84%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="orangejuice">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="「CTSC2016」香山的树 (KMP+dp) | orangejuice's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          「CTSC2016」香山的树 (KMP+dp)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2023-08-12 00:12:00" itemprop="dateCreated datePublished" datetime="2023-08-12T00:12:00+08:00">2023-08-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-08-14 19:23:22" itemprop="dateModified" datetime="2023-08-14T19:23:22+08:00">2023-08-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/CP-%E9%A2%98%E8%A7%A3/" itemprop="url" rel="index"><span itemprop="name">CP 题解</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="ctsc2016香山的树-kmpdp">「CTSC2016」香山的树 (KMP+dp)</h1>
+<h3 id="题目大意">题目大意</h3>
+<p>对于所有的串，满足：</p>
+<ol type="1">
+<li>其是本身的最小循环同构。</li>
+<li>其最小循环同构位置唯一。</li>
+</ol>
+<p>给定一个这样的串，求其字典序在所有合法串中的 <span
+class="math inline">\(\text{rank}\)</span>，以及求 <span
+class="math inline">\(\text{rank}=k\)</span> 的串。</p>
+<h3 id="简要分析">简要分析</h3>
+<p>这是一个暴力的做法，有一定优化空间。</p>
+<p>约定 <span class="math inline">\(\Sigma\)</span> 为字符集。</p>
+<p>显然是要枚举答案，求出当前字符串在所有答案中的 <span
+class="math inline">\(\text{rank}\)</span> ，不断增大答案 <span
+class="math inline">\(S\)</span> 的字典序。</p>
+<p>求出字典序 <span class="math inline">\(&gt;S\)</span> 的个数，考虑
+<span class="math inline">\(\text{dp}\)</span> 求解。</p>
+<p>比较大小可以想到要不断进行前缀匹配，因此考虑 <span
+class="math inline">\(\text{kmp}\)</span>。</p>
+<p>因为要 <span class="math inline">\(\text{dp}\)</span>
+的是一个循环同构串，不妨直接扩展为无限循环的串，<span
+class="math inline">\(\text{dp}\)</span> 一个 <strong>最小</strong>
+的循环节。</p>
+<p>不妨先考虑没有字典序限制的简单情形，也就是抛开 <span
+class="math inline">\(\text{kmp}\)</span> 判断字典序，计算长度为 <span
+class="math inline">\(i\)</span> 的方案数。</p>
+<p>对于限制条件 2
+，等价于不存在循环分解，可以对于长度进行有关倍数的容斥，即 <span
+class="math inline">\(g_i=f_i-\sum_{d|i,d&lt;i} g_d\)</span>。</p>
+<p>对于限制条件 <span
+class="math inline">\(1\)</span>，不妨枚举一个无限循环串 <span
+class="math inline">\(S\)</span> 的<strong>最优匹配位置</strong>为 <span
+class="math inline">\(st\)</span>，然后 <span
+class="math inline">\(\text{dp}\)</span> 一个长度为 <span
+class="math inline">\(i\)</span> 的循环节。</p>
+<p>显然要满足的条件是：</p>
+<ol type="1">
+<li><p><span class="math inline">\(\text{dp}\)</span> 了 <span
+class="math inline">\(i\)</span> 个字符之后匹配状态为 <span
+class="math inline">\(st\)</span>。</p></li>
+<li><p>在 <span class="math inline">\(\text{dp}\)</span> 过程中如果
+<span class="math inline">\(\text{kmp}\)</span>
+出现失配，必须满足当前字符更大。</p>
+<p>注意这里的边界情况，当匹配位置恰好等于 <span
+class="math inline">\(|S|\)</span> 时，可能会将恰好为 <span
+class="math inline">\(S\)</span> 的情况算入，因此要特判。</p></li>
+<li><p>中途不能匹配到比 <span class="math inline">\(st\)</span>
+更大的位置。</p></li>
+</ol>
+<p>同样的会出现两种重复计算：</p>
+<ol type="1">
+<li><p>串内出现了循环，即上文提到的容斥。</p></li>
+<li><p>多个不同的开始位置都合法。</p></li>
+</ol>
+<p>由于不存在循环，即每一个循环同构的位置都不同，考虑直接记录匹配过程中恰好为
+<span class="math inline">\(st\)</span> 的次数，在最终方案里除掉。</p>
+<p>由以上思路，定义 <span class="math inline">\(f_{i,j,d}\)</span>
+表示当前 <span class="math inline">\(\text{dp}\)</span> 了 <span
+class="math inline">\(i\)</span> 位，匹配状态为 <span
+class="math inline">\(j\)</span>，中途出现了 <span
+class="math inline">\(d\)</span> 个恰好为 <span
+class="math inline">\(st\)</span> 的匹配位置。</p>
+<p>在求解完所有 <span class="math inline">\(f_{i,j,d}\)</span>
+后，先对于长度倍数进行容斥，由于多了一个维度，容斥时实际上变成了 <span
+class="math inline">\(f_{i,j,d}-f_{i,jk,dk}\)</span> 的形式。随后再除以
+<span class="math inline">\(d\)</span> 算进答案。</p>
+<p>可以得到一个 <span class="math inline">\(O(n^3|\Sigma|)\)</span>
+的暴力 dp，算上枚举起始位置，复杂度为 <span
+class="math inline">\(O(n^4|\Sigma|)\)</span>。</p>
+<p>由于还需要按位二分答案，所以复杂度为 <span
+class="math inline">\(O(n^5|\Sigma|\log
+|\Sigma|)\)</span>，实际可以通过。</p>
+<p>一个小优化：每次二分时，只有 <span
+class="math inline">\(st=|S|\)</span> 或者 <span
+class="math inline">\(st=|S|-1\)</span> 的部分需要重新 <span
+class="math inline">\(dp\)</span> （即 <span
+class="math inline">\(st&lt;|S|-1\)</span> 时 <span
+class="math inline">\(S\)</span> 的变化与 <span
+class="math inline">\(\text{dp}\)</span> 值无关）。</p>
+<p>因此实际复杂度为 <span class="math inline">\(O(n^4|\Sigma|\log
+|\Sigma|)\)</span>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> __int128 ll;</span><br><span class="line"><span class="comment">//本地测试可以改成long long ，并且把下面的U=1e36改为U=1e18</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> rep(i,a,b) for(int i=a,i##end=b;i&lt;=i##end;++i)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> drep(i,a,b) for(int i=a,i##end=b;i&gt;=i##end;--i)</span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> IO;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>=<span class="type">int</span>&gt; T <span class="built_in">rd</span>()&#123;</span><br><span class="line">	T s=<span class="number">0</span>; <span class="type">int</span> f=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(!<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>())) f|=IO==<span class="string">&#x27;-&#x27;</span>;</span><br><span class="line">	<span class="keyword">do</span> s=(s&lt;&lt;<span class="number">1</span>)+(s&lt;&lt;<span class="number">3</span>)+(IO^<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">isdigit</span>(IO=<span class="built_in">getchar</span>()));</span><br><span class="line">	<span class="keyword">return</span> f?-s:s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">52</span>,S=<span class="number">26</span>;</span><br><span class="line"><span class="type">const</span> ll U=<span class="number">1e36</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">chk</span><span class="params">(ll &amp;a)</span></span>&#123; a&gt;U &amp;&amp; (a=U); &#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line">ll k;</span><br><span class="line"><span class="type">char</span> s[N];</span><br><span class="line"><span class="type">int</span> nxt[N],trans[N][S];</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Init_KMP</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">2</span>,m) &#123;</span><br><span class="line">		<span class="type">int</span> j=nxt[i<span class="number">-1</span>];</span><br><span class="line">		<span class="keyword">while</span>(j &amp;&amp; s[i]!=s[j+<span class="number">1</span>]) j=nxt[j];</span><br><span class="line">		<span class="keyword">if</span>(s[i]==s[j+<span class="number">1</span>]) j++;</span><br><span class="line">		nxt[i]=j;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m) &#123;</span><br><span class="line">		<span class="built_in">rep</span>(j,<span class="number">0</span>,S<span class="number">-1</span>) &#123;</span><br><span class="line">			<span class="type">int</span> k=i,f=<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">while</span>(s[k+<span class="number">1</span>]!=j+<span class="string">&#x27;a&#x27;</span>) &#123;</span><br><span class="line">				f&amp;=j+<span class="string">&#x27;a&#x27;</span>&gt;s[k+<span class="number">1</span>];</span><br><span class="line">				<span class="keyword">if</span>(!k) <span class="keyword">break</span>;</span><br><span class="line">				k=nxt[k];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span>(s[k+<span class="number">1</span>]==j+<span class="string">&#x27;a&#x27;</span>) k++;</span><br><span class="line">			trans[i][j]=f?k:<span class="number">-1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ll dp[N][N][N];</span><br><span class="line">ll Ans[N];</span><br><span class="line"></span><br><span class="line"><span class="function">ll <span class="title">Calc</span><span class="params">(<span class="type">int</span> k=<span class="number">0</span>)</span></span>&#123;</span><br><span class="line">	m=<span class="built_in">strlen</span>(s+<span class="number">1</span>),<span class="built_in">Init_KMP</span>();</span><br><span class="line">	ll ans=<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(st,(k?<span class="number">0</span>:m<span class="number">-1</span>),m) &#123;</span><br><span class="line">		Ans[st]=<span class="number">0</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">0</span>,n) <span class="built_in">rep</span>(j,<span class="number">0</span>,st) <span class="built_in">rep</span>(d,<span class="number">0</span>,n) dp[i][j][d]=<span class="number">0</span>;</span><br><span class="line">		dp[<span class="number">0</span>][st][<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">			<span class="built_in">rep</span>(j,<span class="number">0</span>,st) <span class="built_in">rep</span>(d,<span class="number">0</span>,i) <span class="keyword">if</span>(dp[i<span class="number">-1</span>][j][d])&#123; </span><br><span class="line">				<span class="built_in">rep</span>(c,j==m?<span class="number">0</span>:s[j+<span class="number">1</span>]-<span class="string">&#x27;a&#x27;</span>,S<span class="number">-1</span>) <span class="keyword">if</span>(~trans[j][c]) &#123;</span><br><span class="line">					<span class="built_in">chk</span>(dp[i][trans[j][c]][d+(trans[j][c]==st)]+=dp[i<span class="number">-1</span>][j][d]);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">rep</span>(i,<span class="number">1</span>,n) <span class="built_in">rep</span>(d,<span class="number">0</span>,n) <span class="keyword">if</span>(dp[i][st][d]) &#123;</span><br><span class="line">			<span class="keyword">if</span>(dp[i][st][d]==U) <span class="keyword">return</span> U;</span><br><span class="line">			<span class="built_in">rep</span>(j,<span class="number">2</span>,<span class="built_in">min</span>(n/i,n/d)) dp[i*j][st][d*j]-=dp[i][st][d];</span><br><span class="line">			<span class="keyword">if</span>(i&gt;m || st!=m) <span class="built_in">chk</span>(Ans[st]+=dp[i][st][d]/d); <span class="comment">// 特判了恰好为S的情况</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">0</span>,m) <span class="built_in">chk</span>(ans+=Ans[i]);</span><br><span class="line">	<span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123; </span><br><span class="line">	<span class="comment">//freopen(&quot;treelabel.in&quot;,&quot;r&quot;,stdin),freopen(&quot;treelabel.out&quot;,&quot;w&quot;,stdout);</span></span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d%lld%s&quot;</span>,&amp;n,&amp;k,s+<span class="number">1</span>);</span><br><span class="line">	k=<span class="built_in">Calc</span>(<span class="number">1</span>)-k+<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(k&lt;<span class="number">0</span>) <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;-1&quot;</span>),<span class="number">0</span>;</span><br><span class="line">	<span class="built_in">rep</span>(i,<span class="number">1</span>,n) &#123;</span><br><span class="line">		<span class="type">int</span> l=<span class="string">&#x27;a&#x27;</span>,r=<span class="string">&#x27;a&#x27;</span>+S<span class="number">-1</span>,res=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span>(l&lt;=r)&#123;</span><br><span class="line">			<span class="type">int</span> mid=(l+r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">			s[i]=mid,s[i+<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">			<span class="keyword">if</span>(<span class="built_in">Calc</span>()&gt;=k) res=mid,l=mid+<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">else</span> r=mid<span class="number">-1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		s[i]=res,s[i+<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">		<span class="keyword">if</span>(!res || <span class="built_in">Calc</span>()==k) <span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">puts</span>(s+<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/oi-solutions/UOJ/UOJ%20Round#6%20%E6%87%92%E7%99%8C/" rel="prev" title="UOJ Round#6 懒癌">
+                  <i class="fa fa-angle-left"></i> UOJ Round#6 懒癌
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/oi-solutions/CodeForces/CF1540E%20-%20Tasty%20Dishes/" rel="next" title="[CF1540E - Tasty Dishes](https://codeforces.com/problemset/problem/1540/E)">
+                  [CF1540E - Tasty Dishes](https://codeforces.com/problemset/problem/1540/E) <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">orangejuice</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
