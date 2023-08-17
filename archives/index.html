@@ -49,15 +49,23 @@
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
   <script type="text/javascript">
-    const bgc = 10;
+    const bgc = 15;
     const bgu = "/images/bg";
-    function set_bg(index) {
-      document.cookie["bgid"] = index.toString();
-      url = `/images/bg${index}.jpg`;
-      document.body.style=`background-url:${url}`;
+    function getcookie() {
+      // console.log("get", document.cookie);
+      const s = document.cookie;
+      return s.split('; ').find((row)=>row.startsWith("bgid="))?.split("=")[1];
     }
-    var index = parseInt(document.cookie["bgid"]);
-    if(isNaN(index)) index = -1;
+    function set_bg(index) {
+      console.log("set", index);
+      document.cookie = `bgid=${index}; path=/`;
+      // console.log(document.cookie);
+      url = `/images/bg${index}.jpg`;
+      document.body.style=`background-image:url(${url});background-size:cover;background-repeat:no-repeat;background-position:center;background-attachment:fixed;`;
+    }
+    var index = parseInt(getcookie());
+    if(isNaN(index) || index < 0 || index >= bgc) index = -1;
+    window.onload = () => { set_bg(index) };
   </script>
 </head>
 
